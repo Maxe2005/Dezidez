@@ -1,0 +1,5 @@
+En entrée, l'évaluateur reçoit  l'arbre de décomposition donné par l'analyse synthaxique ainsi que la variable float x.
+
+
+
+En sortie, l'évaluateur doit sortir les valeurs calculées de l'expression trouvé avec l'évaluateur
