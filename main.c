@@ -1,4 +1,6 @@
-#include "graphique.h"
+#include "ressources.h"
+#include "menus.h"
+#include "grapheur.h"
 
 int main (int argc, char *argv[]){
     srand(time(NULL));
@@ -6,13 +8,12 @@ int main (int argc, char *argv[]){
     initSDL();
     initTTF();
 
-    SDL_Window* window = createWindow("DEZIDEZ", 800, 700);
+    SDL_Window* window = createWindow("DEZIDEZ", FEN_X, FEN_Y);
     SDL_Renderer* ren = createRenderer(window);
 
     init_font(fonts);
 
-    //ecran_acceuil(ren, musique);
-    SDL_Delay(2000);
+    ecran_acceuil(ren);
 
     QuitSDL(window,ren);
     return 0;
