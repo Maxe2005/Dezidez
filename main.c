@@ -7,6 +7,6 @@
 #include "syntaxe.h"
 
 int main(int argc, char *argv[]){
-    printf("Coucou on est dans la branche syntaxique ! :)\n");
+    printf("Coucou on est dans la branche syntaxique ! :) \n");
     return 0;
 }
