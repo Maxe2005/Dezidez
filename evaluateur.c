@@ -10,6 +10,38 @@
 
 
 
+
+float decodage_arbre(Node *racine){
+    if (racine->jeton.lexem == REEL){
+        return racine->jeton.valeur.reel;
+
+    }
+
+    if (racine->jeton.lexem == OPERATEUR){
+        
+
+    }
+
+    if (racine->jeton.lexem == FONCTION){
+        calculer_fonction(racine->jeton.valeur.fonction,decodage_arbre(racine->pjeton_suiv));
+    }
+
+    else {
+        erreur_evaluateur();
+        return 0;
+        
+
+    }
+
+}
+
+
+
+
+
+
+
+
 erreur_evaluateur(){
     printf('erreur 3');
 }
