@@ -7,12 +7,6 @@
 #define NB_BOUTONS_ACCUEIL 3
 
 /**
- * Début du lancement du jeu
- * @param ren Un pointeur sur une structure contenant l'état du rendu
- */
-void ecran_acceuil (SDL_Renderer* ren);
-
-/**
  * Affiche le titre de la page d'accueil
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  */

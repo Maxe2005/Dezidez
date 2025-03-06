@@ -40,6 +40,9 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
     int button_height = 50;
     int button_width = 300;
     int button_margin_x = 20;
+    SDL_Color color_texte = {255, 255, 255, 255};
+    SDL_Color color_base = {0, 0, 255, 255};
+    SDL_Color color_touch = {255, 0, 0, 255};
     
     Button* but[] = {button_mode_emploi, button_remerciements, button_grapheur};
     char* noms[] = {"Mode d'emploi", "Remerciements", "Grapheur"};
@@ -49,19 +52,23 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
         but[j]->rect.y = (FEN_Y - button_height)/2;
         but[j]->rect.w = button_width;
         but[j]->rect.h = button_height;
+        but[j]->is_survolable = 1;
         but[j]->hovered = 0;
         but[j]->label = noms[j];
+        but[j]->color_text = color_texte;
+        but[j]->color_base = color_base;
+        but[j]->color_hover = color_touch;
+        but[j]->font_text = fonts[1];
+        but[j]->font_text_hover = fonts[2];
+        but[j]->taille_bonus_hover_x = 20;
+        but[j]->taille_bonus_hover_y = 20;
         buttons[j] = but[j];
     }
 }
 
 void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
-    SDL_Color color_texte = {255, 255, 255, 255};
-    SDL_Color color_base = {0, 0, 255, 255};
-    SDL_Color color_touch = {255, 0, 0, 255};
-
     for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
-        renderButton(ren, buttons[i], color_texte, color_base, color_touch);
+        renderButton(ren, buttons[i]);
     }
 }
 
@@ -145,7 +152,10 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
         lignes[i].rect.w = FEN_X - 2*margin_x;
         lignes[i].rect.h = taille_ligne_y;
         lignes[i].label = Text[i];
-        lignes[i].hovered = 0;
+        lignes[i].is_survolable = 0;
+        lignes[i].color_text = (SDL_Color){255, 255, 255, 255};
+        lignes[i].color_base = (SDL_Color){0, 0, 0, 255};
+        lignes[i].font_text = fonts[1];
     }
 
     int scroll_offset = 0; // Décalage vertical du scrolling
@@ -160,7 +170,9 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
         for (int i = 0; i < nb_lignes; i++) {
             SDL_Rect original_rect = lignes[i].rect;
             lignes[i].rect.y -= scroll_offset; // Appliquer le scroll
-            renderButton(ren, &(lignes[i]), (SDL_Color){255, 255, 255, 255}, (SDL_Color){0, 0, 0, 255}, (SDL_Color){0, 0, 0, 255});
+            if (lignes[i].rect.y > HEADER_HEIGHT + BUTTON_MARGIN/2 && lignes[i].rect.y + lignes[i].rect.h/2 < FEN_Y) {
+                renderButton(ren, &(lignes[i]));
+            }
             lignes[i].rect = original_rect; // Rétablir la position originale
         }
         updateDisplay(ren);
