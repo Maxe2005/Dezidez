@@ -1,6 +1,6 @@
 #include "entrees_expressions.h"
 
-void init_placement_entrees (Bande_entrees* bande_entrees, Button* entrees[NB_ENTREES], Colors* colors){
+void init_placement_entrees (Bande_entrees* bande_entrees, Entree_texte* entrees[NB_ENTREES], Colors* colors){
     int width_entrees_bornes = 100;
     int width_entree_expression = 300;
     int height_entrees = 50;
@@ -31,36 +31,39 @@ void init_placement_entrees (Bande_entrees* bande_entrees, Button* entrees[NB_EN
     }
 
     // Les champs d'entrées
-    bande_entrees->borne_inf.champs_texte = malloc(sizeof(Button));
-    bande_entrees->borne_sup.champs_texte = malloc(sizeof(Button));
-    bande_entrees->expression.champs_texte = malloc(sizeof(Button));
-    Button* but_2[] = {bande_entrees->borne_inf.champs_texte, bande_entrees->borne_sup.champs_texte, bande_entrees->expression.champs_texte};
+    bande_entrees->borne_inf = malloc(sizeof(Entree_texte));
+    bande_entrees->borne_sup = malloc(sizeof(Entree_texte));
+    bande_entrees->expression = malloc(sizeof(Entree_texte));
+    // ! L'ordre des Entree_texte est important pour l'initialisation des champs d'entrées, il doit correspondre à celui de l'enum SelectionEntree
+    Entree_texte* but_2[] = {bande_entrees->borne_inf, bande_entrees->borne_sup, bande_entrees->expression};
+    SelectionEntree type[] = {BORNE_INF, BORNE_SUP, EXPRESSION};
     for (int j = 0; j < 3; j++){
+        but_2[j]->champs_texte = malloc(sizeof(Button));
+        but_2[j]->type_entree = type[j];
         if (j == 2) {
-            but_2[j]->rect.w = width_entree_expression;
+            but_2[j]->champs_texte->rect.w = width_entree_expression;
         } else {
-            but_2[j]->rect.w = width_entrees_bornes;
+            but_2[j]->champs_texte->rect.w = width_entrees_bornes;
         }
-        but_2[j]->rect.h = height_entrees;
-        but_2[j]->rect.x = marge_entree_gauche + j*(width_entrees_bornes + espace_entre_entrees);
-        but_2[j]->rect.y = (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but_2[j]->rect.h)/2 ;
-        but_2[j]->is_survolable = 1;
-        but_2[j]->hovered = 0;
-        but_2[j]->color_text = colors->texte_champ_entree;
-        but_2[j]->color_base = colors->bg_champ_entree;
-        but_2[j]->color_hover = colors->bg_champ_entree_hover;
-        but_2[j]->font_text = fonts[1];
-        but_2[j]->font_text_hover = fonts[2];
-        but_2[j]->taille_bonus_hover_x = 0;
-        but_2[j]->taille_bonus_hover_y = 0;
+        but_2[j]->champs_texte->rect.h = height_entrees;
+        but_2[j]->champs_texte->rect.x = marge_entree_gauche + j*(width_entrees_bornes + espace_entre_entrees);
+        but_2[j]->champs_texte->rect.y = (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but_2[j]->champs_texte->rect.h)/2 ;
+        but_2[j]->champs_texte->is_survolable = 1;
+        but_2[j]->champs_texte->hovered = 0;
+        but_2[j]->champs_texte->color_text = colors->texte_champ_entree;
+        but_2[j]->champs_texte->color_base = colors->bg_champ_entree;
+        but_2[j]->champs_texte->color_hover = colors->bg_champ_entree_hover;
+        but_2[j]->champs_texte->font_text = fonts[1];
+        but_2[j]->champs_texte->font_text_hover = fonts[2];
+        but_2[j]->champs_texte->taille_bonus_hover_x = 0;
+        but_2[j]->champs_texte->taille_bonus_hover_y = 0;
+        but_2[j]->cursorVisible = 0;
+        but_2[j]->position_cursor = 0;
+        but_2[j]->lastCursorToggle = SDL_GetTicks();
+        strcpy(but_2[j]->text, "");
+        entrees[j] = malloc(sizeof(Entree_texte));
         entrees[j] = but_2[j];
     }
-    bande_entrees->borne_inf.cursorVisible = 0;
-    strcpy(bande_entrees->borne_inf.text, " ");
-    bande_entrees->borne_sup.cursorVisible = 0;
-    strcpy(bande_entrees->borne_sup.text, " ");
-    bande_entrees->expression.cursorVisible = 0;
-    strcpy(bande_entrees->expression.text, " ");
 
 }
 
@@ -68,80 +71,137 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     bande_entrees->entree_selectionnee = SELECTION_NULL;
     init_placement_entrees(bande_entrees, bande_entrees->champs_entrees, colors);
 }
-/*
-void handle_events_entrees_experssions(SDL_Event event, Session_modif_map* session, Musique* musique) {
+
+int is_souris_sur_button (Button button, int x_souris_px, int y_souris_px){
+    return x_souris_px >= button.rect.x && x_souris_px <= button.rect.x + button.rect.w &&
+                    y_souris_px >= button.rect.y && y_souris_px <= button.rect.y + button.rect.h;
+}
+
+void insert_char(char text[], int i, char c) {
+    int len = strlen(text);
+    
+    // Vérifier que l'index est valide et qu'on peut insérer un caractère
+    if (i < 0 || i > len) {
+        printf("Insertion impossible\n");
+        return;
+    }
+
+    // Décaler les caractères vers la droite
+    for (int j = len; j >= i; j--) {
+        text[j + 1] = text[j];
+    }
+
+    // Insérer le caractère c
+    text[i] = c;
+}
+
+void remove_char(char text[], int i) {
+    int len = strlen(text);
+
+    // Vérifier que l'index est valide
+    if (i < 0 || i >= len) {
+        printf("Suppression impossible\n");
+        return;
+    }
+
+    // Décaler les caractères vers la gauche
+    for (int j = i; j < len; j++) {
+        text[j] = text[j + 1];
+    }
+}
+
+int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entrees) {
     if (event.type == SDL_MOUSEMOTION) {
-        session->x_souris_px = event.motion.x;
-        session->y_souris_px = event.motion.y;
+        bande_entrees->x_souris_px = event.motion.x;
+        bande_entrees->y_souris_px = event.motion.y;
 
         // Souris sur un bouton ?
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->annuler, session->x_souris_px, session->y_souris_px)) {
-            session->sous_menu_modif_taille_map->annuler->hovered = 1;
-        } else {
-            session->sous_menu_modif_taille_map->annuler->hovered = 0;
-        }
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->valider, session->x_souris_px, session->y_souris_px)) {
-            session->sous_menu_modif_taille_map->valider->hovered = 1;
-        } else {
-            session->sous_menu_modif_taille_map->valider->hovered = 0;
+        for (int i = 0; i < NB_ENTREES; i++) {
+            if (is_souris_sur_button(*bande_entrees->champs_entrees[i]->champs_texte, bande_entrees->x_souris_px, bande_entrees->y_souris_px)) {
+                bande_entrees->champs_entrees[i]->champs_texte->hovered = 1;
+            } else {
+                bande_entrees->champs_entrees[i]->champs_texte->hovered = 0;
+            }
         }
     }
 
     if (event.type == SDL_MOUSEBUTTONUP) {
         // Vérifier si on clique sur un champ
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->entree_width, session->x_souris_px, session->y_souris_px)) {
-            session->sous_menu_modif_taille_map->is_typing_width = 1;
-            session->sous_menu_modif_taille_map->cursorVisible = 1;
-            session->sous_menu_modif_taille_map->lastCursorToggle = SDL_GetTicks();
+        int au_moins_un_champs_selectionne = 0;
+        for (int i = 0; i < NB_ENTREES; i++) {
+            if (is_souris_sur_button(*bande_entrees->champs_entrees[i]->champs_texte, bande_entrees->x_souris_px, bande_entrees->y_souris_px)) {
+                bande_entrees->entree_selectionnee = bande_entrees->champs_entrees[i]->type_entree;
+                bande_entrees->champs_entrees[i]->cursorVisible = 1;
+                bande_entrees->champs_entrees[i]->lastCursorToggle = SDL_GetTicks();
+                au_moins_un_champs_selectionne = 1;
+            }
         }
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->entree_height, session->x_souris_px, session->y_souris_px)) {
-            session->sous_menu_modif_taille_map->is_typing_width = 0;
-            session->sous_menu_modif_taille_map->cursorVisible = 1;
-            session->sous_menu_modif_taille_map->lastCursorToggle = SDL_GetTicks();
-        }
-
-        // Vérifier si on clique sur "Valider"
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->valider, session->x_souris_px, session->y_souris_px)) {
-            valider_modif_taille_map(session, musique);
-        }
-
-        // Vérifier si on clique sur "Annuler"
-        if (is_souris_sur_button(*session->sous_menu_modif_taille_map->annuler, session->x_souris_px, session->y_souris_px)) {
-            playSoundEffect(musique->select);
-            session->is_modif_taille_map = 0;
-            SDL_StopTextInput();
+        if (!au_moins_un_champs_selectionne) {
+            bande_entrees->entree_selectionnee = SELECTION_NULL;
         }
     }
 
     if (event.type == SDL_TEXTINPUT) {
-        char *target = session->sous_menu_modif_taille_map->is_typing_width ? session->sous_menu_modif_taille_map->width_text : session->sous_menu_modif_taille_map->height_text;
-        if (strlen(target) < MAX_NB_LENGTH && isdigit(event.text.text[0])) {
-            strcat(target, event.text.text);
+        if (bande_entrees->entree_selectionnee != SELECTION_NULL){
+            Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+            if (bande_entrees->entree_selectionnee < 2) {
+                if (strlen(target->text) < MAX_LEN_ENTREES_BORNES && isdigit(event.text.text[0])) {
+                    insert_char(target->text, target->position_cursor++, event.text.text[0]);
+                }
+            } else
+            if (strlen(target->text) < MAX_LEN_STR) {
+                insert_char(target->text, target->position_cursor++, event.text.text[0]);
+            }
         }
     }
 
     if (event.type == SDL_KEYDOWN) {
-        if (event.key.keysym.sym == SDLK_BACKSPACE) {
-            char *target = session->sous_menu_modif_taille_map->is_typing_width ? session->sous_menu_modif_taille_map->width_text : session->sous_menu_modif_taille_map->height_text;
-            if (strlen(target) > 0) {
-                target[strlen(target) - 1] = '\0';
+        if (bande_entrees->entree_selectionnee != SELECTION_NULL){
+            if (event.key.keysym.sym == SDLK_BACKSPACE) {
+                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                if (strlen(target->text) > 0 && target->position_cursor > 0) {
+                    remove_char(target->text, --target->position_cursor);
+                }
+            }
+
+            if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_UP) {
+                if (event.key.keysym.sym == SDLK_DOWN) {
+                    bande_entrees->entree_selectionnee = (bande_entrees->entree_selectionnee - 1 + NB_ENTREES) % NB_ENTREES;
+                } else {
+                    bande_entrees->entree_selectionnee = (bande_entrees->entree_selectionnee + 1) % NB_ENTREES;
+                }
+                for (int i = 0; i < NB_ENTREES; i++) {
+                    bande_entrees->champs_entrees[i]->cursorVisible = 0;
+                }
+                bande_entrees->champs_entrees[bande_entrees->entree_selectionnee]->cursorVisible = 1;
+                bande_entrees->champs_entrees[bande_entrees->entree_selectionnee]->lastCursorToggle = SDL_GetTicks();
+            }
+
+            if (event.key.keysym.sym == SDLK_RIGHT){
+                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                if (target->position_cursor < strlen(target->text)) {
+                    target->position_cursor++;
+                }
+            }
+            if (event.key.keysym.sym == SDLK_LEFT){
+                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                if (target->position_cursor > 0) {
+                    target->position_cursor--;
+                }
             }
         }
     }
 
     if (event.type == SDL_KEYUP) {
-        if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_UP) {
-            session->sous_menu_modif_taille_map->is_typing_width = !session->sous_menu_modif_taille_map->is_typing_width;
-            session->sous_menu_modif_taille_map->cursorVisible = 1;
-            session->sous_menu_modif_taille_map->lastCursorToggle = SDL_GetTicks();
-        }
         if (event.key.keysym.sym == SDLK_RETURN) {
-            valider_modif_taille_map(session, musique);
+            //valider_modif_taille_map(session, musique);
         }
     }
+    
+    return bande_entrees->entree_selectionnee == SELECTION_NULL;
 }
-
-void valider_modif_taille_map(Session_modif_map* session, Musique* musique) {
+/*
+void valider_modif_taille_map(Session_modif_map* session) {
     int width = atoi(session->sous_menu_modif_taille_map->width_text);
     int height = atoi(session->sous_menu_modif_taille_map->height_text);
     if (width >= TAILLE_MIN_MAP && width <= TAILLE_MAX_MAP && height >= TAILLE_MIN_MAP && height <= TAILLE_MAX_MAP) {
@@ -192,23 +252,28 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
     SDL_SetRenderDrawColor(ren, colors->bande_haute_description.r, colors->bande_haute_description.g, colors->bande_haute_description.b, colors->bande_haute_description.a);
     SDL_Rect bande_haut_textes_descriptifs = {0, 0, FEN_X, TAILLE_BANDE_DESCRIPTIONS};
     SDL_RenderFillRect(ren, &bande_haut_textes_descriptifs);
-    /*
-    if (SDL_GetTicks() - session->sous_menu_modif_taille_map->lastCursorToggle >= CURSOR_BLINK_TIME) {
-        session->sous_menu_modif_taille_map->cursorVisible = !session->sous_menu_modif_taille_map->cursorVisible;
-        session->sous_menu_modif_taille_map->lastCursorToggle = SDL_GetTicks();
-    }*/
+
     // Texte affiché (ajoute un curseur clignotant)
-    snprintf(bande_entrees->borne_inf.display, sizeof(bande_entrees->borne_inf.display), "%s%s", bande_entrees->borne_inf.text, (bande_entrees->entree_selectionnee == BORNE_INF && bande_entrees->borne_inf.cursorVisible) ? "|" : " ");
-    snprintf(bande_entrees->borne_sup.display, sizeof(bande_entrees->borne_sup.display), "%s%s", bande_entrees->borne_sup.text, (bande_entrees->entree_selectionnee == BORNE_SUP && bande_entrees->borne_sup.cursorVisible) ? "|" : " ");
-    snprintf(bande_entrees->expression.display, sizeof(bande_entrees->expression.display), "%s%s", bande_entrees->expression.text, (bande_entrees->entree_selectionnee == EXPRESSION && bande_entrees->expression.cursorVisible) ? "|" : " ");
-    // Afficher les champs d'entrées
-    bande_entrees->borne_inf.champs_texte->label = bande_entrees->borne_inf.display;
-    bande_entrees->borne_sup.champs_texte->label = bande_entrees->borne_sup.display;
-    bande_entrees->expression.champs_texte->label = bande_entrees->expression.display;
-    renderButton(ren, bande_entrees->borne_inf.champs_texte);
-    renderButton(ren, bande_entrees->borne_sup.champs_texte);
-    renderButton(ren, bande_entrees->expression.champs_texte);
-    
+    const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
+    Entree_texte *target_champs = NULL;
+    for (int i = 0; i < NB_ENTREES; i++) {
+        target_champs = bande_entrees->champs_entrees[i];
+        if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
+            target_champs->cursorVisible = !target_champs->cursorVisible;
+            target_champs->lastCursorToggle = SDL_GetTicks();
+        }
+        if (i != bande_entrees->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
+            target_champs->champs_texte->label = texte_defaut[i];
+        } else {
+            strcpy(target_champs->display, target_champs->text);
+            if (bande_entrees->entree_selectionnee == target_champs->type_entree && target_champs->cursorVisible){
+                insert_char(target_champs->display, target_champs->position_cursor, '|');
+            } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+            target_champs->champs_texte->label = target_champs->display;
+        }
+        renderButton(ren, target_champs->champs_texte);
+    }
+
     // Afficher les textes descriptifs
     renderButton(ren, bande_entrees->texte_descriptif_borne_inf);
     renderButton(ren, bande_entrees->texte_descriptif_borne_sup);

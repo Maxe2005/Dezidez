@@ -28,17 +28,21 @@ void resize_graph (Graph* graph){
 
 void affiche_quadrillage (SDL_Renderer* ren, Graph* graph){
     SDL_SetRenderDrawColor(ren, 50, 50, 50, 255);
-    for (int i = 0; i<=graph->nb_grad_x; i++) {
-        SDL_RenderDrawLine(ren, graph->origine_x + graph->taille_grad_x*i, graph->origine_y, graph->origine_x + graph->taille_grad_x*i, graph->origine_y + graph->nb_grad_y*graph->taille_grad_y);
+    int nb_trait_x = graph->nb_grad_x + 2*(graph->origine_x / (int)graph->taille_grad_x);
+    int nb_trait_y = graph->nb_grad_y + 2*(graph->origine_y / (int)graph->taille_grad_y);
+    int marge_x = graph->origine_x % (int)graph->taille_grad_x;
+    int marge_y = (graph->origine_y - TAILLE_BANDE_HAUT) % (int)graph->taille_grad_y;
+    for (int i = 0; i<=nb_trait_x; i++) {
+        SDL_RenderDrawLine(ren, marge_x + graph->taille_grad_x*i, TAILLE_BANDE_HAUT, marge_x + graph->taille_grad_x*i, FEN_Y);
     }
-    for (int i = 0; i<=graph->nb_grad_y; i++) {
-        SDL_RenderDrawLine(ren, graph->origine_x, graph->origine_y + graph->taille_grad_y*i, graph->origine_x + graph->taille_grad_x*graph->nb_grad_x, graph->origine_y + graph->taille_grad_y*i);
+    for (int i = 0; i<=nb_trait_y; i++) {
+        SDL_RenderDrawLine(ren, 0, TAILLE_BANDE_HAUT + marge_y + graph->taille_grad_y*i, FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT + marge_y + graph->taille_grad_y*i);
     }
 }
 
 Graph init_graph (){
     Graph graph;
-    graph.nb_grad_x = 10;
+    graph.nb_grad_x = 20;
     graph.nb_grad_y = 10;
     graph.min_x = -5;
     graph.max_x = 5;
@@ -61,7 +65,7 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     else if (graph->min_y <= 0 && graph->max_y >= 0) {
         y_axis_pos = graph->origine_y + graph->y - (int)((0 - graph->min_y) / graph->echelle_grad_y) * graph->taille_grad_y;
     }
-    SDL_RenderDrawLine(ren, graph->origine_x, y_axis_pos, graph->origine_x + graph->x, y_axis_pos);
+    SDL_RenderDrawLine(ren, 0, y_axis_pos, FEN_X - TAILLE_BANDE_DROITE, y_axis_pos);
 
     // Axe des ordonnées
     int x_axis_pos = graph->origine_x;
@@ -71,7 +75,7 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     else if (graph->min_x <= 0 && graph->max_x >= 0) {
         x_axis_pos = graph->origine_x + (int)((0 - graph->min_x) / graph->echelle_grad_x) * graph->taille_grad_x;
     }
-    SDL_RenderDrawLine(ren, x_axis_pos, graph->origine_y, x_axis_pos, graph->origine_y + graph->y);
+    SDL_RenderDrawLine(ren, x_axis_pos, TAILLE_BANDE_HAUT, x_axis_pos, FEN_Y);
 
     // Déterminer la taille du texte en fonction de la taille du graphique
     int text_size = (graph->taille_grad_x < 20 || graph->taille_grad_y < 20) ? 10 : 12;
@@ -86,13 +90,14 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     // Déterminer la précision des valeurs des graduations
     int precision_x = 0;
     int precision_y = 0;
-    for (int i = 2; i >= 0; i--) {
+    int presision = 10;
+    for (int i = presision; i >= 0; i--) {
         if (graph->echelle_grad_x < pow(10, 0-i)) {
             precision_x = i+1;
             break;
         }
     }
-    for (int i = 2; i > 0; i--) {
+    for (int i = presision; i > 0; i--) {
         if (graph->echelle_grad_y < pow(10, 0-i)) {
             precision_y = i+1;
             break;
@@ -153,7 +158,7 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     affiche_quadrillage(ren, graph);
     affiche_axes_graph(ren, graph, colors->axes);
 
-    SDL_Rect bande_laterale_gauche = {FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT, FEN_X, FEN_Y};
+    SDL_Rect bande_laterale_gauche = {FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT, TAILLE_BANDE_DROITE, FEN_Y - TAILLE_BANDE_HAUT};
     SDL_SetRenderDrawColor(ren, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
     SDL_RenderFillRect(ren, &bande_laterale_gauche);
 
@@ -172,6 +177,7 @@ void Grapheur (SDL_Renderer* ren){
 
 
     SDL_StartTextInput();
+    int is_event_backspace = 1;
     int running = 1;
     SDL_Event event;
     time_t current_time;
@@ -184,8 +190,10 @@ void Grapheur (SDL_Renderer* ren){
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) running = 0;
 
+            is_event_backspace = handle_events_entrees_experssions(event, bande_entrees);
+
             if (event.type == SDL_KEYUP) {
-                if (event.key.keysym.sym == SDLK_BACKSPACE){
+                if (is_event_backspace && event.key.keysym.sym == SDLK_BACKSPACE){
                     ecran_acceuil(ren);
                     running = 0;
                 }

@@ -5,6 +5,8 @@
 #include "entrees_expressions.h"
 
 #define TAILLE_BANDE_DROITE 100
+#define NB_GRAD_MIN 5
+#define NB_GRAD_MAX 20
 
 typedef struct {
     Button button_base;

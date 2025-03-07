@@ -17,8 +17,8 @@ void renderButton(SDL_Renderer *renderer, Button *button) {
         SDL_Color color = button->hovered ? button->color_hover : button->color_base;
         SDL_Rect tmp_rect;
         if (button->hovered) {
-            int taille_bonus_x = 20;
-            int taille_bonus_y = 20;
+            int taille_bonus_x = button->taille_bonus_hover_x;
+            int taille_bonus_y = button->taille_bonus_hover_y;
             tmp_rect.w = button->rect.w + taille_bonus_x;
             tmp_rect.h = button->rect.h + taille_bonus_y;
             tmp_rect.x = button->rect.x - taille_bonus_x/2;
