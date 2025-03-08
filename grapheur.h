@@ -18,22 +18,24 @@ typedef struct {
 } Message;
 
 typedef struct {
-    int nb_grad_x; // Nombre de graduations en x
-    int nb_grad_y; // Nombre de graduations en y
-    float taille_grad_x; // Taille en pixels d'une graduation en x (espacement entre les graduations)
-    float taille_grad_y; // Taille en pixels d'une graduation en y (espacement entre les graduations)
-    float echelle_grad_x; // Echelle de graduation en x (ex: une grad tout les 0.1, 1 ou 10)
-    float echelle_grad_y; // Echelle de graduation en y (ex: une grad tout les 0.1, 1 ou 10)
+    int precision; // Précision des graduations (nombre de chiffres après la virgule)
+    int nb_grad; // Nombre de graduations
+    float taille_grad; // Taille en pixels d'une graduation (espacement entre les graduations)
+    float echelle_grad; // Echelle de graduation (ex: une grad tout les 0.1, 1 ou 10)
+    float min; // Valeur minimale visible
+    float max; // Valeur maximale visible
+    int skip_graduation; // Il faut écrire la valeur de la graduation tout les <skip_graduation> graduations
+    int grad_text_size;
+    TTF_Font* font_texte_grad;
+} Axe;
+
+typedef struct {
+    Axe* axe_x;
+    Axe* axe_y;
     float x; // Largeur du graph en pixels
     float y; // Hauteur du graph en pixels
     int origine_x; // Origine en x
     int origine_y; // Origine en y
-    float min_x; // Valeur minimale en x
-    float max_x; // Valeur maximale en x
-    float min_y; // Valeur minimale en y
-    float max_y; // Valeur maximale en y
-    int grad_text_size;
-    TTF_Font* font_texte_grad;
 } Graph;
 
 

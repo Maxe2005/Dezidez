@@ -5,52 +5,75 @@ float f (float x) {
 }
 
 void resize_graph (Graph* graph){
-    if (graph->nb_grad_x < 1) graph->nb_grad_x = 1;
-    if (graph->nb_grad_y < 1) graph->nb_grad_y = 1;
-    if (graph->min_x >= graph->max_x) graph->max_x = graph->min_x + 1;
-    if (graph->min_y == graph->max_y) graph->max_y = graph->min_y + 1;
-
     int marge = 0; 
     if (FEN_X - TAILLE_BANDE_DROITE < FEN_Y - TAILLE_BANDE_HAUT) {
         marge = (int)((FEN_X - TAILLE_BANDE_DROITE) / 15);
     } else {
         marge = (int)((FEN_Y - TAILLE_BANDE_HAUT) / 15);
     }
+    int presision_max = 10;
+    int text_size;
     graph->origine_x = marge;
     graph->origine_y = TAILLE_BANDE_HAUT + marge;
     graph->x = FEN_X-TAILLE_BANDE_DROITE - 2*marge;
     graph->y = FEN_Y - 2*marge - TAILLE_BANDE_HAUT;
-    graph->taille_grad_x = graph->x / graph->nb_grad_x;
-    graph->taille_grad_y = graph->y / graph->nb_grad_y;
-    graph->echelle_grad_x = (graph->max_x - graph->min_x) / graph->nb_grad_x;
-    graph->echelle_grad_y = (graph->max_y - graph->min_y) / graph->nb_grad_y;
+    Axe* axes[] = {graph->axe_x, graph->axe_y};
+    int taille[] = {graph->x, graph->y};
+    for (int i = 0; i < 2; i++) {
+        if (axes[i]->nb_grad < 1) axes[i]->nb_grad = 1;
+        if (axes[i]->min >= axes[i]->max) axes[i]->max = axes[i]->min + 1;
+        axes[i]->taille_grad = taille[i] / axes[i]->nb_grad;
+        axes[i]->echelle_grad = (axes[i]->max - axes[i]->min) / axes[i]->nb_grad;
+        // Précision des graduations (nombre de chiffres après la virgule)
+        axes[i]->precision = 0;
+        for (int i = presision_max; i >= 0; i--) {
+            if (axes[i]->echelle_grad < pow(10, 0-i)) {
+                axes[i]->precision = i+1;
+                break;
+            }
+        }
+        // Déterminer la taille du texte en fonction de la taille du graphique
+        text_size = (axes[i]->taille_grad < 20) ? 10 : 12;
+        if (axes[i]->grad_text_size != text_size) {
+            axes[i]->grad_text_size = text_size;
+            if (axes[i]->font_texte_grad != NULL) TTF_CloseFont(axes[i]->font_texte_grad);
+            axes[i]->font_texte_grad = createFont("Ressources/DejaVuSans-Bold.ttf", text_size);
+        }
+        axes[i]->skip_graduation = (axes[i]->taille_grad < 20) ? 2 : 1;
+    }
 }
 
 void affiche_quadrillage (SDL_Renderer* ren, Graph* graph){
     SDL_SetRenderDrawColor(ren, 50, 50, 50, 255);
-    int nb_trait_x = graph->nb_grad_x + 2*(graph->origine_x / (int)graph->taille_grad_x);
-    int nb_trait_y = graph->nb_grad_y + 2*(graph->origine_y / (int)graph->taille_grad_y);
-    int marge_x = graph->origine_x % (int)graph->taille_grad_x;
-    int marge_y = (graph->origine_y - TAILLE_BANDE_HAUT) % (int)graph->taille_grad_y;
+    int nb_trait_x = graph->axe_x->nb_grad + 2*(graph->origine_x / (int)graph->axe_x->taille_grad);
+    int nb_trait_y = graph->axe_y->nb_grad + 2*(graph->origine_y / (int)graph->axe_y->taille_grad);
+    int marge_x = graph->origine_x % (int)graph->axe_x->taille_grad;
+    int marge_y = (graph->origine_y - TAILLE_BANDE_HAUT) % (int)graph->axe_y->taille_grad;
     for (int i = 0; i<=nb_trait_x; i++) {
-        SDL_RenderDrawLine(ren, marge_x + graph->taille_grad_x*i, TAILLE_BANDE_HAUT, marge_x + graph->taille_grad_x*i, FEN_Y);
+        SDL_RenderDrawLine(ren, marge_x + graph->axe_x->taille_grad*i, TAILLE_BANDE_HAUT, marge_x + graph->axe_x->taille_grad*i, FEN_Y);
     }
     for (int i = 0; i<=nb_trait_y; i++) {
-        SDL_RenderDrawLine(ren, 0, TAILLE_BANDE_HAUT + marge_y + graph->taille_grad_y*i, FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT + marge_y + graph->taille_grad_y*i);
+        SDL_RenderDrawLine(ren, 0, TAILLE_BANDE_HAUT + marge_y + graph->axe_y->taille_grad*i, FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT + marge_y + graph->axe_y->taille_grad*i);
     }
 }
 
 Graph init_graph (){
     Graph graph;
-    graph.nb_grad_x = 20;
-    graph.nb_grad_y = 10;
-    graph.min_x = -5;
-    graph.max_x = 5;
-    graph.min_y = -5;
-    graph.max_y = 5;
+    // Axe x
+    graph.axe_x = malloc(sizeof(Axe));
+    graph.axe_x->nb_grad = 10;
+    graph.axe_x->min = -5;
+    graph.axe_x->max = 5;
+    graph.axe_x->font_texte_grad = NULL;
+
+    // Axe y
+    graph.axe_y = malloc(sizeof(Axe));
+    graph.axe_y->nb_grad = 10;
+    graph.axe_y->min = -5;
+    graph.axe_y->max = 5;
+    graph.axe_y->font_texte_grad = NULL;
+
     resize_graph(&graph);
-    graph.font_texte_grad = NULL;
-    graph.grad_text_size = 0;
     return graph;
 }
 
@@ -59,74 +82,47 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
 
     // Axe des abscisses
     int y_axis_pos = graph->origine_y + graph->y;
-    if (graph->max_y <= 0) {
+    if (graph->axe_y->max <= 0) {
         y_axis_pos = graph->origine_y;
     }
-    else if (graph->min_y <= 0 && graph->max_y >= 0) {
-        y_axis_pos = graph->origine_y + graph->y - (int)((0 - graph->min_y) / graph->echelle_grad_y) * graph->taille_grad_y;
+    else if (graph->axe_y->min <= 0 && graph->axe_y->max >= 0) {
+        y_axis_pos = graph->origine_y + graph->y - (int)((0 - graph->axe_y->min) / graph->axe_y->echelle_grad) * graph->axe_y->taille_grad;
     }
     SDL_RenderDrawLine(ren, 0, y_axis_pos, FEN_X - TAILLE_BANDE_DROITE, y_axis_pos);
 
     // Axe des ordonnées
     int x_axis_pos = graph->origine_x;
-    if (graph->max_x <= 0) {
+    if (graph->axe_x->max <= 0) {
         x_axis_pos = graph->origine_x + graph->x;
     }
-    else if (graph->min_x <= 0 && graph->max_x >= 0) {
-        x_axis_pos = graph->origine_x + (int)((0 - graph->min_x) / graph->echelle_grad_x) * graph->taille_grad_x;
+    else if (graph->axe_x->min <= 0 && graph->axe_x->max >= 0) {
+        x_axis_pos = graph->origine_x + (int)((0 - graph->axe_x->min) / graph->axe_x->echelle_grad) * graph->axe_x->taille_grad;
     }
     SDL_RenderDrawLine(ren, x_axis_pos, TAILLE_BANDE_HAUT, x_axis_pos, FEN_Y);
 
-    // Déterminer la taille du texte en fonction de la taille du graphique
-    int text_size = (graph->taille_grad_x < 20 || graph->taille_grad_y < 20) ? 10 : 12;
-    if (graph->grad_text_size != text_size) {
-        graph->grad_text_size = text_size;
-        if (graph->font_texte_grad != NULL) TTF_CloseFont(graph->font_texte_grad);
-        graph->font_texte_grad = createFont("Ressources/DejaVuSans-Bold.ttf", text_size);
-    }
-    int skip_graduation_x = (graph->taille_grad_x < 20) ? 2 : 1;
-    int skip_graduation_y = (graph->taille_grad_y < 20) ? 2 : 1;
-
-    // Déterminer la précision des valeurs des graduations
-    int precision_x = 0;
-    int precision_y = 0;
-    int presision = 10;
-    for (int i = presision; i >= 0; i--) {
-        if (graph->echelle_grad_x < pow(10, 0-i)) {
-            precision_x = i+1;
-            break;
-        }
-    }
-    for (int i = presision; i > 0; i--) {
-        if (graph->echelle_grad_y < pow(10, 0-i)) {
-            precision_y = i+1;
-            break;
-        }
-    }
-
     // Traits perpendiculaires et valeurs des graduations en x
-    for (int i = 0; i <= graph->nb_grad_x; i++) {
-        if (i % skip_graduation_x == 0) {
-            int x = graph->origine_x + i * graph->taille_grad_x;
+    for (int i = 0; i <= graph->axe_x->nb_grad; i++) {
+        if (i % graph->axe_x->skip_graduation == 0) {
+            int x = graph->origine_x + i * graph->axe_x->taille_grad;
             if (x_axis_pos != x) {
                 SDL_RenderDrawLine(ren, x, y_axis_pos - 5, x, y_axis_pos + 5);
                 // Afficher les valeurs des graduations en x
                 char label[10];
-                snprintf(label, 10, "%.*f", precision_x, graph->min_x + i * graph->echelle_grad_x);
-                renderText(ren, (const char*)label, x, y_axis_pos + 2*text_size, color_axes, graph->font_texte_grad);
+                snprintf(label, 10, "%.*f", graph->axe_x->precision, graph->axe_x->min + i * graph->axe_x->echelle_grad);
+                renderText(ren, (const char*)label, x, y_axis_pos + 2*graph->axe_x->grad_text_size, color_axes, graph->axe_x->font_texte_grad);
             }
         }
     }
-    // Traits perpendiculaires et valeurs des graduations en y
-    for (int i = 0; i <= graph->nb_grad_y; i++) {
-        if (i % skip_graduation_y == 0) {
-            int y = graph->origine_y + i * graph->taille_grad_y;
+
+    for (int i = 0; i <= graph->axe_y->nb_grad; i++) {
+        if (i % graph->axe_y->skip_graduation == 0) {
+            int y = graph->origine_y + i * graph->axe_y->taille_grad;
             if (y_axis_pos != y) {
                 SDL_RenderDrawLine(ren, x_axis_pos - 5, y, x_axis_pos + 5, y);
                 // Afficher les valeurs des graduations en y
                 char label[10];
-                snprintf(label, 10, "%.*f", precision_y, graph->max_y - i * graph->echelle_grad_y);
-                renderText(ren, (const char*)label, x_axis_pos - (precision_y + 1)*text_size*2, y, color_axes, graph->font_texte_grad);
+                snprintf(label, 10, "%.*f", graph->axe_y->precision, graph->axe_y->max - i * graph->axe_y->echelle_grad);
+                renderText(ren, (const char*)label, x_axis_pos - (graph->axe_y->precision + 1)*2*graph->axe_x->grad_text_size, y, color_axes, graph->axe_y->font_texte_grad);
             }
         }
     }
@@ -202,5 +198,6 @@ void Grapheur (SDL_Renderer* ren){
         updateDisplay(ren);
     }
     free(graph);
+    free(colors);
     SDL_StopTextInput();
 }
