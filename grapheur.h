@@ -29,6 +29,8 @@ typedef struct {
     TTF_Font* font_texte_grad;
 } Axe;
 
+
+
 typedef struct {
     Axe* axe_x;
     Axe* axe_y;
@@ -66,10 +68,11 @@ void resize_graph (Graph* graph);
 void affiche_quadrillage (SDL_Renderer* ren, Graph* graph);
 
 /**
- * Initialise un graphique avec des valeurs par défaut
+ * Initialise un graphique avec des valeurs par défaut, centré autour le la fonction par défaut
+ * @param fonction_defaut La fonction par défaut sur laquelle sera centrée le graphique
  * @return Le graphique initialisé
  */
-Graph init_graph ();
+Graph init_graph (Fonction* fonction_defaut);
 
 /**
  * Affiche les axes du graphique avec les graduations
@@ -91,5 +94,28 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
  * @param color_mode Le mode de couleur à appliquer
  */
 void change_color_mode (Colors* colors, int color_mode);
+
+/**
+ * @param renderer Un pointeur sur une structure contenant l'état du rendu
+ * @param x La position en x du point
+ * @param y La position en y du point
+ * @param size L'épaisseur du point
+ */
+void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size);
+
+/**
+ * Trace la fonction f(x) sur le graphique
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param graph Le graphique à afficher
+ * @param fonction La fonction à afficher
+ */
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction);
+
+/**
+ * Cherche et trouve le maximum et le minimum de la fonction. Et affecte les valeurs trouvés aux paramètres de la fonction
+ * @param fonction La fonction à étudier
+ * @param steps Le nombre de points à étudier
+ */
+void find_min_max(Fonction* fonction, int steps);
 
 #endif

@@ -1,7 +1,7 @@
 #include "grapheur.h"
 
 float f (float x) {
-    return exp(x);
+    return sin(x);
 }
 
 void resize_graph (Graph* graph){
@@ -26,9 +26,9 @@ void resize_graph (Graph* graph){
         axes[i]->echelle_grad = (axes[i]->max - axes[i]->min) / axes[i]->nb_grad;
         // Précision des graduations (nombre de chiffres après la virgule)
         axes[i]->precision = 0;
-        for (int i = presision_max; i >= 0; i--) {
-            if (axes[i]->echelle_grad < pow(10, 0-i)) {
-                axes[i]->precision = i+1;
+        for (int j = presision_max; j >= 0; j--) {
+            if (axes[i]->echelle_grad < pow(10, 0-j)) {
+                axes[i]->precision = j+1;
                 break;
             }
         }
@@ -57,20 +57,21 @@ void affiche_quadrillage (SDL_Renderer* ren, Graph* graph){
     }
 }
 
-Graph init_graph (){
+Graph init_graph (Fonction* fonction_defaut){
     Graph graph;
+    find_min_max(fonction_defaut, 1000);
     // Axe x
     graph.axe_x = malloc(sizeof(Axe));
     graph.axe_x->nb_grad = 10;
-    graph.axe_x->min = -5;
-    graph.axe_x->max = 5;
+    graph.axe_x->min = fonction_defaut->borne_inf - ((fonction_defaut->borne_sup - fonction_defaut->borne_inf)/(graph.axe_x->nb_grad-2));
+    graph.axe_x->max = fonction_defaut->borne_sup + ((fonction_defaut->borne_sup - fonction_defaut->borne_inf)/(graph.axe_x->nb_grad-2));
     graph.axe_x->font_texte_grad = NULL;
 
     // Axe y
     graph.axe_y = malloc(sizeof(Axe));
     graph.axe_y->nb_grad = 10;
-    graph.axe_y->min = -5;
-    graph.axe_y->max = 5;
+    graph.axe_y->min = fonction_defaut->fx_min - ((fonction_defaut->fx_max - fonction_defaut->fx_min)/(graph.axe_y->nb_grad-2));
+    graph.axe_y->max = fonction_defaut->fx_max + ((fonction_defaut->fx_max - fonction_defaut->fx_min)/(graph.axe_y->nb_grad-2));
     graph.axe_y->font_texte_grad = NULL;
 
     resize_graph(&graph);
@@ -158,18 +159,64 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     SDL_SetRenderDrawColor(ren, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
     SDL_RenderFillRect(ren, &bande_laterale_gauche);
 
-    affiche_bande_haut(ren, bande_entrees, colors);
+    affiche_bande_haut(ren, bande_entrees, bande_entrees->expressions[0], colors);
+
+    tracer_fonction(ren, graph, bande_entrees->expressions[0]->fonction);
+}
+
+void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size) {
+    if (size < 1) size = 1; // Assurer une taille valide
+
+    SDL_Rect rect = {x - size / 2, y - size / 2, size, size};
+    SDL_RenderFillRect(renderer, &rect);
+}
+
+void find_min_max(Fonction* fonction, int steps) {
+    if (fonction->borne_inf >= fonction->borne_sup) {
+        printf("Erreur: borne inférieure plus grande que borne supérieure dans 'find_min_max'\n");
+        return;
+    }
+
+    float step_size = (fonction->borne_sup - fonction->borne_inf) / steps;
+    fonction->fx_min = fonction->fx_max = f(fonction->borne_inf); // Initialisation
+
+    for (int i = 1; i <= steps; i++) {
+        float x = fonction->borne_inf + i * step_size;
+        float y = f(x);
+
+        if (y < fonction->fx_min) fonction->fx_min = y;
+        if (y > fonction->fx_max) fonction->fx_max = y;
+    }
+}
+
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
+    if (fonction.borne_sup > graph->axe_x->min && fonction.borne_inf < graph->axe_x->max){
+        SDL_SetRenderDrawColor(ren, fonction.color.r, fonction.color.g, fonction.color.b, fonction.color.a);
+        int nb_pts = graph->x;
+        float borne_sup = (fonction.borne_sup > graph->axe_x->max) ? graph->axe_x->max : fonction.borne_sup;
+        float borne_inf = (fonction.borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction.borne_inf;;
+        float step_size = (borne_sup - borne_inf) / nb_pts;
+        float x, y_sur_graph, x_sur_graph;
+        for (int i = 0; i < nb_pts; i++) {
+            x = borne_inf + i * step_size;
+            if (f(x) >= graph->axe_y->min && f(x) <= graph->axe_y->max){
+                y_sur_graph = graph->origine_y + (graph->axe_y->max - f(x)) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
+                x_sur_graph = graph->origine_x + (0-graph->axe_x->min + x) / graph->axe_x->echelle_grad * graph->axe_x->taille_grad;
+                draw_thick_point(ren, x_sur_graph, y_sur_graph, 3);
+            }
+        }
+    }
 }
 
 void Grapheur (SDL_Renderer* ren){
     Colors* colors = malloc(sizeof(Colors));
     change_color_mode(colors, 1);
 
-    Graph* graph = malloc(sizeof(Graph));
-    *graph = init_graph();
-
     Bande_entrees* bande_entrees = malloc(sizeof(Bande_entrees));
     init_bande_entrees(bande_entrees, colors);
+
+    Graph* graph = malloc(sizeof(Graph));
+    *graph = init_graph(&bande_entrees->expressions[0]->fonction);
 
 
     SDL_StartTextInput();
@@ -186,7 +233,12 @@ void Grapheur (SDL_Renderer* ren){
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) running = 0;
 
-            is_event_backspace = handle_events_entrees_experssions(event, bande_entrees);
+            if (event.type == SDL_MOUSEMOTION) {
+                bande_entrees->x_souris_px = event.motion.x;
+                bande_entrees->y_souris_px = event.motion.y;
+            }
+
+            is_event_backspace = handle_events_entrees_experssions(event, bande_entrees->expressions[0], bande_entrees->x_souris_px, bande_entrees->y_souris_px);
 
             if (event.type == SDL_KEYUP) {
                 if (is_event_backspace && event.key.keysym.sym == SDLK_BACKSPACE){

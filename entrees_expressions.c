@@ -1,13 +1,6 @@
 #include "entrees_expressions.h"
 
-void init_placement_entrees (Bande_entrees* bande_entrees, Entree_texte* entrees[NB_ENTREES], Colors* colors){
-    int width_entrees_bornes = 100;
-    int width_entree_expression = 300;
-    int height_entrees = 50;
-    int height_texte_desctriptif = 40;
-    int espace_entre_entrees = (FEN_X - 2*width_entrees_bornes - width_entree_expression - 100) / 4;
-    int marge_entree_gauche = espace_entre_entrees;
-
+void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors){
     // Bande descriptive : bornes inférieure, supérieure et expression
     bande_entrees->texte_descriptif_borne_inf = malloc(sizeof(Button));
     bande_entrees->texte_descriptif_borne_sup = malloc(sizeof(Button));
@@ -16,12 +9,12 @@ void init_placement_entrees (Bande_entrees* bande_entrees, Entree_texte* entrees
     char* noms[] = {"Borne inférieure", "Borne supérieure", "Expression"};
     for (int j = 0; j < 3; j++){
         if (j == 2) {
-            but[j]->rect.w = width_entree_expression;
+            but[j]->rect.w = params.width_entree_expression;
         } else {
-            but[j]->rect.w = width_entrees_bornes;
+            but[j]->rect.w = params.width_entrees_bornes;
         }
-        but[j]->rect.h = height_texte_desctriptif;
-        but[j]->rect.x = marge_entree_gauche + j*(width_entrees_bornes + espace_entre_entrees);
+        but[j]->rect.h = params.height_texte_desctriptif;
+        but[j]->rect.x = params.marge_entree_gauche + j*(params.width_entrees_bornes + params.espace_entre_entrees);
         but[j]->rect.y = (TAILLE_BANDE_DESCRIPTIONS - but[j]->rect.h)/2 ;
         but[j]->is_survolable = 0;
         but[j]->label = noms[j];
@@ -29,24 +22,27 @@ void init_placement_entrees (Bande_entrees* bande_entrees, Entree_texte* entrees
         but[j]->color_base = colors->bande_haute_description;
         but[j]->font_text = fonts[4];
     }
+}
 
+void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
+    expression->entree_selectionnee = SELECTION_NULL;
     // Les champs d'entrées
-    bande_entrees->borne_inf = malloc(sizeof(Entree_texte));
-    bande_entrees->borne_sup = malloc(sizeof(Entree_texte));
-    bande_entrees->expression = malloc(sizeof(Entree_texte));
+    expression->borne_inf = malloc(sizeof(Entree_texte));
+    expression->borne_sup = malloc(sizeof(Entree_texte));
+    expression->expression = malloc(sizeof(Entree_texte));
     // ! L'ordre des Entree_texte est important pour l'initialisation des champs d'entrées, il doit correspondre à celui de l'enum SelectionEntree
-    Entree_texte* but_2[] = {bande_entrees->borne_inf, bande_entrees->borne_sup, bande_entrees->expression};
+    Entree_texte* but_2[] = {expression->borne_inf, expression->borne_sup, expression->expression};
     SelectionEntree type[] = {BORNE_INF, BORNE_SUP, EXPRESSION};
     for (int j = 0; j < 3; j++){
         but_2[j]->champs_texte = malloc(sizeof(Button));
         but_2[j]->type_entree = type[j];
         if (j == 2) {
-            but_2[j]->champs_texte->rect.w = width_entree_expression;
+            but_2[j]->champs_texte->rect.w = params.width_entree_expression;
         } else {
-            but_2[j]->champs_texte->rect.w = width_entrees_bornes;
+            but_2[j]->champs_texte->rect.w = params.width_entrees_bornes;
         }
-        but_2[j]->champs_texte->rect.h = height_entrees;
-        but_2[j]->champs_texte->rect.x = marge_entree_gauche + j*(width_entrees_bornes + espace_entre_entrees);
+        but_2[j]->champs_texte->rect.h = params.height_entrees;
+        but_2[j]->champs_texte->rect.x = params.marge_entree_gauche + j*(params.width_entrees_bornes + params.espace_entre_entrees);
         but_2[j]->champs_texte->rect.y = (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but_2[j]->champs_texte->rect.h)/2 ;
         but_2[j]->champs_texte->is_survolable = 1;
         but_2[j]->champs_texte->hovered = 0;
@@ -61,15 +57,27 @@ void init_placement_entrees (Bande_entrees* bande_entrees, Entree_texte* entrees
         but_2[j]->position_cursor = 0;
         but_2[j]->lastCursorToggle = SDL_GetTicks();
         strcpy(but_2[j]->text, "");
-        entrees[j] = malloc(sizeof(Entree_texte));
-        entrees[j] = but_2[j];
+        expression->champs_entrees[j] = malloc(sizeof(Entree_texte));
+        expression->champs_entrees[j] = but_2[j];
     }
-
 }
 
 void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
-    bande_entrees->entree_selectionnee = SELECTION_NULL;
-    init_placement_entrees(bande_entrees, bande_entrees->champs_entrees, colors);
+    Parametres_bandes_entrees params;
+    params.width_entrees_bornes = 150;
+    params.width_entree_expression = 400;
+    params.height_entrees = 50;
+    params.height_texte_desctriptif = 40;
+    params.espace_entre_entrees = (FEN_X - 2*params.width_entrees_bornes - params.width_entree_expression - 100) / 4;
+    params.marge_entree_gauche = params.espace_entre_entrees;
+
+    init_placement_bande_descriptive(bande_entrees, params, colors);
+
+    bande_entrees->expressions[0] = malloc(sizeof(Expression_fonction));
+    init_placement_entrees(bande_entrees->expressions[0], params, colors);
+    bande_entrees->expressions[0]->fonction.borne_inf = -4;
+    bande_entrees->expressions[0]->fonction.borne_sup = 4;
+    bande_entrees->expressions[0]->fonction.color = (SDL_Color){255, 0, 0, 255};
 }
 
 int is_souris_sur_button (Button button, int x_souris_px, int y_souris_px){
@@ -110,17 +118,36 @@ void remove_char(char text[], int i) {
     }
 }
 
-int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entrees) {
-    if (event.type == SDL_MOUSEMOTION) {
-        bande_entrees->x_souris_px = event.motion.x;
-        bande_entrees->y_souris_px = event.motion.y;
+void charge_valeur_borne_inf (Expression_fonction* expression){
+    char *end;
+    float test = strtof(expression->borne_inf->text, &end);
+    if (*end != '\0') {
+        printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
+    } else {
+        expression->fonction.borne_inf = test;
+        expression->entree_selectionnee = SELECTION_NULL;
+    }
+}
 
+void charge_valeur_borne_sup (Expression_fonction* expression){
+    char *end;
+    float test = strtof(expression->borne_sup->text, &end);
+    if (*end != '\0') {
+        printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
+    } else {
+        expression->fonction.borne_sup = test;
+        expression->entree_selectionnee = SELECTION_NULL;
+    }
+}
+
+int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
+    if (event.type == SDL_MOUSEMOTION) {
         // Souris sur un bouton ?
         for (int i = 0; i < NB_ENTREES; i++) {
-            if (is_souris_sur_button(*bande_entrees->champs_entrees[i]->champs_texte, bande_entrees->x_souris_px, bande_entrees->y_souris_px)) {
-                bande_entrees->champs_entrees[i]->champs_texte->hovered = 1;
+            if (is_souris_sur_button(*expression->champs_entrees[i]->champs_texte, x_souris_px, y_souris_px)) {
+                expression->champs_entrees[i]->champs_texte->hovered = 1;
             } else {
-                bande_entrees->champs_entrees[i]->champs_texte->hovered = 0;
+                expression->champs_entrees[i]->champs_texte->hovered = 0;
             }
         }
     }
@@ -129,23 +156,24 @@ int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entr
         // Vérifier si on clique sur un champ
         int au_moins_un_champs_selectionne = 0;
         for (int i = 0; i < NB_ENTREES; i++) {
-            if (is_souris_sur_button(*bande_entrees->champs_entrees[i]->champs_texte, bande_entrees->x_souris_px, bande_entrees->y_souris_px)) {
-                bande_entrees->entree_selectionnee = bande_entrees->champs_entrees[i]->type_entree;
-                bande_entrees->champs_entrees[i]->cursorVisible = 1;
-                bande_entrees->champs_entrees[i]->lastCursorToggle = SDL_GetTicks();
+            if (is_souris_sur_button(*expression->champs_entrees[i]->champs_texte, x_souris_px, y_souris_px)) {
+                expression->entree_selectionnee = expression->champs_entrees[i]->type_entree;
+                expression->champs_entrees[i]->cursorVisible = 1;
+                expression->champs_entrees[i]->lastCursorToggle = SDL_GetTicks();
                 au_moins_un_champs_selectionne = 1;
             }
         }
-        if (!au_moins_un_champs_selectionne) {
-            bande_entrees->entree_selectionnee = SELECTION_NULL;
+        if (!au_moins_un_champs_selectionne) { // Si clic à côté, on regarde si on quitte un champs et si c'est le cas, on charge la valeur de ce champs. PS : l' entree_selectionnee sera également remise à SELECTION_NULL
+            if (expression->entree_selectionnee = BORNE_INF){charge_valeur_borne_inf(expression);}
+            if (expression->entree_selectionnee = BORNE_SUP){charge_valeur_borne_sup(expression);}
         }
     }
 
     if (event.type == SDL_TEXTINPUT) {
-        if (bande_entrees->entree_selectionnee != SELECTION_NULL){
-            Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
-            if (bande_entrees->entree_selectionnee < 2) {
-                if (strlen(target->text) < MAX_LEN_ENTREES_BORNES && isdigit(event.text.text[0])) {
+        if (expression->entree_selectionnee != SELECTION_NULL){
+            Entree_texte *target = expression->champs_entrees[expression->entree_selectionnee];
+            if (expression->entree_selectionnee < 2) {
+                if (strlen(target->text) < MAX_LEN_ENTREES_BORNES && (isdigit(event.text.text[0]) || event.text.text[0] == '-' || event.text.text[0] == '.'|| event.text.text[0] == 'e')) {
                     insert_char(target->text, target->position_cursor++, event.text.text[0]);
                 }
             } else
@@ -156,9 +184,9 @@ int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entr
     }
 
     if (event.type == SDL_KEYDOWN) {
-        if (bande_entrees->entree_selectionnee != SELECTION_NULL){
+        if (expression->entree_selectionnee != SELECTION_NULL){
             if (event.key.keysym.sym == SDLK_BACKSPACE) {
-                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                Entree_texte *target = expression->champs_entrees[expression->entree_selectionnee];
                 if (strlen(target->text) > 0 && target->position_cursor > 0) {
                     remove_char(target->text, --target->position_cursor);
                 }
@@ -166,25 +194,25 @@ int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entr
 
             if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_UP) {
                 if (event.key.keysym.sym == SDLK_DOWN) {
-                    bande_entrees->entree_selectionnee = (bande_entrees->entree_selectionnee - 1 + NB_ENTREES) % NB_ENTREES;
+                    expression->entree_selectionnee = (expression->entree_selectionnee - 1 + NB_ENTREES) % NB_ENTREES;
                 } else {
-                    bande_entrees->entree_selectionnee = (bande_entrees->entree_selectionnee + 1) % NB_ENTREES;
+                    expression->entree_selectionnee = (expression->entree_selectionnee + 1) % NB_ENTREES;
                 }
                 for (int i = 0; i < NB_ENTREES; i++) {
-                    bande_entrees->champs_entrees[i]->cursorVisible = 0;
+                    expression->champs_entrees[i]->cursorVisible = 0;
                 }
-                bande_entrees->champs_entrees[bande_entrees->entree_selectionnee]->cursorVisible = 1;
-                bande_entrees->champs_entrees[bande_entrees->entree_selectionnee]->lastCursorToggle = SDL_GetTicks();
+                expression->champs_entrees[expression->entree_selectionnee]->cursorVisible = 1;
+                expression->champs_entrees[expression->entree_selectionnee]->lastCursorToggle = SDL_GetTicks();
             }
 
             if (event.key.keysym.sym == SDLK_RIGHT){
-                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                Entree_texte *target = expression->champs_entrees[expression->entree_selectionnee];
                 if (target->position_cursor < strlen(target->text)) {
                     target->position_cursor++;
                 }
             }
             if (event.key.keysym.sym == SDLK_LEFT){
-                Entree_texte *target = bande_entrees->champs_entrees[bande_entrees->entree_selectionnee];
+                Entree_texte *target = expression->champs_entrees[expression->entree_selectionnee];
                 if (target->position_cursor > 0) {
                     target->position_cursor--;
                 }
@@ -193,12 +221,18 @@ int handle_events_entrees_experssions(SDL_Event event, Bande_entrees* bande_entr
     }
 
     if (event.type == SDL_KEYUP) {
-        if (event.key.keysym.sym == SDLK_RETURN) {
-            //valider_modif_taille_map(session, musique);
+        if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER) {
+            if (expression->entree_selectionnee == BORNE_INF){charge_valeur_borne_inf(expression);}
+
+            if (expression->entree_selectionnee == BORNE_SUP){charge_valeur_borne_sup(expression);}
+        
+            if (expression->entree_selectionnee == EXPRESSION){
+                // TODO : A connecter avec les autres modules
+            }
         }
     }
     
-    return bande_entrees->entree_selectionnee == SELECTION_NULL;
+    return expression->entree_selectionnee == SELECTION_NULL;
 }
 /*
 void valider_modif_taille_map(Session_modif_map* session) {
@@ -244,7 +278,7 @@ void valider_modif_taille_map(Session_modif_map* session) {
     session->message->start_time = time(NULL);
 }
 */
-void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors){
+void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Expression_fonction* expression, Colors* colors){
     // Fond de la bande haute
     SDL_SetRenderDrawColor(ren, colors->bande_haute_champs.r, colors->bande_haute_champs.g, colors->bande_haute_champs.b, colors->bande_haute_champs.a);
     SDL_Rect bande_haut_champs_entrees = {0, TAILLE_BANDE_DESCRIPTIONS, FEN_X, TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS};
@@ -257,16 +291,16 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
     const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
     Entree_texte *target_champs = NULL;
     for (int i = 0; i < NB_ENTREES; i++) {
-        target_champs = bande_entrees->champs_entrees[i];
+        target_champs = expression->champs_entrees[i];
         if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
             target_champs->cursorVisible = !target_champs->cursorVisible;
             target_champs->lastCursorToggle = SDL_GetTicks();
         }
-        if (i != bande_entrees->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
+        if (i != expression->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
             target_champs->champs_texte->label = texte_defaut[i];
         } else {
             strcpy(target_champs->display, target_champs->text);
-            if (bande_entrees->entree_selectionnee == target_champs->type_entree && target_champs->cursorVisible){
+            if (expression->entree_selectionnee == target_champs->type_entree && target_champs->cursorVisible){
                 insert_char(target_champs->display, target_champs->position_cursor, '|');
             } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
             target_champs->champs_texte->label = target_champs->display;
