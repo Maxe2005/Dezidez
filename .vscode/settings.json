@@ -1,6 +1,7 @@
 {
   "files.associations": {
     "limits": "c",
-    "entrees_expressions.h": "c"
+    "entrees_expressions.h": "c",
+    "grapheur.h": "c"
   }
 }

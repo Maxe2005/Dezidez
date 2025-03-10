@@ -6,10 +6,9 @@
 #include <stdio.h>
 #include <time.h>
 #include <math.h>
+#include <stdbool.h>
 #include "gestionGraphique.h"
 
-#define FEN_X 1000
-#define FEN_Y 800
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 50
@@ -17,8 +16,11 @@
 #define SCROLL_SPEED 30  // Vitesse du scroll
 #define SCROLL_OFFSET_MIN -100
 
-#define NB_FONTS 5
+#define NB_FONTS 6
 extern TTF_Font* fonts[NB_FONTS];
+
+extern int FEN_X;
+extern int FEN_Y;
 
 
 /**

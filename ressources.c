@@ -1,6 +1,9 @@
 #include "ressources.h"
 
 TTF_Font* fonts[NB_FONTS] = {NULL};
+int FEN_X = 1000;
+int FEN_Y = 800;
+
 
 void init_font (TTF_Font* font[NB_FONTS]) {
     font[0] = createFont("Ressources/DejaVuSans-Bold.ttf", 40); //Font de titres
@@ -8,6 +11,7 @@ void init_font (TTF_Font* font[NB_FONTS]) {
     font[2] = createFont("Ressources/DejaVuSans-Bold.ttf", 30); //Font de bouton avec souris dessus
     font[3] = createFont("Ressources/DejaVuSans-Bold.ttf", 35);
     font[4] = createFont("Ressources/DejaVuSans-Bold.ttf", 15); //Font de texte descriptif de bande haute
+    font[5] = createFont("Ressources/DejaVuSans-Bold.ttf", 12); //Font de texte de graduation
 }
 
 void renderButton(SDL_Renderer *renderer, Button *button) {

@@ -119,25 +119,29 @@ void remove_char(char text[], int i) {
 }
 
 void charge_valeur_borne_inf (Expression_fonction* expression){
-    char *end;
-    float test = strtof(expression->borne_inf->text, &end);
-    if (*end != '\0') {
-        printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-    } else {
-        expression->fonction.borne_inf = test;
-        expression->entree_selectionnee = SELECTION_NULL;
-    }
+    if (expression->borne_inf->text[0] != '\0'){
+        char *end;
+        float test = strtof(expression->borne_inf->text, &end);
+        if (*end != '\0') {
+            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
+        } else {
+            expression->fonction.borne_inf = test;
+            expression->entree_selectionnee = SELECTION_NULL;
+        }
+    } else expression->entree_selectionnee = SELECTION_NULL;
 }
 
 void charge_valeur_borne_sup (Expression_fonction* expression){
-    char *end;
-    float test = strtof(expression->borne_sup->text, &end);
-    if (*end != '\0') {
-        printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-    } else {
-        expression->fonction.borne_sup = test;
-        expression->entree_selectionnee = SELECTION_NULL;
-    }
+    if (expression->borne_sup->text[0] != '\0'){
+        char *end;
+        float test = strtof(expression->borne_sup->text, &end);
+        if (*end != '\0') {
+            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
+        } else {
+            expression->fonction.borne_sup = test;
+            expression->entree_selectionnee = SELECTION_NULL;
+        }
+    } else expression->entree_selectionnee = SELECTION_NULL;
 }
 
 int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
@@ -164,8 +168,8 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
             }
         }
         if (!au_moins_un_champs_selectionne) { // Si clic à côté, on regarde si on quitte un champs et si c'est le cas, on charge la valeur de ce champs. PS : l' entree_selectionnee sera également remise à SELECTION_NULL
-            if (expression->entree_selectionnee = BORNE_INF){charge_valeur_borne_inf(expression);}
-            if (expression->entree_selectionnee = BORNE_SUP){charge_valeur_borne_sup(expression);}
+            if (expression->entree_selectionnee == BORNE_INF){charge_valeur_borne_inf(expression);}
+            if (expression->entree_selectionnee == BORNE_SUP){charge_valeur_borne_sup(expression);}
         }
     }
 

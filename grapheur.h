@@ -20,11 +20,11 @@ typedef struct {
 typedef struct {
     int precision; // Précision des graduations (nombre de chiffres après la virgule)
     int nb_grad; // Nombre de graduations
+    int pos_premiere_grad; // La position en pixel de la première graduation dans le sens de l'axe
     float taille_grad; // Taille en pixels d'une graduation (espacement entre les graduations)
     float echelle_grad; // Echelle de graduation (ex: une grad tout les 0.1, 1 ou 10)
     float min; // Valeur minimale visible
     float max; // Valeur maximale visible
-    int skip_graduation; // Il faut écrire la valeur de la graduation tout les <skip_graduation> graduations
     int grad_text_size;
     TTF_Font* font_texte_grad;
 } Axe;
@@ -36,8 +36,11 @@ typedef struct {
     Axe* axe_y;
     float x; // Largeur du graph en pixels
     float y; // Hauteur du graph en pixels
-    int origine_x; // Origine en x
-    int origine_y; // Origine en y
+    int origine_x; // Origine du graphique en x (coin en haut à gauche)
+    int origine_y; // Origine du graphique en y (coin en haut à gauche)
+    int centre_x; // Position en pixel du centre (ou de l'origine du graphique)
+    int centre_y; // Position en pixel du centre (ou de l'origine du graphique)
+    bool souris_pressee;
 } Graph;
 
 
@@ -117,5 +120,41 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction);
  * @param steps Le nombre de points à étudier
  */
 void find_min_max(Fonction* fonction, int steps);
+
+/**
+ * Permet de trouver la meilleur échelle de graduation en fonction du min et du max pour obtenir un nombre de graduation voulues (paramétrés dans la fonction recherche_meilleur_echelle_grad)
+ * @param max Le maximum de la fonction f(x) considérée
+ * @param min Le minimum de la fonction f(x) considérée
+ * @return la meilleur échelle de graduation en fonction du min et du max
+ */
+float recherche_meilleur_echelle_grad (float max, float min);
+
+/**
+ * Arrondi un float en fonction de son ordre de grandeur (ex : 0.1245 -> 0.12 et 0.00037843 -> 0.00038)
+ * @param x Le nombre à arrondir
+ * @return Le nombre correctement arrondi
+ */
+float arrondir_ordre_grandeur(float x);
+
+/**
+ * Redimentionne les éléments pos_premiere_grad (La position de la première graduation) et nb_grad (Le nombre de graduation visibles)
+ * @param graph Le graphique à afficher
+ */
+void resize_translation (Graph* graph);
+
+/**
+ * Gère tous les évènement relatif au graphique
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ */
+void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
+
+/**
+ * Redimentionne les contours du graphique donc son origine et sa taille
+ * @param graph Le graphique à afficher
+ */
+void resize_contours_graph (Graph* graph);
 
 #endif
