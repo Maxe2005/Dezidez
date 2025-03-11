@@ -7,6 +7,9 @@
 #define TAILLE_BANDE_DROITE 100
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
+#define ZOOM_SPEED 5
+#define TAILLE_GRADUATION_MIN 40
+#define TAILLE_GRADUATION_MAX 100
 
 typedef struct {
     Button button_base;
@@ -58,10 +61,11 @@ float f (float x);
 void Grapheur (SDL_Renderer* ren);
 
 /**
- * Redimensionne le graphique
+ * Redimensionne le graphique et le centre sur la fonction donnée
  * @param graph Le graphique à redimensionner
+ * @param fonction_defaut La fonction par défaut sur laquelle sera centrée le graphique
  */
-void resize_graph (Graph* graph);
+void resize_recentrer (Graph* graph, Fonction* fonction_defaut);
 
 /**
  * Affiche le quadrillage du graphique au niveau des graduations
@@ -137,10 +141,13 @@ float recherche_meilleur_echelle_grad (float max, float min);
 float arrondir_ordre_grandeur(float x);
 
 /**
- * Redimentionne les éléments pos_premiere_grad (La position de la première graduation) et nb_grad (Le nombre de graduation visibles)
+ * Redimentionne les éléments nécessaires après avoir naviger sur le graphique : 
+ * pos_premiere_grad (La position de la première graduation),
+ * nb_grad (Le nombre de graduation visibles) et 
+ * le point-centre en x et y
  * @param graph Le graphique à afficher
  */
-void resize_translation (Graph* graph);
+void resize_navigation (Graph* graph);
 
 /**
  * Gère tous les évènement relatif au graphique
@@ -156,5 +163,11 @@ void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_s
  * @param graph Le graphique à afficher
  */
 void resize_contours_graph (Graph* graph);
+
+/**
+ * Redimentionne la précision des graduation (nb de chiffres après la virgule)
+ * @param graph Le graphique à afficher
+ */
+void resize_precision_grad (Graph* graph);
 
 #endif

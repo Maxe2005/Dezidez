@@ -4,7 +4,7 @@ float f (float x) {
     return sin(x);
 }
 
-void resize_translation (Graph* graph){
+void resize_navigation (Graph* graph){
     graph->axe_x->pos_premiere_grad = graph->origine_x + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) * graph->axe_x->taille_grad / graph->axe_x->echelle_grad;
     graph->axe_x->nb_grad = (graph->x - graph->axe_x->pos_premiere_grad + graph->origine_x) / graph->axe_x->taille_grad;
 
@@ -22,17 +22,11 @@ void resize_contours_graph (Graph* graph){
     graph->y = FEN_Y - TAILLE_BANDE_HAUT;
 }
 
-void resize_graph (Graph* graph){
-    resize_contours_graph(graph);
-    
+void resize_precision_grad (Graph* graph){
     int presision_max = 10;
 
     Axe* axes[] = {graph->axe_x, graph->axe_y};
-    int taille[] = {graph->x, graph->y};
-    int origine[] = {graph->origine_x, graph->origine_y};
     for (int i = 0; i < 2; i++) {
-        if (axes[i]->min >= axes[i]->max) printf("Erreur : min > max");//axes[i]->max = axes[i]->min + 1;
-        axes[i]->taille_grad = taille[i] * axes[i]->echelle_grad / (axes[i]->max - axes[i]->min);
         // Précision des graduations (nombre de chiffres après la virgule)
         axes[i]->precision = 0;
         for (int j = presision_max; j >= 0; j--) {
@@ -42,7 +36,27 @@ void resize_graph (Graph* graph){
             }
         }
     }
-    resize_translation(graph);
+}
+
+void resize_recentrer (Graph* graph, Fonction* fonction_defaut){
+    find_min_max(fonction_defaut, 1e7);
+
+    graph->axe_x->echelle_grad = recherche_meilleur_echelle_grad(fonction_defaut->borne_sup, fonction_defaut->borne_inf);
+    graph->axe_x->min = fonction_defaut->borne_inf - graph->axe_x->echelle_grad;
+    graph->axe_x->max = fonction_defaut->borne_sup + graph->axe_x->echelle_grad;
+
+    graph->axe_y->echelle_grad = recherche_meilleur_echelle_grad(fonction_defaut->fx_max, fonction_defaut->fx_min);
+    graph->axe_y->min = fonction_defaut->fx_min - graph->axe_y->echelle_grad;
+    graph->axe_y->max = fonction_defaut->fx_max + graph->axe_y->echelle_grad;
+
+    if (graph->axe_x->min >= graph->axe_x->max) printf("Erreur : min > max");//graph->axe_x->max = graph->axe_x->min + 1;
+    graph->axe_x->taille_grad = graph->x * graph->axe_x->echelle_grad / (graph->axe_x->max - graph->axe_x->min);
+    
+    if (graph->axe_y->min >= graph->axe_y->max) printf("Erreur : min > max");//graph->axe_y->max = graph->axe_y->min + 1;
+    graph->axe_y->taille_grad = graph->y * graph->axe_y->echelle_grad / (graph->axe_y->max - graph->axe_y->min);
+
+    resize_precision_grad(graph);
+    resize_navigation(graph);
 }
 
 void affiche_quadrillage (SDL_Renderer* ren, Graph* graph){
@@ -134,22 +148,17 @@ float recherche_meilleur_echelle_grad (float max, float min){
 
 Graph init_graph (Fonction* fonction_defaut){
     Graph graph;
-    find_min_max(fonction_defaut, 1e7);
+
     // Axe x
     graph.axe_x = malloc(sizeof(Axe));
-    graph.axe_x->echelle_grad = recherche_meilleur_echelle_grad(fonction_defaut->borne_sup, fonction_defaut->borne_inf);
-    graph.axe_x->min = fonction_defaut->borne_inf - graph.axe_x->echelle_grad;
-    graph.axe_x->max = fonction_defaut->borne_sup + graph.axe_x->echelle_grad;
     graph.axe_x->font_texte_grad = NULL;
 
     // Axe y
     graph.axe_y = malloc(sizeof(Axe));
-    graph.axe_y->echelle_grad = recherche_meilleur_echelle_grad(fonction_defaut->fx_max, fonction_defaut->fx_min);
-    graph.axe_y->min = fonction_defaut->fx_min - graph.axe_y->echelle_grad;
-    graph.axe_y->max = fonction_defaut->fx_max + graph.axe_y->echelle_grad;
     graph.axe_y->font_texte_grad = NULL;
 
-    resize_graph(&graph);
+    resize_contours_graph(&graph);
+    resize_recentrer(&graph, fonction_defaut);
 
     // Déterminer la taille du texte en fonction de la taille du graphique
     int text_size;
@@ -293,17 +302,47 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
 }
 
 void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
+    if (event.type == SDL_MOUSEWHEEL) {
+        float old_taille_grad_x = graph->axe_x->taille_grad;
+        float old_taille_grad_y = graph->axe_y->taille_grad;
+        graph->axe_x->taille_grad += event.wheel.y * ZOOM_SPEED;
+        graph->axe_y->taille_grad += event.wheel.y * ZOOM_SPEED;
+
+        graph->axe_x->min +=  ((x_souris_px - graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+        graph->axe_x->max -=  ((graph->x - x_souris_px + graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+        graph->axe_y->max -=  ((y_souris_px - graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+        graph->axe_y->min +=  ((graph->y - y_souris_px + graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+        
+        if (graph->axe_x->taille_grad < TAILLE_GRADUATION_MIN){
+            graph->axe_x->echelle_grad *= 2;
+            graph->axe_x->taille_grad *= 2;
+        }
+        if (graph->axe_x->taille_grad > TAILLE_GRADUATION_MAX){
+            graph->axe_x->echelle_grad /= 2;
+            graph->axe_x->taille_grad /= 2;
+        }
+        if (graph->axe_y->taille_grad < TAILLE_GRADUATION_MIN){
+            graph->axe_y->echelle_grad *= 2;
+            graph->axe_y->taille_grad *= 2;
+        }
+        if (graph->axe_y->taille_grad > TAILLE_GRADUATION_MAX){
+            graph->axe_y->echelle_grad /= 2;
+            graph->axe_y->taille_grad /= 2;
+        }
+
+        resize_navigation(graph);
+        resize_precision_grad(graph);
+    }
+
     if (event.type == SDL_MOUSEMOTION) {
         if (graph->souris_pressee && 
                 x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
                 y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
-            //graph->centre_x += event.motion.xrel;
-            //graph->centre_y += event.motion.yrel;
             graph->axe_x->min -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
             graph->axe_x->max -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
             graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
             graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-            resize_translation(graph);
+            resize_navigation(graph);
         }
     }
 
@@ -317,6 +356,7 @@ void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_s
             graph->souris_pressee = true;
         }
     }
+
 }
 
 void Grapheur (SDL_Renderer* ren){
@@ -345,11 +385,15 @@ void Grapheur (SDL_Renderer* ren){
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) running = 0;
 
-            if (event.type == SDL_WINDOWEVENT) {
-                if (event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                    FEN_X = event.window.data1;
-                    FEN_Y = event.window.data2;
-                }
+            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+                FEN_X = event.window.data1;
+                FEN_Y = event.window.data2;
+                int x = graph->x;
+                int y = graph->y;
+                resize_contours_graph(graph);
+                graph->axe_x->taille_grad *= graph->x / x;
+                graph->axe_y->taille_grad *= graph->y / y;
+                resize_navigation(graph);
             }
 
             if (event.type == SDL_MOUSEMOTION) {
@@ -364,6 +408,10 @@ void Grapheur (SDL_Renderer* ren){
                 if (is_event_backspace && event.key.keysym.sym == SDLK_BACKSPACE){
                     ecran_acceuil(ren);
                     running = 0;
+                }
+
+                if (event.key.keysym.sym == SDLK_c){
+                    resize_recentrer(graph, &bande_entrees->expressions[0]->fonction);
                 }
             }
         }
