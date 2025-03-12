@@ -34,7 +34,9 @@
           "-lSDL2main",
           "-lSDL2_ttf",
           "-lm",
-          "-lSDL2_mixer"
+          "-lSDL2_mixer",
+          "-lSDL2_gfx",
+          "-lSDL2_image"
         ],
         "group": {
           "kind": "build",

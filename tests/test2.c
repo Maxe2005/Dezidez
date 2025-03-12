@@ -60,7 +60,7 @@ int main() {
     SDL_Window *window = SDL_CreateWindow("Animated Header", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     
-    TTF_Font *font = TTF_OpenFont("Ressources/DejaVuSans-Bold.ttf", 24);
+    TTF_Font *font = TTF_OpenFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 24);
     if (!font) {
         SDL_Log("Failed to load font: %s", TTF_GetError());
         return 1;

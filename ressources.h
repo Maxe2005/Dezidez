@@ -8,6 +8,8 @@
 #include <math.h>
 #include <stdbool.h>
 #include "gestionGraphique.h"
+#include <SDL2/SDL_image.h>
+#include <SDL2/SDL2_gfxPrimitives.h>
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
@@ -38,7 +40,21 @@ typedef struct {
     int taille_bonus_hover_x;
     int taille_bonus_hover_y;
     int is_survolable; // Booleen pour savoir si le bouton utilise ses param hover (= 1) ou non (= 0)
+    int radius; // Rayon des coins arrondis
 } Button;
+
+typedef struct {
+    SDL_Rect rect;
+    int hovered;
+    SDL_Texture *image;
+    SDL_Color color_base;
+    SDL_Color color_hover;
+    int taille_bonus_hover_x;
+    int taille_bonus_hover_y;
+    int is_survolable; // Booleen pour savoir si le bouton utilise ses param hover (= 1) ou non (= 0)
+    int radius; // Rayon des coins arrondis
+    int pourcentage_place; // Le pourcentage de place utilisé par l'image dans le bouton
+} ImageButton;
 
 typedef struct {
     SDL_Color bg;
@@ -69,12 +85,9 @@ void init_font (TTF_Font* font[NB_FONTS]);
 void renderHeader(SDL_Renderer *renderer, char *titre);
 
 /**
- * Affiche un bouton
+ * Affiche un bouton avec du texte
  * @param renderer Un pointeur sur une structure contenant l'état du rendu
  * @param button Une instance de bouton
- * @param color_text La couleur du texte du bouton
- * @param colorh0 La couleur de base du font du bouton
- * @param colorh1 La couleur quand la souris est sur le bouton
  */
 void renderButton(SDL_Renderer *renderer, Button *button);
 
@@ -88,6 +101,37 @@ void renderButton(SDL_Renderer *renderer, Button *button);
  * @param font La police du texte
  */
 void renderText(SDL_Renderer *renderer, const char *text, int x, int y, SDL_Color color, TTF_Font *font);
+
+/**
+ * Affiche un bouton avec une image
+ * @param renderer Un pointeur sur une structure contenant l'état du rendu
+ * @param button Une instance de bouton
+ */
+void renderImageButton(SDL_Renderer *renderer, ImageButton *button);
+
+/**
+ * Affiche une image de bouton dans le rectangle rect en prenant en compte le paramètre du bouton pourcentage_place
+ * @param renderer Un pointeur sur une structure contenant l'état du rendu
+ * @param button Une instance de bouton
+ * @param rect Le rectangle dans lequel placer l'image
+ */
+void draw_image (SDL_Renderer *renderer, ImageButton *button, SDL_Rect rect);
+
+/**
+ * Charge l'image (avec le nom <filename> se trouvant dans le répèrtoire Ressources/) et la renvoie
+ * @param renderer Un pointeur sur une structure contenant l'état du rendu
+ * @param filename Le nom de l'image avec son extention ou le path pour accèder à l'image depuis Ressources/
+ * @return La texture de l'image chargée
+ */
+SDL_Texture* load_image (SDL_Renderer *renderer, const char * filename);
+
+/**
+ * Test si la souris est dans le rectangle
+ * @param rect Le rectangle
+ * @param x_souris_px La position de la souris sur l'axe x en pixels
+ * @param y_souris_px La position de la souris sur l'axe y en pixels
+ */
+int is_souris_sur_rectangle (SDL_Rect rect, int x_souris_px, int y_souris_px);
 
 
 

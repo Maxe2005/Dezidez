@@ -21,6 +21,7 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
         but[j]->color_text = colors->texte_descriptifs_bande_haut;
         but[j]->color_base = colors->bande_haute_description;
         but[j]->font_text = fonts[4];
+        but[j]->radius = 0;
     }
 }
 
@@ -53,6 +54,7 @@ void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_
         but_2[j]->champs_texte->font_text_hover = fonts[2];
         but_2[j]->champs_texte->taille_bonus_hover_x = 0;
         but_2[j]->champs_texte->taille_bonus_hover_y = 0;
+        but_2[j]->champs_texte->radius = 0;
         but_2[j]->cursorVisible = 0;
         but_2[j]->position_cursor = 0;
         but_2[j]->lastCursorToggle = SDL_GetTicks();
@@ -67,7 +69,7 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     params.width_entrees_bornes = 150;
     params.width_entree_expression = 400;
     params.height_entrees = 50;
-    params.height_texte_desctriptif = 40;
+    params.height_texte_desctriptif = TAILLE_BANDE_DESCRIPTIONS - 10;
     params.espace_entre_entrees = (FEN_X - 2*params.width_entrees_bornes - params.width_entree_expression - 100) / 4;
     params.marge_entree_gauche = params.espace_entre_entrees;
 
@@ -80,10 +82,7 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     bande_entrees->expressions[0]->fonction.color = (SDL_Color){255, 0, 0, 255};
 }
 
-int is_souris_sur_button (Button button, int x_souris_px, int y_souris_px){
-    return x_souris_px >= button.rect.x && x_souris_px <= button.rect.x + button.rect.w &&
-                    y_souris_px >= button.rect.y && y_souris_px <= button.rect.y + button.rect.h;
-}
+
 
 void insert_char(char text[], int i, char c) {
     int len = strlen(text);
@@ -148,7 +147,7 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
     if (event.type == SDL_MOUSEMOTION) {
         // Souris sur un bouton ?
         for (int i = 0; i < NB_ENTREES; i++) {
-            if (is_souris_sur_button(*expression->champs_entrees[i]->champs_texte, x_souris_px, y_souris_px)) {
+            if (is_souris_sur_rectangle(expression->champs_entrees[i]->champs_texte->rect, x_souris_px, y_souris_px)) {
                 expression->champs_entrees[i]->champs_texte->hovered = 1;
             } else {
                 expression->champs_entrees[i]->champs_texte->hovered = 0;
@@ -160,7 +159,7 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
         // Vérifier si on clique sur un champ
         int au_moins_un_champs_selectionne = 0;
         for (int i = 0; i < NB_ENTREES; i++) {
-            if (is_souris_sur_button(*expression->champs_entrees[i]->champs_texte, x_souris_px, y_souris_px)) {
+            if (is_souris_sur_rectangle(expression->champs_entrees[i]->champs_texte->rect, x_souris_px, y_souris_px)) {
                 expression->entree_selectionnee = expression->champs_entrees[i]->type_entree;
                 expression->champs_entrees[i]->cursorVisible = 1;
                 expression->champs_entrees[i]->lastCursorToggle = SDL_GetTicks();

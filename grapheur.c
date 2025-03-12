@@ -1,5 +1,7 @@
 #include "grapheur.h"
 
+// TODO ajouter les free et les SDL_DestroyTexture (pour les boutons image et fonts)
+
 float f (float x) {
     return sin(x);
 }
@@ -168,7 +170,7 @@ Graph init_graph (Fonction* fonction_defaut){
         if (axes[i]->grad_text_size != text_size) {
             axes[i]->grad_text_size = text_size;
             if (axes[i]->font_texte_grad != NULL) TTF_CloseFont(axes[i]->font_texte_grad);
-            axes[i]->font_texte_grad = createFont("Ressources/DejaVuSans-Bold.ttf", text_size);
+            axes[i]->font_texte_grad = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", text_size);
         }
     }
     
@@ -301,48 +303,58 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
     }
 }
 
+void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
+    float old_taille_grad_x = graph->axe_x->taille_grad;
+    float old_taille_grad_y = graph->axe_y->taille_grad;
+    graph->axe_x->taille_grad += event.wheel.y * ZOOM_SPEED;
+    graph->axe_y->taille_grad += event.wheel.y * ZOOM_SPEED;
+
+    graph->axe_x->min +=  ((x_souris_px - graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+    graph->axe_x->max -=  ((graph->x - x_souris_px + graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+    graph->axe_y->max -=  ((y_souris_px - graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+    graph->axe_y->min +=  ((graph->y - y_souris_px + graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+    
+    if (graph->axe_x->taille_grad < TAILLE_GRADUATION_MIN){
+        graph->axe_x->echelle_grad *= 2;
+        graph->axe_x->taille_grad *= 2;
+    }
+    if (graph->axe_x->taille_grad > TAILLE_GRADUATION_MAX){
+        graph->axe_x->echelle_grad /= 2;
+        graph->axe_x->taille_grad /= 2;
+    }
+    if (graph->axe_y->taille_grad < TAILLE_GRADUATION_MIN){
+        graph->axe_y->echelle_grad *= 2;
+        graph->axe_y->taille_grad *= 2;
+    }
+    if (graph->axe_y->taille_grad > TAILLE_GRADUATION_MAX){
+        graph->axe_y->echelle_grad /= 2;
+        graph->axe_y->taille_grad /= 2;
+    }
+
+    resize_navigation(graph);
+    resize_precision_grad(graph);
+}
+
 void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
     if (event.type == SDL_MOUSEWHEEL) {
-        float old_taille_grad_x = graph->axe_x->taille_grad;
-        float old_taille_grad_y = graph->axe_y->taille_grad;
-        graph->axe_x->taille_grad += event.wheel.y * ZOOM_SPEED;
-        graph->axe_y->taille_grad += event.wheel.y * ZOOM_SPEED;
-
-        graph->axe_x->min +=  ((x_souris_px - graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-        graph->axe_x->max -=  ((graph->x - x_souris_px + graph->origine_x) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-        graph->axe_y->max -=  ((y_souris_px - graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-        graph->axe_y->min +=  ((graph->y - y_souris_px + graph->origine_y) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-        
-        if (graph->axe_x->taille_grad < TAILLE_GRADUATION_MIN){
-            graph->axe_x->echelle_grad *= 2;
-            graph->axe_x->taille_grad *= 2;
+        if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
+                y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
+            zoomer(event, graph, x_souris_px, y_souris_px);
         }
-        if (graph->axe_x->taille_grad > TAILLE_GRADUATION_MAX){
-            graph->axe_x->echelle_grad /= 2;
-            graph->axe_x->taille_grad /= 2;
-        }
-        if (graph->axe_y->taille_grad < TAILLE_GRADUATION_MIN){
-            graph->axe_y->echelle_grad *= 2;
-            graph->axe_y->taille_grad *= 2;
-        }
-        if (graph->axe_y->taille_grad > TAILLE_GRADUATION_MAX){
-            graph->axe_y->echelle_grad /= 2;
-            graph->axe_y->taille_grad /= 2;
-        }
-
-        resize_navigation(graph);
-        resize_precision_grad(graph);
     }
 
     if (event.type == SDL_MOUSEMOTION) {
-        if (graph->souris_pressee && 
-                x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
-                y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
-            graph->axe_x->min -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-            graph->axe_x->max -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-            graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-            graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-            resize_navigation(graph);
+        if (graph->souris_pressee){
+            if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
+                    y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
+                graph->axe_x->min -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+                graph->axe_x->max -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+                graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+                graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
+                resize_navigation(graph);
+            } else {
+                graph->souris_pressee = false;
+            }
         }
     }
 

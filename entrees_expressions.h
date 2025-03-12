@@ -81,14 +81,6 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Expres
 void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors);
 
 /**
- * Test si la souris est sur le bouton
- * @param button Le bouton
- * @param x_souris_px La position de la souris sur l'axe x en pixels
- * @param y_souris_px La position de la souris sur l'axe y en pixels
- */
-int is_souris_sur_button (Button button, int x_souris_px, int y_souris_px);
-
-/**
  * Insère un caractère dans une chaine de caractères
  * @param text La chaine de caractères
  * @param i La position où insérer le caractère

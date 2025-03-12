@@ -6,6 +6,16 @@
 
 #define NB_BOUTONS_ACCUEIL 3
 
+typedef struct {
+    SDL_Rect dstRect;
+    int textureWidth;
+    int textureHeight;
+    SDL_Texture* backgroundTexture;
+    bool is_filtre; // Pour savoir si un flitre doit être appliqué
+    SDL_Color color_filtre;
+    SDL_Rect filtre;
+} Background;
+
 /**
  * Affiche le titre de la page d'accueil
  * @param ren Un pointeur sur une structure contenant l'état du rendu
@@ -33,9 +43,10 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]);
  * Gère les événements des boutons de l'écran d'accueil
  * @param buttons Le tableau de boutons
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bg L'image de fond
  * @param running Un pointeur sur un entier qui permet de quitter la boucle de jeu
  */
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, int *running);
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running);
 
 /**
  * Affiche une page de texte scrollable
@@ -56,5 +67,32 @@ void ecran_remerciements (SDL_Renderer* ren);
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  */
 void ecran_mode_emploi (SDL_Renderer* ren);
+
+/**
+ * Initialise l'image de fond contenue dans Ressources/background/
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param filename Le nom de l'image de fond avec son extention
+ * @param bg La structure nessessaire pour l'image de fond
+ */
+void init_background (SDL_Renderer* ren, const char* filename, Background* bg);
+
+/**
+ * Redimentionne l'image de fond en fonction de la taille de la fenêtre
+ * @param bg La structure nessessaire pour l'image de fond
+ */
+void resize_background (Background* bg);
+
+/**
+ * Affiche l'image de fond sur le renderer
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bg La structure nessessaire pour l'image de fond
+ */
+void affiche_background (SDL_Renderer* ren, Background* bg);
+
+/**
+ * Libère l'espace pour l'image de fond et sa structure quand elle n'est plus utilisée
+ * @param bg La structure nessessaire pour l'image de fond
+ */
+void free_background (Background* bg);
 
 #endif

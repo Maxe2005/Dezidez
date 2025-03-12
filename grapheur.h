@@ -170,4 +170,13 @@ void resize_contours_graph (Graph* graph);
  */
 void resize_precision_grad (Graph* graph);
 
+/**
+ * Modifie la taille des graduation, ajuste l'echelle des graduation si necessaire et modifie le min et le max de chaque axe
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ */
+void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
+
 #endif
