@@ -3,8 +3,13 @@
 
 #include "ressources.h"
 
-#define TAILLE_BANDE_HAUT 120
-#define TAILLE_BANDE_DESCRIPTIONS 40 // Inclus dans la bande haute
+#define TAILLE_BANDE_DROITE 100
+#define TAILLE_BANDE_DESCRIPTIONS 40 
+#define TAILLE_BANDE_HAUT TAILLE_BANDE_DESCRIPTIONS + 100
+#define TAILLE_BANDE_EXPRESSIONS_MIN TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS
+#define TAILLE_BANDE_EXPRESSIONS_MAX 300
+#define BANDE_EXPRESSIONS_ON_SCROLL_STEP 20
+#define BANDE_EXPRESSIONS_OFF_SCROLL_STEP 10
 #define MAX_LEN_STR 20
 #define MAX_LEN_ENTREES_BORNES 8
 #define NB_ENTREES 3
@@ -31,6 +36,7 @@ typedef struct {
 
 typedef struct {
     char fonction_str [MAX_LEN_STR]; // L'expression en chaine de caractère de la fonction
+    float (*f)(float);
     float borne_inf; // Le minimum de l'intervale de définition choisi
     float borne_sup; // Le maximum de l'intervale de définition choisi
     float fx_max; // Le maximum de la fonction sur l'interval choisi
@@ -49,11 +55,13 @@ typedef struct {
 
 typedef struct {
     Expression_fonction* expressions[NB_EXPRESSION_MAX];
+    int nb_expressions; // La taille à l'instant t du tableau <expressions>
     Button* texte_descriptif_borne_inf;
     Button* texte_descriptif_borne_sup;
     Button* texte_descriptif_expression;
-    int x_souris_px;
-    int y_souris_px;
+    bool expanding; // Pour savoir si la bande est fermée ou ouverte (false = fermé, true = ouverte)
+    int scroll_offset;
+    SDL_Rect surface; // Le recantgle occupé par la bande 
 } Bande_entrees;
 
 typedef struct {
@@ -64,6 +72,9 @@ typedef struct {
     int espace_entre_entrees;
     int marge_entree_gauche;
 } Parametres_bandes_entrees;
+
+float f (float x);
+float g (float x);
 
 /**
  * Affiche la bande haute de l'interface
@@ -119,7 +130,17 @@ void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_
  * @param y_souris_px La position en pixel de la souris
  * @return 0 si l'événement <SDLK_BACKSPACE> a été géré, 1 sinon
  */
-int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px);
+int handle_events_entrees_expressions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px);
+
+/** 
+ * Gère tous les évènement de la bande haut
+ * @param event L'événement à gérer
+ * @param bande_entrees La bande d'entrées dans laquelle ce trouvent la bande descriptive et les expressions
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @return 0 si l'événement <SDLK_BACKSPACE> a été géré, 1 sinon
+ */
+int handle_event_bande_haut (SDL_Event event, Bande_entrees* bande_entrees, int x_souris_px, int y_souris_px);
 
 /**
  * Charge la valeur présente dans le champs de saisie dans la valeur de la borne inférieur de la fonction
@@ -134,5 +155,24 @@ void charge_valeur_borne_inf (Expression_fonction* expression);
  * @param expression La bande de l'expression
  */
 void charge_valeur_borne_sup (Expression_fonction* expression);
+
+/**
+ * Affiche un rectangle avec les bord bas arrondis
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param x1 Le point en haut à gauche du rectangle
+ * @param y1 Le point en haut à gauche du rectangle
+ * @param x2 Le point en bas à droite du rectangle
+ * @param y2 Le point en bas à droite du rectangle
+ * @param radius Le rayon de la courbure des coins bas
+ * @param color La couleur du rectangle
+ */
+void affiche_bande_des_champs (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
+
+/**
+ * Regarde s'il faut executer une action en quittant le focus d'un certain champs avant d'en focus un autre (ou pas)
+ * @param expression La bande de l'expression
+ * @param nouvelle_entree Le prochain champs focus (au aucun si SELECTION_NULL)
+ */
+void execute_champs_select_and_change_focus (Expression_fonction* expression, SelectionEntree nouvelle_entree);
 
 #endif

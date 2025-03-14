@@ -91,7 +91,7 @@ int main() {
         
         // Animation de l'agrandissement
         if (expanding && header_height < HEADER_MAX) {
-            header_height += 5;
+            header_height += 7;
         } else if (!expanding && header_height > HEADER_MIN) {
             header_height -= 5;
         }
@@ -102,7 +102,6 @@ int main() {
         drawHeader(renderer, header_height, font, scroll_offset);
         
         SDL_RenderPresent(renderer);
-        SDL_Delay(16);
     }
     
     TTF_CloseFont(font);

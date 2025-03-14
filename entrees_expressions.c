@@ -1,5 +1,13 @@
 #include "entrees_expressions.h"
 
+float f (float x) {
+    return sin(x);
+}
+
+float g (float x) {
+    return cos(x);
+}
+
 void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors){
     // Bande descriptive : bornes inférieure, supérieure et expression
     bande_entrees->texte_descriptif_borne_inf = malloc(sizeof(Button));
@@ -73,13 +81,22 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     params.espace_entre_entrees = (FEN_X - 2*params.width_entrees_bornes - params.width_entree_expression - 100) / 4;
     params.marge_entree_gauche = params.espace_entre_entrees;
 
+    bande_entrees->expanding = false;
+    bande_entrees->scroll_offset = 0;
+    bande_entrees->surface.x = 0;
+    bande_entrees->surface.y = TAILLE_BANDE_DESCRIPTIONS;
+    bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
+    bande_entrees->surface.h = TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS;
+
     init_placement_bande_descriptive(bande_entrees, params, colors);
 
+    bande_entrees->nb_expressions = 1;
     bande_entrees->expressions[0] = malloc(sizeof(Expression_fonction));
     init_placement_entrees(bande_entrees->expressions[0], params, colors);
     bande_entrees->expressions[0]->fonction.borne_inf = -4;
     bande_entrees->expressions[0]->fonction.borne_sup = 4;
     bande_entrees->expressions[0]->fonction.color = (SDL_Color){255, 0, 0, 255};
+    bande_entrees->expressions[0]->fonction.f = f;
 }
 
 
@@ -125,9 +142,8 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
         } else {
             expression->fonction.borne_inf = test;
-            expression->entree_selectionnee = SELECTION_NULL;
         }
-    } else expression->entree_selectionnee = SELECTION_NULL;
+    }
 }
 
 void charge_valeur_borne_sup (Expression_fonction* expression){
@@ -138,12 +154,47 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
         } else {
             expression->fonction.borne_sup = test;
-            expression->entree_selectionnee = SELECTION_NULL;
         }
-    } else expression->entree_selectionnee = SELECTION_NULL;
+    }
 }
 
-int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
+void execute_champs_select_and_change_focus (Expression_fonction* expression, SelectionEntree nouvelle_entree){
+    if (expression->entree_selectionnee == BORNE_INF) charge_valeur_borne_inf(expression);
+    if (expression->entree_selectionnee == BORNE_SUP) charge_valeur_borne_sup(expression);
+    if (expression->entree_selectionnee == EXPRESSION){
+        // TODO : A connecter avec les autres modules
+    }
+    expression->entree_selectionnee = nouvelle_entree;
+}
+
+int handle_event_bande_haut (SDL_Event event, Bande_entrees* bande_entrees, int x_souris_px, int y_souris_px){
+    bool backspace_gere = true; // Pour faire l'union des sorties de handle_events_entrees_expressions
+    bool clic_utile = false;
+    bool inter;
+    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
+        inter = handle_events_entrees_expressions(event, bande_entrees->expressions[i], x_souris_px, y_souris_px);
+        if (backspace_gere) backspace_gere = inter;
+    }
+    if (is_souris_sur_rectangle(bande_entrees->surface, x_souris_px, y_souris_px)){
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            bande_entrees->expanding = !bande_entrees->expanding;
+        }
+
+        if (event.type == SDL_MOUSEWHEEL) {
+            if (bande_entrees->expanding) {
+                bande_entrees->scroll_offset -= event.wheel.y * BANDE_EXPRESSIONS_ON_SCROLL_STEP;
+            }
+            if (!bande_entrees->expanding) {
+                bande_entrees->scroll_offset -= event.wheel.y * BANDE_EXPRESSIONS_OFF_SCROLL_STEP;
+            }
+            if (bande_entrees->scroll_offset < 0) bande_entrees->scroll_offset = 0;
+            //if (bande_entrees->scroll_offset > ) bande_entrees->scroll_offset = ;
+        }
+    }
+    return backspace_gere;
+}
+
+int handle_events_entrees_expressions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
     if (event.type == SDL_MOUSEMOTION) {
         // Souris sur un bouton ?
         for (int i = 0; i < NB_ENTREES; i++) {
@@ -167,8 +218,7 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
             }
         }
         if (!au_moins_un_champs_selectionne) { // Si clic à côté, on regarde si on quitte un champs et si c'est le cas, on charge la valeur de ce champs. PS : l' entree_selectionnee sera également remise à SELECTION_NULL
-            if (expression->entree_selectionnee == BORNE_INF){charge_valeur_borne_inf(expression);}
-            if (expression->entree_selectionnee == BORNE_SUP){charge_valeur_borne_sup(expression);}
+            execute_champs_select_and_change_focus(expression, SELECTION_NULL);
         }
     }
 
@@ -197,9 +247,9 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
 
             if (event.key.keysym.sym == SDLK_DOWN || event.key.keysym.sym == SDLK_UP) {
                 if (event.key.keysym.sym == SDLK_DOWN) {
-                    expression->entree_selectionnee = (expression->entree_selectionnee - 1 + NB_ENTREES) % NB_ENTREES;
+                    execute_champs_select_and_change_focus(expression, (expression->entree_selectionnee - 1 + NB_ENTREES) % NB_ENTREES);
                 } else {
-                    expression->entree_selectionnee = (expression->entree_selectionnee + 1) % NB_ENTREES;
+                    execute_champs_select_and_change_focus(expression, (expression->entree_selectionnee + 1) % NB_ENTREES);
                 }
                 for (int i = 0; i < NB_ENTREES; i++) {
                     expression->champs_entrees[i]->cursorVisible = 0;
@@ -225,13 +275,7 @@ int handle_events_entrees_experssions(SDL_Event event, Expression_fonction* expr
 
     if (event.type == SDL_KEYUP) {
         if (event.key.keysym.sym == SDLK_RETURN || event.key.keysym.sym == SDLK_KP_ENTER) {
-            if (expression->entree_selectionnee == BORNE_INF){charge_valeur_borne_inf(expression);}
-
-            if (expression->entree_selectionnee == BORNE_SUP){charge_valeur_borne_sup(expression);}
-        
-            if (expression->entree_selectionnee == EXPRESSION){
-                // TODO : A connecter avec les autres modules
-            }
+            execute_champs_select_and_change_focus(expression, SELECTION_NULL);
         }
     }
     
@@ -281,14 +325,20 @@ void valider_modif_taille_map(Session_modif_map* session) {
     session->message->start_time = time(NULL);
 }
 */
+
+void affiche_bande_des_champs (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
+    // Dessiner le rectangle principal
+    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, 255);
+    
+    // Dessiner le bas arrondi seulement
+    filledCircleRGBA(renderer, x1 + radius, y2 - radius, radius, color.r, color.g, color.b, 255);
+    filledCircleRGBA(renderer, x2 - radius, y2 - radius, radius, color.r, color.g, color.b, 255);
+    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, 255);
+}
+
 void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Expression_fonction* expression, Colors* colors){
-    // Fond de la bande haute
-    SDL_SetRenderDrawColor(ren, colors->bande_haute_champs.r, colors->bande_haute_champs.g, colors->bande_haute_champs.b, colors->bande_haute_champs.a);
-    SDL_Rect bande_haut_champs_entrees = {0, TAILLE_BANDE_DESCRIPTIONS, FEN_X, TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS};
-    SDL_RenderFillRect(ren, &bande_haut_champs_entrees);
-    SDL_SetRenderDrawColor(ren, colors->bande_haute_description.r, colors->bande_haute_description.g, colors->bande_haute_description.b, colors->bande_haute_description.a);
-    SDL_Rect bande_haut_textes_descriptifs = {0, 0, FEN_X, TAILLE_BANDE_DESCRIPTIONS};
-    SDL_RenderFillRect(ren, &bande_haut_textes_descriptifs);
+    // Fond de la bande haute des champs
+    affiche_bande_des_champs(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_entrees->surface.y + bande_entrees->surface.h, 20, colors->bande_haute_champs);
 
     // Texte affiché (ajoute un curseur clignotant)
     const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
@@ -311,6 +361,8 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Expres
         renderButton(ren, target_champs->champs_texte);
     }
 
+    // Fond de la bande haute des descriptions
+    boxRGBA(ren, 0, 0, FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_DESCRIPTIONS, colors->bande_haute_description.r, colors->bande_haute_description.g, colors->bande_haute_description.b, colors->bande_haute_description.a);
     // Afficher les textes descriptifs
     renderButton(ren, bande_entrees->texte_descriptif_borne_inf);
     renderButton(ren, bande_entrees->texte_descriptif_borne_sup);

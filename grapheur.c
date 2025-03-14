@@ -2,9 +2,6 @@
 
 // TODO ajouter les free et les SDL_DestroyTexture (pour les boutons image et fonts)
 
-float f (float x) {
-    return sin(x);
-}
 
 void resize_navigation (Graph* graph){
     graph->axe_x->pos_premiere_grad = graph->origine_x + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) * graph->axe_x->taille_grad / graph->axe_x->echelle_grad;
@@ -250,13 +247,12 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     affiche_quadrillage(ren, graph);
     affiche_axes_graph(ren, graph, colors->axes);
 
-    SDL_Rect bande_laterale_gauche = {FEN_X - TAILLE_BANDE_DROITE, TAILLE_BANDE_HAUT, TAILLE_BANDE_DROITE, FEN_Y - TAILLE_BANDE_HAUT};
-    SDL_SetRenderDrawColor(ren, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
-    SDL_RenderFillRect(ren, &bande_laterale_gauche);
+    tracer_fonction(ren, graph, bande_entrees->expressions[0]->fonction);
+
+    // Affichage de la bande droite
+    boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
 
     affiche_bande_haut(ren, bande_entrees, bande_entrees->expressions[0], colors);
-
-    tracer_fonction(ren, graph, bande_entrees->expressions[0]->fonction);
 }
 
 void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size) {
@@ -294,8 +290,8 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
         float x, y_sur_graph, x_sur_graph;
         for (int i = 0; i < nb_pts; i++) {
             x = borne_inf + i * step_size;
-            if (f(x) >= graph->axe_y->min && f(x) <= graph->axe_y->max){
-                y_sur_graph = graph->origine_y + (graph->axe_y->max - f(x)) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
+            if (fonction.f(x) >= graph->axe_y->min && fonction.f(x) <= graph->axe_y->max){
+                y_sur_graph = graph->origine_y + (graph->axe_y->max - fonction.f(x)) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
                 x_sur_graph = graph->origine_x + (0-graph->axe_x->min + x) / graph->axe_x->echelle_grad * graph->axe_x->taille_grad;
                 draw_thick_point(ren, x_sur_graph, y_sur_graph, 3);
             }
@@ -385,6 +381,7 @@ void Grapheur (SDL_Renderer* ren){
 
     SDL_StartTextInput();
     int is_event_backspace = 1;
+    int x_souris_px, y_souris_px;
     int running = 1;
     SDL_Event event;
     time_t current_time;
@@ -409,12 +406,12 @@ void Grapheur (SDL_Renderer* ren){
             }
 
             if (event.type == SDL_MOUSEMOTION) {
-                bande_entrees->x_souris_px = event.motion.x;
-                bande_entrees->y_souris_px = event.motion.y;
+                x_souris_px = event.motion.x;
+                y_souris_px = event.motion.y;
             }
 
-            handle_events_graph(event, graph, bande_entrees->x_souris_px, bande_entrees->y_souris_px);
-            is_event_backspace = handle_events_entrees_experssions(event, bande_entrees->expressions[0], bande_entrees->x_souris_px, bande_entrees->y_souris_px);
+            handle_events_graph(event, graph, x_souris_px, y_souris_px);
+            is_event_backspace = handle_event_bande_haut(event, bande_entrees, x_souris_px, y_souris_px);
 
             if (event.type == SDL_KEYUP) {
                 if (is_event_backspace && event.key.keysym.sym == SDLK_BACKSPACE){
@@ -426,6 +423,12 @@ void Grapheur (SDL_Renderer* ren){
                     resize_recentrer(graph, &bande_entrees->expressions[0]->fonction);
                 }
             }
+        }
+        // Animation de l'agrandissement
+        if (bande_entrees->expanding && bande_entrees->surface.h < TAILLE_BANDE_EXPRESSIONS_MAX) {
+            bande_entrees->surface.h += 5;
+        } else if (!bande_entrees->expanding && bande_entrees->surface.h > TAILLE_BANDE_EXPRESSIONS_MIN) {
+            bande_entrees->surface.h -= 5;
         }
         updateDisplay(ren);
     }
