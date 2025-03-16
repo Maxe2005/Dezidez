@@ -331,41 +331,6 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
     resize_precision_grad(graph);
 }
 
-void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
-    if (event.type == SDL_MOUSEWHEEL) {
-        if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
-                y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
-            zoomer(event, graph, x_souris_px, y_souris_px);
-        }
-    }
-
-    if (event.type == SDL_MOUSEMOTION) {
-        if (graph->souris_pressee){
-            if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
-                    y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
-                graph->axe_x->min -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-                graph->axe_x->max -= event.motion.xrel * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
-                graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-                graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
-                resize_navigation(graph);
-            } else {
-                graph->souris_pressee = false;
-            }
-        }
-    }
-
-    if (event.type == SDL_MOUSEBUTTONUP) {
-        graph->souris_pressee = false;
-    }
-
-    if (event.type == SDL_MOUSEBUTTONDOWN) {
-        if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
-                y_souris_px > graph->origine_y && y_souris_px < graph->origine_y + graph->y){
-            graph->souris_pressee = true;
-        }
-    }
-
-}
 
 void Grapheur (SDL_Renderer* ren){
     Colors* colors = malloc(sizeof(Colors));
@@ -377,10 +342,10 @@ void Grapheur (SDL_Renderer* ren){
     Graph* graph = malloc(sizeof(Graph));
     *graph = init_graph(&bande_entrees->expressions[0]->fonction);
     graph->souris_pressee = false;
-
+    graph->origine_y_apres_bande_haut = bande_entrees->surface.y + bande_entrees->surface.h;
 
     SDL_StartTextInput();
-    int is_event_backspace = 1;
+    int is_event_backspace_used = 0;
     int x_souris_px, y_souris_px;
     int running = 1;
     SDL_Event event;
@@ -408,13 +373,36 @@ void Grapheur (SDL_Renderer* ren){
             if (event.type == SDL_MOUSEMOTION) {
                 x_souris_px = event.motion.x;
                 y_souris_px = event.motion.y;
+                handle_event_bande_haut_MOUSEMOTION (event, bande_entrees, x_souris_px, y_souris_px);
+                handle_event_graph_MOUSEMOTION (event, graph, x_souris_px, y_souris_px);
             }
 
-            handle_events_graph(event, graph, x_souris_px, y_souris_px);
-            is_event_backspace = handle_event_bande_haut(event, bande_entrees, x_souris_px, y_souris_px);
+            if (event.type == SDL_MOUSEWHEEL) {
+                handle_event_bande_haut_MOUSEWHEEL (event, bande_entrees, x_souris_px, y_souris_px);
+                handle_event_graph_MOUSEWHEEL (event, graph, x_souris_px, y_souris_px);
+            }
+
+            if (event.type == SDL_MOUSEBUTTONUP) {
+                handle_event_bande_haut_MOUSEBUTTONUP (event, bande_entrees, x_souris_px, y_souris_px);
+                handle_event_graph_MOUSEBUTTONUP (event, graph, x_souris_px, y_souris_px);
+            }
+        
+            if (event.type == SDL_MOUSEBUTTONDOWN) {
+                handle_event_graph_MOUSEBUTTONDOWN (event, graph, x_souris_px, y_souris_px);
+            }
+
+            if (event.type == SDL_TEXTINPUT) {
+                handle_event_bande_haut_TEXTINPUT (event, bande_entrees);
+            }
+        
+            if (event.type == SDL_KEYDOWN) {
+                is_event_backspace_used = handle_event_bande_haut_KEYDOWN (event, bande_entrees);
+            }
 
             if (event.type == SDL_KEYUP) {
-                if (is_event_backspace && event.key.keysym.sym == SDLK_BACKSPACE){
+                handle_event_bande_haut_KEYUP (event, bande_entrees);
+
+                if (!is_event_backspace_used && event.key.keysym.sym == SDLK_BACKSPACE){
                     ecran_acceuil(ren);
                     running = 0;
                 }
@@ -426,9 +414,11 @@ void Grapheur (SDL_Renderer* ren){
         }
         // Animation de l'agrandissement
         if (bande_entrees->expanding && bande_entrees->surface.h < TAILLE_BANDE_EXPRESSIONS_MAX) {
-            bande_entrees->surface.h += 5;
+            bande_entrees->surface.h += (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
+            graph->origine_y_apres_bande_haut = bande_entrees->surface.y + bande_entrees->surface.h;
         } else if (!bande_entrees->expanding && bande_entrees->surface.h > TAILLE_BANDE_EXPRESSIONS_MIN) {
-            bande_entrees->surface.h -= 5;
+            bande_entrees->surface.h -= (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
+            graph->origine_y_apres_bande_haut = bande_entrees->surface.y + bande_entrees->surface.h;
         }
         updateDisplay(ren);
     }

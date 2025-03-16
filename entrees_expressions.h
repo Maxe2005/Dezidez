@@ -5,9 +5,9 @@
 
 #define TAILLE_BANDE_DROITE 100
 #define TAILLE_BANDE_DESCRIPTIONS 40 
-#define TAILLE_BANDE_HAUT TAILLE_BANDE_DESCRIPTIONS + 100
-#define TAILLE_BANDE_EXPRESSIONS_MIN TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS
-#define TAILLE_BANDE_EXPRESSIONS_MAX 300
+#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 100)
+#define TAILLE_BANDE_EXPRESSIONS_MIN (TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS)
+#define TAILLE_BANDE_EXPRESSIONS_MAX (TAILLE_BANDE_EXPRESSIONS_MIN + 200)
 #define BANDE_EXPRESSIONS_ON_SCROLL_STEP 20
 #define BANDE_EXPRESSIONS_OFF_SCROLL_STEP 10
 #define MAX_LEN_STR 20
@@ -121,26 +121,6 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
  * @param colors Les couleurs de l'interface
  */
 void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
-
-/**
- * Gère les événements des entrées et des expressions
- * @param event L'événement à gérer
- * @param expression La bande de l'expression, donc les entrées à modifier
- * @param x_souris_px La position en pixel de la souris
- * @param y_souris_px La position en pixel de la souris
- * @return 0 si l'événement <SDLK_BACKSPACE> a été géré, 1 sinon
- */
-int handle_events_entrees_expressions(SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px);
-
-/** 
- * Gère tous les évènement de la bande haut
- * @param event L'événement à gérer
- * @param bande_entrees La bande d'entrées dans laquelle ce trouvent la bande descriptive et les expressions
- * @param x_souris_px La position en pixel de la souris
- * @param y_souris_px La position en pixel de la souris
- * @return 0 si l'événement <SDLK_BACKSPACE> a été géré, 1 sinon
- */
-int handle_event_bande_haut (SDL_Event event, Bande_entrees* bande_entrees, int x_souris_px, int y_souris_px);
 
 /**
  * Charge la valeur présente dans le champs de saisie dans la valeur de la borne inférieur de la fonction

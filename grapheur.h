@@ -3,6 +3,7 @@
 
 #include "ressources.h"
 #include "entrees_expressions.h"
+// Il y a aussi l'include de "events.h" mais il est fait après les déclarations de structures car il en a besoins
 
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
@@ -31,8 +32,6 @@ typedef struct {
     TTF_Font* font_texte_grad;
 } Axe;
 
-
-
 typedef struct {
     Axe* axe_x;
     Axe* axe_y;
@@ -40,11 +39,13 @@ typedef struct {
     float y; // Hauteur du graph en pixels
     int origine_x; // Origine du graphique en x (coin en haut à gauche)
     int origine_y; // Origine du graphique en y (coin en haut à gauche)
+    int origine_y_apres_bande_haut; // Origine du graphique en y (coin en haut à gauche)
     int centre_x; // Position en pixel du centre (ou de l'origine du graphique)
     int centre_y; // Position en pixel du centre (ou de l'origine du graphique)
     bool souris_pressee;
 } Graph;
 
+#include "events.h"
 
 /**
  * Fonction mathématique f(x) pour du test
@@ -147,15 +148,6 @@ float arrondir_ordre_grandeur(float x);
  * @param graph Le graphique à afficher
  */
 void resize_navigation (Graph* graph);
-
-/**
- * Gère tous les évènement relatif au graphique
- * @param event L'événement à gérer
- * @param graph Le graphique affiché
- * @param x_souris_px La position en pixel de la souris
- * @param y_souris_px La position en pixel de la souris
- */
-void handle_events_graph(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
 
 /**
  * Redimentionne les contours du graphique donc son origine et sa taille
