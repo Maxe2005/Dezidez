@@ -61,13 +61,15 @@ typedef struct {
     SDL_Color axes;
     SDL_Color texte_axes;
     SDL_Color bande_droite;
-    SDL_Color bande_haute_champs;
+    SDL_Color bande_haute_expressions;
     SDL_Color bande_haute_description;
     SDL_Color bg_champ_entree;
     SDL_Color bg_champ_entree_hover;
     SDL_Color texte_champ_entree;
     SDL_Color texte_descriptifs_bande_haut;
-
+    SDL_Color bg_bandes_expression_1;
+    SDL_Color bg_bandes_expression_2;
+    SDL_Color bande_bas_de_bande_haut;
 } Colors;
 
 

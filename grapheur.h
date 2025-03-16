@@ -10,6 +10,7 @@
 #define ZOOM_SPEED 5
 #define TAILLE_GRADUATION_MIN 40
 #define TAILLE_GRADUATION_MAX 100
+#define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
 
 typedef struct {
     Button button_base;
@@ -169,5 +170,12 @@ void resize_precision_grad (Graph* graph);
  * @param y_souris_px La position en pixel de la souris
  */
 void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
+
+/**
+ * Actions à effectuer après avoir chager la taille de la bande des entrées
+ * @param graph Le graphique à afficher
+ * @param bande_entrees La bande d'entrées à afficher
+ */
+void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entrees);
 
 #endif

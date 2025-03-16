@@ -77,6 +77,17 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
     }
 }
 
+void resize_boutons_acceuil (Button* boutons[]){
+    int button_height = 60;
+    int button_width = 300;
+    int button_margin_x = 20;
+    int origine_x = FEN_X/2 - (NB_BOUTONS_ACCUEIL * button_width + (NB_BOUTONS_ACCUEIL - 1) * button_margin_x)/2;
+    for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
+        boutons[i]->rect.x = origine_x + i * (button_width + button_margin_x);
+        boutons[i]->rect.y = (FEN_Y - button_height)/2;
+    }
+}
+
 void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
     for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
         renderButton(ren, buttons[i]);
@@ -92,6 +103,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
             FEN_X = e.window.data1;
             FEN_Y = e.window.data2;
             resize_background(bg);
+            resize_boutons_acceuil(buttons);
         }
 
         if (e.type == SDL_MOUSEMOTION) {

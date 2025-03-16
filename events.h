@@ -134,7 +134,11 @@ void handle_event_entrees_expressions_KEYDOWN(SDL_Event event, Expression_foncti
  */
 void handle_event_entrees_expressions_TEXTINPUT(SDL_Event event, Expression_fonction* expression);
 
-
+/**
+ * Actions à effectuer après une modification de l'offset
+ * @param bande_entrees La bande d'entrées à afficher
+ */
+void action_apres_modif_offset (Bande_entrees* bande_entrees);
 
 
 

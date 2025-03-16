@@ -3,9 +3,17 @@
 float f (float x) {
     return sin(x);
 }
-
 float g (float x) {
     return cos(x);
+}
+float h (float x) {
+    return exp(x);
+}
+float i (float x) {
+    return x;
+}
+float j (float x) {
+    return 2 - x;
 }
 
 void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors){
@@ -33,8 +41,19 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
     }
 }
 
-void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
+void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors){
     expression->entree_selectionnee = SELECTION_NULL;
+    expression->rect_initial.x = surface_bande_haut.x;
+    expression->rect_initial.h = params.height_bande_expression;
+    expression->rect_initial.y = surface_bande_haut.y + expression->numero * (expression->rect_initial.h); // pour centrer : (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but_2[j]->champs_texte->rect.h)/2 ;
+    expression->rect_initial.w = surface_bande_haut.w;
+    expression->rect_affiche = expression->rect_initial;
+    if (expression->numero % 2 == 0){
+        expression->bg_color = colors->bg_bandes_expression_1;
+    } else {
+        expression->bg_color = colors->bg_bandes_expression_2;
+    }
+    
     // Les champs d'entrées
     expression->borne_inf = malloc(sizeof(Entree_texte));
     expression->borne_sup = malloc(sizeof(Entree_texte));
@@ -46,13 +65,14 @@ void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_
         but_2[j]->champs_texte = malloc(sizeof(Button));
         but_2[j]->type_entree = type[j];
         if (j == 2) {
-            but_2[j]->champs_texte->rect.w = params.width_entree_expression;
+            but_2[j]->position_initiale.w = params.width_entree_expression;
         } else {
-            but_2[j]->champs_texte->rect.w = params.width_entrees_bornes;
+            but_2[j]->position_initiale.w = params.width_entrees_bornes;
         }
-        but_2[j]->champs_texte->rect.h = params.height_entrees;
-        but_2[j]->champs_texte->rect.x = params.marge_entree_gauche + j*(params.width_entrees_bornes + params.espace_entre_entrees);
-        but_2[j]->champs_texte->rect.y = (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but_2[j]->champs_texte->rect.h)/2 ;
+        but_2[j]->position_initiale.h = params.height_entrees_pourcentage * expression->rect_initial.h / 100;
+        but_2[j]->position_initiale.x = expression->rect_initial.x + params.marge_entree_gauche + j*(params.width_entrees_bornes + params.espace_entre_entrees);
+        but_2[j]->position_initiale.y = expression->rect_initial.y + (expression->rect_initial.h - but_2[j]->position_initiale.h) / 2;
+        but_2[j]->champs_texte->rect = but_2[j]->position_initiale;
         but_2[j]->champs_texte->is_survolable = 1;
         but_2[j]->champs_texte->hovered = 0;
         but_2[j]->champs_texte->color_text = colors->texte_champ_entree;
@@ -73,14 +93,6 @@ void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_
 }
 
 void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
-    Parametres_bandes_entrees params;
-    params.width_entrees_bornes = 150;
-    params.width_entree_expression = 400;
-    params.height_entrees = 50;
-    params.height_texte_desctriptif = TAILLE_BANDE_DESCRIPTIONS - 10;
-    params.espace_entre_entrees = (FEN_X - 2*params.width_entrees_bornes - params.width_entree_expression - 100) / 4;
-    params.marge_entree_gauche = params.espace_entre_entrees;
-
     bande_entrees->expanding = false;
     bande_entrees->scroll_offset = 0;
     bande_entrees->surface.x = 0;
@@ -88,17 +100,66 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
     bande_entrees->surface.h = TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS;
 
-    init_placement_bande_descriptive(bande_entrees, params, colors);
+    bande_entrees->params.width_entrees_bornes = 150;
+    bande_entrees->params.width_entree_expression = 400;
+    bande_entrees->params.height_entrees_pourcentage = 70;
+    bande_entrees->params.height_bande_expression = 70;
+    bande_entrees->params.height_texte_desctriptif = TAILLE_BANDE_DESCRIPTIONS - 10;
+    bande_entrees->params.espace_entre_entrees = (FEN_X - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression - 100) / 4;
+    bande_entrees->params.marge_entree_gauche = bande_entrees->params.espace_entre_entrees;
 
-    bande_entrees->nb_expressions = 1;
-    bande_entrees->expressions[0] = malloc(sizeof(Expression_fonction));
-    init_placement_entrees(bande_entrees->expressions[0], params, colors);
-    bande_entrees->expressions[0]->fonction.borne_inf = -4;
-    bande_entrees->expressions[0]->fonction.borne_sup = 4;
-    bande_entrees->expressions[0]->fonction.color = (SDL_Color){255, 0, 0, 255};
-    bande_entrees->expressions[0]->fonction.f = f;
+    init_placement_bande_descriptive(bande_entrees, bande_entrees->params, colors);
+
+    float (*fx[])(float) = {f,g,h,i,j};
+    const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
+    SDL_Color classic_colors[] = {
+        {255, 0, 0, 255},   // Rouge
+        {0, 255, 0, 255},   // Vert
+        {0, 0, 255, 255},   // Bleu
+        {255, 255, 0, 255}, // Jaune
+        {0, 255, 255, 255}, // Cyan
+        {255, 0, 255, 255}, // Magenta
+        {255, 255, 255, 255}, // Blanc
+        {0, 0, 0, 255}      // Noir
+    };
+    bande_entrees->nb_expressions = 0;
+    for (int i = 0; i < 5; i++) {
+        bande_entrees->expressions[i] = malloc(sizeof(Expression_fonction));
+        bande_entrees->expressions[i]->numero = i;
+        init_placement_entrees(bande_entrees->expressions[i], bande_entrees->params, bande_entrees->surface, colors);
+        bande_entrees->expressions[i]->fonction.borne_inf = -4;
+        bande_entrees->expressions[i]->fonction.borne_sup = 4;
+        bande_entrees->expressions[i]->fonction.color = classic_colors[i];
+        bande_entrees->expressions[i]->fonction.f = fx[i];
+        strcpy(bande_entrees->expressions[i]->expression->text, nom_f[i]);
+        strcpy(bande_entrees->expressions[i]->borne_inf->text, "-4");
+        strcpy(bande_entrees->expressions[i]->borne_sup->text, "4");
+        bande_entrees->nb_expressions++;
+    }
 }
 
+void resize_bande_haut (Bande_entrees* bande_entrees){
+    bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
+    bande_entrees->params.espace_entre_entrees = (FEN_X - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression - 100) / 4;
+    bande_entrees->params.marge_entree_gauche = bande_entrees->params.espace_entre_entrees;
+
+    bande_entrees->texte_descriptif_borne_inf->rect.x = bande_entrees->params.marge_entree_gauche;
+    bande_entrees->texte_descriptif_borne_sup->rect.x = bande_entrees->params.marge_entree_gauche + bande_entrees->params.width_entrees_bornes + bande_entrees->params.espace_entre_entrees;
+    bande_entrees->texte_descriptif_expression->rect.x = bande_entrees->params.marge_entree_gauche + 2*(bande_entrees->params.width_entrees_bornes + bande_entrees->params.espace_entre_entrees);
+
+    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
+        bande_entrees->expressions[i]->rect_initial.w = bande_entrees->surface.w;
+        bande_entrees->expressions[i]->rect_affiche.w = bande_entrees->surface.w;
+
+        bande_entrees->expressions[i]->borne_inf->position_initiale.x = bande_entrees->expressions[i]->rect_initial.x + bande_entrees->params.marge_entree_gauche;
+        bande_entrees->expressions[i]->borne_sup->position_initiale.x = bande_entrees->expressions[i]->rect_initial.x + bande_entrees->params.marge_entree_gauche + bande_entrees->params.width_entrees_bornes + bande_entrees->params.espace_entre_entrees;
+        bande_entrees->expressions[i]->expression->position_initiale.x = bande_entrees->expressions[i]->rect_initial.x + bande_entrees->params.marge_entree_gauche + 2*(bande_entrees->params.width_entrees_bornes + bande_entrees->params.espace_entre_entrees);
+        
+        bande_entrees->expressions[i]->borne_inf->champs_texte->rect.x = bande_entrees->expressions[i]->borne_inf->position_initiale.x;
+        bande_entrees->expressions[i]->borne_sup->champs_texte->rect.x = bande_entrees->expressions[i]->borne_sup->position_initiale.x;
+        bande_entrees->expressions[i]->expression->champs_texte->rect.x = bande_entrees->expressions[i]->expression->position_initiale.x;
+    }
+}
 
 
 void insert_char(char text[], int i, char c) {
@@ -174,24 +235,6 @@ void valider_modif_taille_map(Session_modif_map* session) {
     if (width >= TAILLE_MIN_MAP && width <= TAILLE_MAX_MAP && height >= TAILLE_MIN_MAP && height <= TAILLE_MAX_MAP) {
         playSoundEffect(musique->select);
         *session->map_totale = modif_taille_map(session->map_totale, width, height);
-        if (session->zoom > session->map_totale->x - ZOOM_MAX) {
-            session->zoom = session->map_totale->x - ZOOM_MAX;
-        }
-        if (session->zoom > session->map_totale->y - ZOOM_MAX) {
-            session->zoom = session->map_totale->y - ZOOM_MAX;
-        }
-        if (session->position_zoom_x + session->map->x > session->map_totale->x){
-            session->position_zoom_x = session->map_totale->x - session->map->x;
-            if (session->position_zoom_x < 0){
-                session->position_zoom_x = 0;
-            }
-        }
-        if (session->position_zoom_y + session->map->y > session->map_totale->y){
-            session->position_zoom_y = session->map_totale->y - session->map->y;
-            if (session->position_zoom_y < 0){
-                session->position_zoom_y = 0;
-            }
-        }
         nouveau_zoom(session->map, session->map_totale, session->zoom, session->position_zoom_x, session->position_zoom_y);
         session->message->button_base.label = "La map à bien été redimentionnée";
         session->message->couleur_message = (SDL_Color){255, 255, 255, 255};
@@ -212,39 +255,51 @@ void valider_modif_taille_map(Session_modif_map* session) {
 }
 */
 
-void affiche_bande_des_champs (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
+void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
     // Dessiner le rectangle principal
-    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, 255);
+    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, color.a);
     
     // Dessiner le bas arrondi seulement
-    filledCircleRGBA(renderer, x1 + radius, y2 - radius, radius, color.r, color.g, color.b, 255);
-    filledCircleRGBA(renderer, x2 - radius, y2 - radius, radius, color.r, color.g, color.b, 255);
-    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, 255);
+    filledPieRGBA(renderer, x1 + radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
+    filledPieRGBA(renderer, x2 - radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
+    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, color.a);
 }
 
-void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Expression_fonction* expression, Colors* colors){
+void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
+    expression->rect_affiche.y = expression->rect_initial.y - offset;
+    for (int i = 0; i < 3; i++) {
+        expression->champs_entrees[i]->champs_texte->rect.y = expression->champs_entrees[i]->position_initiale.y - offset;
+    }
+}
+
+void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors){
     // Fond de la bande haute des champs
-    affiche_bande_des_champs(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_entrees->surface.y + bande_entrees->surface.h, 20, colors->bande_haute_champs);
+    affiche_bande_arrondis_en_bas(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_entrees->surface.y + bande_entrees->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_haute_expressions);
 
     // Texte affiché (ajoute un curseur clignotant)
     const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
     Entree_texte *target_champs = NULL;
-    for (int i = 0; i < NB_ENTREES; i++) {
-        target_champs = expression->champs_entrees[i];
-        if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
-            target_champs->cursorVisible = !target_champs->cursorVisible;
-            target_champs->lastCursorToggle = SDL_GetTicks();
+    for (int j = 0; j < bande_entrees->nb_expressions; j++) {
+        if (bande_entrees->expressions[j]->visible) {
+            boxRGBA(ren, bande_entrees->expressions[j]->rect_affiche.x, bande_entrees->expressions[j]->rect_affiche.y, bande_entrees->expressions[j]->rect_affiche.x + bande_entrees->expressions[j]->rect_affiche.w, bande_entrees->expressions[j]->rect_affiche.y + bande_entrees->expressions[j]->rect_affiche.h, bande_entrees->expressions[j]->bg_color.r, bande_entrees->expressions[j]->bg_color.g, bande_entrees->expressions[j]->bg_color.b, bande_entrees->expressions[j]->bg_color.a);
+            for (int i = 0; i < NB_ENTREES; i++) {
+                target_champs = bande_entrees->expressions[j]->champs_entrees[i];
+                if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
+                    target_champs->cursorVisible = !target_champs->cursorVisible;
+                    target_champs->lastCursorToggle = SDL_GetTicks();
+                }
+                if (i != bande_entrees->expressions[j]->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
+                    target_champs->champs_texte->label = texte_defaut[i];
+                } else {
+                    strcpy(target_champs->display, target_champs->text);
+                    if (bande_entrees->expressions[j]->entree_selectionnee == target_champs->type_entree && target_champs->cursorVisible){
+                        insert_char(target_champs->display, target_champs->position_cursor, '|');
+                    } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+                    target_champs->champs_texte->label = target_champs->display;
+                }
+                renderButton(ren, target_champs->champs_texte);
+            }
         }
-        if (i != expression->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
-            target_champs->champs_texte->label = texte_defaut[i];
-        } else {
-            strcpy(target_champs->display, target_champs->text);
-            if (expression->entree_selectionnee == target_champs->type_entree && target_champs->cursorVisible){
-                insert_char(target_champs->display, target_champs->position_cursor, '|');
-            } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
-            target_champs->champs_texte->label = target_champs->display;
-        }
-        renderButton(ren, target_champs->champs_texte);
     }
 
     // Fond de la bande haute des descriptions

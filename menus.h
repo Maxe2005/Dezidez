@@ -95,4 +95,10 @@ void affiche_background (SDL_Renderer* ren, Background* bg);
  */
 void free_background (Background* bg);
 
+/**
+ * Redimentione les boutons de la page d'acceuil en fonction de la taille de la fenêtre
+ * @param boutons Un tableau avec tous les boutons à redimentionner
+ */
+void resize_boutons_acceuil (Button* boutons[]);
+
 #endif
