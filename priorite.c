@@ -19,10 +19,10 @@ bool parenthese(int tailletab, typejeton *tab){
     int nbouv = 0;
     int nbfer = 0;
     for (int i = 0; i < tailletab; i++){
-        if (tab[i].lexem == BAR_OUV){
+        if (tab[i].lexem == PAR_OUV){
             nbouv = nbouv + 1;
         }
-        if(tab[i].lexem == BAR_FERM){
+        if(tab[i].lexem == PAR_FERM){
             nbfer = nbfer + 1;
         }
     }
