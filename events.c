@@ -150,7 +150,7 @@ bool handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Expression
 void handle_event_entrees_expressions_TEXTINPUT (SDL_Event event, Expression_fonction* expression) {
     Entree_texte *target = expression->champs_entrees[expression->entree_selectionnee];
     if (expression->entree_selectionnee < 2) {
-        if (strlen(target->text) < MAX_LEN_ENTREES_BORNES && (isdigit(event.text.text[0]) || event.text.text[0] == '-' || event.text.text[0] == '.'|| event.text.text[0] == 'e')) {
+        if (strlen(target->text) < MAX_LEN_ENTREES_BORNES && (isdigit(event.text.text[0]) || event.text.text[0] == '-' || event.text.text[0] == '.'|| event.text.text[0] == 'E' || event.text.text[0] == 'e')) {
             insert_char(target->text, target->position_cursor++, event.text.text[0]);
         }
     } else

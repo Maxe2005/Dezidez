@@ -17,6 +17,8 @@
 #define NB_EXPRESSION_MAX 5 // Le nombre de fonction maximum affichables en simultané
 #define RAYON_BAS_BANDE_HAUT 20
 
+//extern Message message;
+
 
 typedef enum { // ! L'ordre est important pour l'initialisation des champs d'entrées. Il doit correspondre à celui de l'initialisation des champs d'entrées et la SELECTION_NULL doit être en dernier
     BORNE_INF,
@@ -24,6 +26,13 @@ typedef enum { // ! L'ordre est important pour l'initialisation des champs d'ent
     EXPRESSION,
     SELECTION_NULL
 } SelectionEntree;
+
+typedef struct {
+    Button button_base;
+    int temps_affichage; // en secondes
+    int is_visible;
+    time_t start_time;
+} Message;
 
 typedef struct {
     char text[MAX_LEN_STR + 1]; // +1 pour le /0 comme fin de chaine
@@ -181,5 +190,14 @@ void placement_pour_affichage_avec_offset (Expression_fonction* expression, int 
  * @param bande_entrees La bande d'entrées dans laquelle ce trouve les bande descriptive et expressions
  */
 void resize_bande_haut (Bande_entrees* bande_entrees);
+
+
+
+/**
+ * Redimmentionne la bande haute en fonction de la taille de la fenêtre et des autres éléments de la fenêtre à l'instant t
+ * @param text_erreur message d'erreur affiché
+ * @param endroit_erreur rectangle où l'erreur a été enregestré
+ */
+void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
 
 #endif

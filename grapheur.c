@@ -2,7 +2,6 @@
 
 // TODO ajouter les free et les SDL_DestroyTexture (pour les boutons image et fonts)
 
-
 void resize_navigation (Graph* graph){
     graph->axe_x->pos_premiere_grad = graph->origine_x + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) * graph->axe_x->taille_grad / graph->axe_x->echelle_grad;
     graph->axe_x->nb_grad = (graph->x - graph->axe_x->pos_premiere_grad + graph->origine_x) / graph->axe_x->taille_grad;
@@ -288,6 +287,17 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     affiche_bande_arrondis_en_bas(ren, bande_entrees->surface.x, bande_entrees->surface.y + bande_entrees->surface.h - ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT), bande_entrees->surface.x + bande_entrees->surface.w, bande_entrees->surface.y + bande_entrees->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
     // Affichage de la bande droite
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
+    
+
+
+
+    if (message.is_visible){
+        if (time(NULL) - message.start_time > message.temps_affichage){
+            message.is_visible = 0;
+        } else {
+            renderButton(ren, &message.button_base);
+        }
+    }
 
 }
 
@@ -356,6 +366,17 @@ void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entr
     }
 }
 
+void init_const_message(){
+    message.temps_affichage = 5;
+    message.button_base.is_survolable = 0;
+    message.button_base.color_base = (SDL_Color) {255,0,0,255};
+    message.button_base.radius = 15;
+    message.button_base.font_text = fonts[5];
+    message.button_base.color_text = (SDL_Color) {255,255,255,255};
+
+}
+
+
 void Grapheur (SDL_Renderer* ren){
     Colors* colors = malloc(sizeof(Colors));
     change_color_mode(colors, 1);
@@ -367,6 +388,9 @@ void Grapheur (SDL_Renderer* ren){
     *graph = init_graph(&bande_entrees->expressions[0]->fonction);
     graph->souris_pressee = false;
     actions_apres_resize_bande_entrees(graph, bande_entrees);
+
+    init_const_message();
+    message.is_visible = 0; 
 
     SDL_StartTextInput();
     int is_event_backspace_used = 0;
