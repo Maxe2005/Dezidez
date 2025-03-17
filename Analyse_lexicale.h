@@ -1,4 +1,6 @@
 #include "Structures.h"
+#include <stdio.h>
+#include <string.h>
 
 
 /**
@@ -16,15 +18,30 @@ int AnalyseLexicale (typejeton Token[], char *Expression, int SizeExpression);
  */
 typelexem TypeString (char *Expression, int SizeExpression);
 
+/**
+ * Renvoie 1 si l'element recherché est dans le tableau sinon renvoie 0
+ * @param tab : tableaude chaine de caractère
+ * @param size : La taille du tableau
+  * @param element : Element recherché
+ */
+ int IsInTab(char *tab[], int size, char element)
+ /**
+ * Prend l'expression en paramètre et rajoute tout les * implicite qui ne sont pas marque
+ * @param Expression : chaine de caractère qui contient l'expression sans les espaces
+ * @param SizeExpression : La taille de l'expression
+ */
+char MultiplicationImplicite (char *Expression,int SizeExpression);
+/**
+ * Retire tout les espaces de l'expression
+ * @param Expression : chaine de caractère qui contient l'expression 
+ * @param SizeExpression : La taille de l'expression
+ */
+char ExpressionSansLesEspaces (char *Expression,int SizeExpression);
 
 
-
-
-
-
-
-
-
-
-
-
+/**
+ * Découpe la chaine de caractère
+ * @param str : chaine de caractère qui contient l'expression 
+ * @param SizeExpression : La taille de l'expression
+ */
+int CutStr (char *str, int SizeExpression, char *Strdecoupee);

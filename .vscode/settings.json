@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "analyse_lexicale.h": "c",
-        "cstdlib": "c"
+        "cstdlib": "c",
+        "structures.h": "c",
+        "string.h": "c"
     }
 }
