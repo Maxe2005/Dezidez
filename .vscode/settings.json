@@ -1,5 +1,6 @@
 {
     "files.associations": {
-        "analyse_lexicale.h": "c"
+        "analyse_lexicale.h": "c",
+        "cstdlib": "c"
     }
 }

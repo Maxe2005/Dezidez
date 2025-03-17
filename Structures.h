@@ -5,7 +5,7 @@ typedef enum
 } typelexem;
 
 //énumération des diff types d'opérateurs existants
-typedef enum
+typedef enum 
 {
     PLUS, MOINS, FOIS, DIV, PUIS
 } typeoperateur;
