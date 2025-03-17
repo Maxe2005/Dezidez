@@ -7,11 +7,10 @@ int operateur (int tailletab, typejeton *tab){
         if (tab[i].lexem != OPERATEUR){
             continue;
         }
-        if (tab[i].valeur.operateur > operateurmax){
+        if (tab[i].valeur.operateur - operateurmax > 3){ // regarde la difference de priorite entre les operateurs, selon les valeurs qui leur sont attribuées
             operateurmax = tab[i].valeur.operateur;
             indmax = i;
-        }
-     
+        }     
     }
     return indmax;
 }

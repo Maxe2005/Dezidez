@@ -7,7 +7,7 @@ typedef enum
 //énumération des diff types d'opérateurs existants
 typedef enum
 {
-    PLUS = 0, MOINS = 0, FOIS = 1, DIV = 1, PUIS = 2
+    PLUS = 0, MOINS = 1, FOIS = 10, DIV = 11, PUIS = 20
 } typeoperateur;
 
 //énumération des diff types de fonctions existantes
