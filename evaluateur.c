@@ -40,7 +40,7 @@ float decodage_arbre(Node *racine){
 
 
     if (racine->jeton.lexem == FONCTION){ // si l'élément est une fonction on prend sont élément suivant afin de le donner à la fonction de calcul de fonction
-        calculer_fonction(racine->jeton.valeur.fonction,decodage_arbre(racine->pjeton_suiv));
+       return calculer_fonction(racine->jeton.valeur.fonction,decodage_arbre(racine->pjeton_suiv));
     }
 
     else {
