@@ -151,18 +151,6 @@ void charge_valeur_borne_inf (Expression_fonction* expression);
 void charge_valeur_borne_sup (Expression_fonction* expression);
 
 /**
- * Affiche un rectangle avec les bord bas arrondis
- * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param x1 Le point en haut à gauche du rectangle
- * @param y1 Le point en haut à gauche du rectangle
- * @param x2 Le point en bas à droite du rectangle
- * @param y2 Le point en bas à droite du rectangle
- * @param radius Le rayon de la courbure des coins bas
- * @param color La couleur du rectangle
- */
-void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
-
-/**
  * Regarde s'il faut executer une action en quittant le focus d'un certain champs avant d'en focus un autre (ou pas)
  * @param expression La bande de l'expression
  * @param nouvelle_entree Le prochain champs focus (au aucun si SELECTION_NULL)

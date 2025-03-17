@@ -135,6 +135,30 @@ SDL_Texture* load_image (SDL_Renderer *renderer, const char * filename);
  */
 int is_souris_sur_rectangle (SDL_Rect rect, int x_souris_px, int y_souris_px);
 
+/**
+ * Affiche un rectangle avec les bord bas arrondis
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param x1 Le point en haut à gauche du rectangle
+ * @param y1 Le point en haut à gauche du rectangle
+ * @param x2 Le point en bas à droite du rectangle
+ * @param y2 Le point en bas à droite du rectangle
+ * @param radius Le rayon de la courbure des coins bas
+ * @param color La couleur du rectangle
+ */
+void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
+
+/**
+ * Affiche un rectangle avec les bord bas arrondis
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param x1 Le point en haut à gauche du rectangle
+ * @param y1 Le point en haut à gauche du rectangle
+ * @param x2 Le point en bas à droite du rectangle
+ * @param y2 Le point en bas à droite du rectangle
+ * @param radius Le rayon de la courbure des coins bas
+ * @param color La couleur du rectangle
+ */
+void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
+
 
 
 // Fonctions définies dans menus.c mais utilisées dans plusieurs fichiers (pour éviter les inclusions circulaires)

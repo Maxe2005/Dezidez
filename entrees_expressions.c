@@ -255,16 +255,6 @@ void valider_modif_taille_map(Session_modif_map* session) {
 }
 */
 
-void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
-    // Dessiner le rectangle principal
-    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, color.a);
-    
-    // Dessiner le bas arrondi seulement
-    filledPieRGBA(renderer, x1 + radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    filledPieRGBA(renderer, x2 - radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, color.a);
-}
-
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
     expression->rect_affiche.y = expression->rect_initial.y - offset;
     for (int i = 0; i < 3; i++) {

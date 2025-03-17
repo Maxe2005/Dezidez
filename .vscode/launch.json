@@ -32,6 +32,34 @@
             "programOutput": true,
             "exceptions": true
         }
+        },
+        {
+        "type": "cppdbg",
+        "request": "launch",
+        "name": "Test color",
+        "program": "${workspaceFolder}/prog",
+        "preLaunchTask": "build_test",
+        "stopAtEntry": false,
+        "args": [],
+        "cwd": "${workspaceFolder}",
+        "environment": [],
+        "externalConsole": false,
+        "MIMode": "gdb",
+        "setupCommands": [
+            {
+            "description": "Enable pretty-printing for gdb",
+            "text": "-enable-pretty-printing",
+            "ignoreFailures": true
+            }
+        ],
+        "miDebuggerPath": "/usr/bin/gdb",
+        "logging": {
+            "moduleLoad": false,
+            "trace": false,
+            "engineLogging": false,
+            "programOutput": true,
+            "exceptions": true
+        }
         }
     ]
 }
