@@ -1,7 +1,11 @@
 #ifndef EVALUATEUR
 #define EVALUATEUR
+#define _USE_MATH_DEFINES
 #include <math.h>
 #include "Structures.h"
+#include <stdio.h>
+
+Node remplacer_variable(Node *racine,float valeur_x, float valeur_y ); //Je la fait plus tard, Esteban
 
 float calculer_fonction(typefonction fonction, float variable);
 /**
@@ -19,4 +23,7 @@ float decodage_arbre(Node *racine);
  * @param racine La racine d'où on commence le décodage de l'arbre
  * @return return le résultat totale de l'expression
  */
+
+
+
 #endif

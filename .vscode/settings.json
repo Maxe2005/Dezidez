@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "evaluateur.h": "c",
+        "math.h": "c"
+    }
+}
