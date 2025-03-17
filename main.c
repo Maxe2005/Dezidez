@@ -5,6 +5,7 @@
 #include <math.h>
 #include <ctype.h>
 #include "syntaxe.h"
+#include "priorite.h"
 
 int main(int argc, char *argv[]){
     printf("Coucou on est dans la branche syntaxique ! :) \n");
