@@ -5,7 +5,7 @@
 #include "Structures.h"
 #include <stdio.h>
 
-Node remplacer_variable(Node *racine,float valeur_x, float valeur_y ); //Je la fait plus tard, Esteban
+void remplacer_variable(Node *racine,float valeur_x, float valeur_y ); //Je la fait plus tard, Esteban
 
 float calculer_fonction(typefonction fonction, float variable);
 /**

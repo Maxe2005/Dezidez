@@ -1,6 +1,6 @@
 # include "evaluateur.h"
 
-Node remplacer_variable(Node *racine,float valeur_x, float valeur_y ){
+void remplacer_variable(Node *racine,float valeur_x, float valeur_y ){
     if(racine->jeton.lexem==VARIABLE){
         switch (racine->jeton.valeur.variable)
         {
@@ -48,7 +48,11 @@ float decodage_arbre(Node *racine){
             return decodage_arbre(racine->pjeton_preced)*decodage_arbre(racine->pjeton_suiv);
             
         }
-        
+        if (racine->jeton.valeur.operateur==PUIS){ // appel récursif pour calculer la multiplication
+            return powf(decodage_arbre(racine->pjeton_preced),decodage_arbre(racine->pjeton_suiv));
+            
+        }
+
         break;
     case FONCTION:
         return calculer_fonction(racine->jeton.valeur.fonction,decodage_arbre(racine->pjeton_preced));
