@@ -9,8 +9,8 @@
 #include <stdbool.h>
 #include "gestionGraphique.h"
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL2_gfxPrimitives.h>
-// Inclusion de "color_picker.h" à la fin pour éviter les inclusion en boucle
+#include "SDL2_gfx/SDL2_gfxPrimitives.h"
+#include <ctype.h>
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200

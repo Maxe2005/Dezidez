@@ -1,5 +1,7 @@
 #include "entrees_expressions.h"
 
+Message message;
+
 float f (float x) {
     return sin(x);
 }
@@ -200,7 +202,12 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
         float test = strtof(expression->borne_inf->text, &end);
         if (*end != '\0') {
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-        } else {
+            set_message("PROBLEME DE CONVERSION", expression->borne_inf->champs_texte->rect);
+        
+        } else if(test > expression->fonction.borne_sup){
+            set_message("BORNE INF SUPERIEUR A BORNE SUP", expression->borne_inf->champs_texte->rect);
+        }
+        else {
             expression->fonction.borne_inf = test;
         }
     }
@@ -212,7 +219,12 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
         float test = strtof(expression->borne_sup->text, &end);
         if (*end != '\0') {
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-        } else {
+            set_message("PROBLEME DE CONVERSION", expression->borne_sup->champs_texte->rect);
+        } 
+        else if(expression->fonction.borne_inf > test){
+            set_message("BORNE SUP INFERIEUR A BORNE INF", expression->borne_sup->champs_texte->rect);
+        }
+        else {
             expression->fonction.borne_sup = test;
         }
     }
@@ -225,6 +237,17 @@ void execute_champs_select_and_change_focus (Expression_fonction* expression, Se
         // TODO : A connecter avec les autres modules
     }
     expression->entree_selectionnee = nouvelle_entree;
+}
+
+void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
+    message.start_time = time(NULL);
+    message.button_base.label = text_erreur;
+    message.is_visible = 1;
+    message.button_base.rect.x = endroit_erreur.x;
+    message.button_base.rect.y = endroit_erreur.y + FEN_Y/16;
+    message.button_base.rect.w = FEN_X/4;
+    message.button_base.rect.h = FEN_Y/16;
+
 }
 
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){

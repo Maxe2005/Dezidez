@@ -12,14 +12,7 @@
 #define TAILLE_GRADUATION_MAX 100
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
 
-typedef struct {
-    Button button_base;
-    int temps_affichage; // en secondes
-    SDL_Color couleur_message;
-    SDL_Color couleur_fond;
-    int is_visible;
-    time_t start_time;
-} Message;
+extern Message message;
 
 typedef struct {
     int precision; // Précision des graduations (nombre de chiffres après la virgule)
@@ -177,5 +170,10 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
  * @param bande_entrees La bande d'entrées à afficher
  */
 void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entrees);
+
+/**
+ * Initialisation des constantes pour la structure message
+ */
+void init_const_message();
 
 #endif
