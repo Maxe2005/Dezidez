@@ -44,6 +44,30 @@
         },
         "problemMatcher": ["$gcc"],
         "detail": "Generated task for building all .c files with gcc"
+      },
+      {
+        "label": "build_test",
+        "type": "shell",
+        "command": "/usr/bin/gcc",
+        "args": [
+          "tests/test6.c",
+          "-o",
+          "prog",
+          "-g",
+          "-lSDL2",
+          "-lSDL2main",
+          "-lSDL2_ttf",
+          "-lm",
+          "-lSDL2_mixer",
+          "-lSDL2_gfx",
+          "-lSDL2_image"
+        ],
+        "group": {
+          "kind": "build",
+          "isDefault": true
+        },
+        "problemMatcher": ["$gcc"],
+        "detail": "Generated task for building all .c files with gcc"
       }
     ],
     "version": "2.0.0"

@@ -16,6 +16,7 @@
 #define CURSOR_BLINK_TIME 500
 #define NB_EXPRESSION_MAX 5 // Le nombre de fonction maximum affichables en simultané
 #define RAYON_BAS_BANDE_HAUT 20
+#define TAILLE_BARRE_BASSE_DE_BANDE_HAUT ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT)
 
 //extern Message message;
 
@@ -67,6 +68,7 @@ typedef struct {
     SDL_Rect rect_initial; // L'espace pris par la bande d'expression sans offset
     SDL_Rect rect_affiche; // L'espace pris par la bande d'expression avec offset
     bool visible;
+    Color_picker* color_picker;
 } Expression_fonction;
 
 typedef struct {
@@ -77,6 +79,7 @@ typedef struct {
     int espace_entre_entrees;
     int marge_entree_gauche;
     int height_bande_expression;
+    int taille_color_picker;
 } Parametres_bandes_entrees;
 
 typedef struct {
@@ -108,10 +111,11 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
 
 /**
  * Initialise la bande d'entrées
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_entrees La bande d'entrées à initialiser
  * @param colors Les couleurs de l'interface
  */
-void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors);
+void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors);
 
 /**
  * Insère un caractère dans une chaine de caractères
@@ -138,12 +142,13 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
 
 /**
  * Initialise les positions des champs d'entrées (et des textes descrictifs des entrées) dans la bande haute
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
  * @param surface_bande_haut La surface totale de la bande haute
  * @param colors Les couleurs de l'interface
  */
-void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors);
+void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors);
 
 /**
  * Charge la valeur présente dans le champs de saisie dans la valeur de la borne inférieur de la fonction
@@ -158,18 +163,6 @@ void charge_valeur_borne_inf (Expression_fonction* expression);
  * @param expression La bande de l'expression
  */
 void charge_valeur_borne_sup (Expression_fonction* expression);
-
-/**
- * Affiche un rectangle avec les bord bas arrondis
- * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param x1 Le point en haut à gauche du rectangle
- * @param y1 Le point en haut à gauche du rectangle
- * @param x2 Le point en bas à droite du rectangle
- * @param y2 Le point en bas à droite du rectangle
- * @param radius Le rayon de la courbure des coins bas
- * @param color La couleur du rectangle
- */
-void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
 
 /**
  * Regarde s'il faut executer une action en quittant le focus d'un certain champs avant d'en focus un autre (ou pas)

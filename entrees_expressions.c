@@ -43,7 +43,7 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
     }
 }
 
-void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors){
+void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors){
     expression->entree_selectionnee = SELECTION_NULL;
     expression->rect_initial.x = surface_bande_haut.x;
     expression->rect_initial.h = params.height_bande_expression;
@@ -92,9 +92,14 @@ void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_
         expression->champs_entrees[j] = malloc(sizeof(Entree_texte));
         expression->champs_entrees[j] = but_2[j];
     }
+
+    expression->color_picker = malloc(sizeof(Color_picker));
+    *expression->color_picker = init_color_picker(ren, expression->rect_initial.x + params.marge_entree_gauche + NB_ENTREES*params.espace_entre_entrees + 2*params.width_entrees_bornes + params.width_entree_expression + params.taille_color_picker/2,
+                                                        expression->rect_initial.y + expression->rect_initial.h/2,
+                                                        params.taille_color_picker, &expression->fonction.color, classic_colors[expression->numero % NB_COULEURS_CLASSIQUES]);
 }
 
-void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
+void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors){
     bande_entrees->expanding = false;
     bande_entrees->scroll_offset = 0;
     bande_entrees->surface.x = 0;
@@ -106,32 +111,23 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
     bande_entrees->params.width_entree_expression = 400;
     bande_entrees->params.height_entrees_pourcentage = 70;
     bande_entrees->params.height_bande_expression = 70;
+    bande_entrees->params.taille_color_picker = 0.4 * bande_entrees->params.height_bande_expression;
     bande_entrees->params.height_texte_desctriptif = TAILLE_BANDE_DESCRIPTIONS - 10;
-    bande_entrees->params.espace_entre_entrees = (FEN_X - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression - 100) / 4;
+    bande_entrees->params.espace_entre_entrees = (FEN_X - TAILLE_BANDE_DROITE - bande_entrees->params.taille_color_picker - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression) / (NB_ENTREES + 2);
     bande_entrees->params.marge_entree_gauche = bande_entrees->params.espace_entre_entrees;
 
     init_placement_bande_descriptive(bande_entrees, bande_entrees->params, colors);
 
     float (*fx[])(float) = {f,g,h,i,j};
     const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
-    SDL_Color classic_colors[] = {
-        {255, 0, 0, 255},   // Rouge
-        {0, 255, 0, 255},   // Vert
-        {0, 0, 255, 255},   // Bleu
-        {255, 255, 0, 255}, // Jaune
-        {0, 255, 255, 255}, // Cyan
-        {255, 0, 255, 255}, // Magenta
-        {255, 255, 255, 255}, // Blanc
-        {0, 0, 0, 255}      // Noir
-    };
     bande_entrees->nb_expressions = 0;
     for (int i = 0; i < 5; i++) {
         bande_entrees->expressions[i] = malloc(sizeof(Expression_fonction));
         bande_entrees->expressions[i]->numero = i;
-        init_placement_entrees(bande_entrees->expressions[i], bande_entrees->params, bande_entrees->surface, colors);
+        init_placement_entrees(ren, bande_entrees->expressions[i], bande_entrees->params, bande_entrees->surface, colors);
         bande_entrees->expressions[i]->fonction.borne_inf = -4;
         bande_entrees->expressions[i]->fonction.borne_sup = 4;
-        bande_entrees->expressions[i]->fonction.color = classic_colors[i];
+        //bande_entrees->expressions[i]->fonction.color = classic_colors[i];
         bande_entrees->expressions[i]->fonction.f = fx[i];
         strcpy(bande_entrees->expressions[i]->expression->text, nom_f[i]);
         strcpy(bande_entrees->expressions[i]->borne_inf->text, "-4");
@@ -142,7 +138,7 @@ void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors){
 
 void resize_bande_haut (Bande_entrees* bande_entrees){
     bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
-    bande_entrees->params.espace_entre_entrees = (FEN_X - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression - 100) / 4;
+    bande_entrees->params.espace_entre_entrees = (FEN_X - TAILLE_BANDE_DROITE - bande_entrees->params.taille_color_picker - 2*bande_entrees->params.width_entrees_bornes - bande_entrees->params.width_entree_expression) / (NB_ENTREES + 2);
     bande_entrees->params.marge_entree_gauche = bande_entrees->params.espace_entre_entrees;
 
     bande_entrees->texte_descriptif_borne_inf->rect.x = bande_entrees->params.marge_entree_gauche;
@@ -160,6 +156,9 @@ void resize_bande_haut (Bande_entrees* bande_entrees){
         bande_entrees->expressions[i]->borne_inf->champs_texte->rect.x = bande_entrees->expressions[i]->borne_inf->position_initiale.x;
         bande_entrees->expressions[i]->borne_sup->champs_texte->rect.x = bande_entrees->expressions[i]->borne_sup->position_initiale.x;
         bande_entrees->expressions[i]->expression->champs_texte->rect.x = bande_entrees->expressions[i]->expression->position_initiale.x;
+    
+        init_placement_color_picker(bande_entrees->expressions[i]->color_picker);
+        bande_entrees->expressions[i]->color_picker->boutton_x = bande_entrees->expressions[i]->rect_initial.x + bande_entrees->params.marge_entree_gauche + NB_ENTREES*bande_entrees->params.espace_entre_entrees + 2*bande_entrees->params.width_entrees_bornes + bande_entrees->params.width_entree_expression + bande_entrees->params.taille_color_picker/2;
     }
 }
 
@@ -251,47 +250,11 @@ void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
 
 }
 
-/*
-void valider_modif_taille_map(Session_modif_map* session) {
-    int width = atoi(session->sous_menu_modif_taille_map->width_text);
-    int height = atoi(session->sous_menu_modif_taille_map->height_text);
-    if (width >= TAILLE_MIN_MAP && width <= TAILLE_MAX_MAP && height >= TAILLE_MIN_MAP && height <= TAILLE_MAX_MAP) {
-        playSoundEffect(musique->select);
-        *session->map_totale = modif_taille_map(session->map_totale, width, height);
-        nouveau_zoom(session->map, session->map_totale, session->zoom, session->position_zoom_x, session->position_zoom_y);
-        session->message->button_base.label = "La map à bien été redimentionnée";
-        session->message->couleur_message = (SDL_Color){255, 255, 255, 255};
-        session->message->couleur_fond = (SDL_Color){0, 255, 0, 150};
-        session->is_modif_taille_map = 0;
-        SDL_StopTextInput();
-    } else {
-        char *buffer = malloc(100); // Allouer un espace mémoire suffisant
-        if (buffer) {
-            snprintf(buffer, 100, "Les dimensions doivent être entre %d et %d !", TAILLE_MIN_MAP, TAILLE_MAX_MAP);
-            session->message->button_base.label = buffer;
-        }        session->message->couleur_message = (SDL_Color){0, 0, 0, 255};
-        session->message->couleur_fond = (SDL_Color){255, 50, 0, 200};
-    }
-    session->message->temps_affichage = 3;
-    session->message->is_visible = 1;
-    session->message->start_time = time(NULL);
-}
-*/
-
-void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
-    // Dessiner le rectangle principal
-    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, color.a);
-    
-    // Dessiner le bas arrondi seulement
-    filledPieRGBA(renderer, x1 + radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    filledPieRGBA(renderer, x2 - radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, color.a);
-}
-
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
     expression->rect_affiche.y = expression->rect_initial.y - offset;
     for (int i = 0; i < 3; i++) {
         expression->champs_entrees[i]->champs_texte->rect.y = expression->champs_entrees[i]->position_initiale.y - offset;
+        expression->color_picker->boutton_y_affiche = expression->color_picker->boutton_y - offset;
     }
 }
 
@@ -322,6 +285,7 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
                 }
                 renderButton(ren, target_champs->champs_texte);
             }
+            affiche_boutton_color_picker(ren, bande_entrees->expressions[j]->color_picker);
         }
     }
 

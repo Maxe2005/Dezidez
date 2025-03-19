@@ -6,6 +6,7 @@ int FEN_Y = 800;
 
 
 void init_font (TTF_Font* font[NB_FONTS]) {
+    // ! A faire correspondre avec <NB_FONTS>
     font[0] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 40); //Font de titres
     font[1] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 25); //Font de bouton normal
     font[2] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 30); //Font de bouton avec souris dessus
@@ -113,3 +114,26 @@ int is_souris_sur_rectangle (SDL_Rect rect, int x_souris_px, int y_souris_px){
                     y_souris_px >= rect.y && y_souris_px <= rect.y + rect.h;
 }
 
+void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
+    // Dessiner le rectangle principal
+    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, color.a);
+    
+    // Dessiner le bas arrondi seulement
+    filledPieRGBA(renderer, x1 + radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
+    filledPieRGBA(renderer, x2 - radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
+    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, color.a);
+}
+
+void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
+    // Dessiner le rectangle principal
+    boxRGBA(renderer, x1, y1 + radius, x2, y2, color.r, color.g, color.b, color.a);
+    
+    // Dessiner le haut arrondi seulement
+    filledPieRGBA(renderer, x1 + radius, y1 + radius, radius, 180, 360, color.r, color.g, color.b, color.a);
+    filledPieRGBA(renderer, x2 - radius, y1 + radius, radius, 180, 360, color.r, color.g, color.b, color.a);
+    boxRGBA(renderer, x1 + radius, y1, x2 - radius, y1 + radius, color.r, color.g, color.b, color.a);
+}
+
+int nb_alea(int min, int max){
+    return min + rand() % (max-min +1);
+}
