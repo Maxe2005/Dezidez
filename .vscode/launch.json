@@ -36,11 +36,11 @@
         {
         "type": "cppdbg",
         "request": "launch",
-        "name": "Test color",
+        "name": "Tests",
         "program": "${workspaceFolder}/prog",
         "preLaunchTask": "build_test",
         "stopAtEntry": false,
-        "args": [],
+        "args": ["tests/markdown.md"],
         "cwd": "${workspaceFolder}",
         "environment": [],
         "externalConsole": false,

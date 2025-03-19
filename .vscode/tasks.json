@@ -50,10 +50,7 @@
         "type": "shell",
         "command": "/usr/bin/gcc",
         "args": [
-          "tests/test.c",
-          "color_picker.c",
-          "ressources.c",
-          "gestionGraphique.c",
+          "tests/test6.c",
           "-o",
           "prog",
           "-g",

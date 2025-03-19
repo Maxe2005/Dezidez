@@ -62,12 +62,16 @@ void init_placement_color_picker (Color_picker* cp){
     if (cp->rect_initial.y + cp->rect_initial.h > FEN_Y - MARGE_AVEC_FENETRE) cp->rect_initial.y = FEN_Y - MARGE_AVEC_FENETRE - cp->rect_initial.h;
 }
 
-Color_picker init_color_picker (SDL_Renderer *renderer, int x, int y, int taille, SDL_Color default_color){
+Color_picker init_color_picker (SDL_Renderer *renderer, int x, int y, int taille, SDL_Color* color_dest, SDL_Color default_color){
     Color_picker cp;
     cp.boutton_x = x;
     cp.boutton_y = y;
+    cp.boutton_y_affiche = y;
     cp.boutton_taille = taille;
+    cp.boutton_taille_hover = taille * 1.1;
     cp.selected_color = default_color;
+    cp.color_dest = color_dest;
+    *cp.color_dest = default_color;
     cp.hovered = false;
     cp.show_picker = false;
     cp.dragging_picker = false;
@@ -89,7 +93,7 @@ Color_picker init_color_picker (SDL_Renderer *renderer, int x, int y, int taille
     cp.boutton_quitter_rect_base = cp.boutton_quitter.rect;
     cp.boutton_quitter.is_survolable = 1;
     cp.boutton_quitter.color_base = cp.color_bande_haute;
-    cp.boutton_quitter.color_hover = cp.bg_color;
+    cp.boutton_quitter.color_hover = (SDL_Color){255, 0, 0, 200};
     cp.boutton_quitter.hovered = 0;
     cp.boutton_quitter.radius = cp.boutton_quitter.rect.w / 3;
     cp.boutton_quitter.pourcentage_place = 50;
@@ -98,23 +102,26 @@ Color_picker init_color_picker (SDL_Renderer *renderer, int x, int y, int taille
     return cp;
 }
 
-void affiche_color_picker (SDL_Renderer *renderer, Color_picker* cp){
+void affiche_boutton_color_picker (SDL_Renderer *renderer, Color_picker* cp){
     if (cp->hovered){
-        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y, cp->boutton_taille/2, 0, 0, 0, 255);
-        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y, cp->boutton_taille*(1 - 2/10.0)/2.0, cp->selected_color.r, cp->selected_color.g, cp->selected_color.b, cp->selected_color.a);
+        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y_affiche, cp->boutton_taille_hover/2, 0, 0, 0, 255);
+        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y_affiche, cp->boutton_taille_hover*(1 - 1/10.0)/2.0, cp->selected_color.r, cp->selected_color.g, cp->selected_color.b, cp->selected_color.a);
     } else {
-        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y, cp->boutton_taille/2, 0, 0, 0, 255);
-        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y, cp->boutton_taille*(1 - 1/10.0)/2.0, cp->selected_color.r, cp->selected_color.g, cp->selected_color.b, cp->selected_color.a);
+        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y_affiche, cp->boutton_taille/2, 0, 0, 0, 255);
+        filledCircleRGBA(renderer, cp->boutton_x, cp->boutton_y_affiche, cp->boutton_taille*(1 - 1/10.0)/2.0, cp->selected_color.r, cp->selected_color.g, cp->selected_color.b, cp->selected_color.a);
     }
+}
+
+void affiche_interface_color_picker (SDL_Renderer *renderer, Color_picker* cp){
     if (cp->show_picker){
-        // Contour du picker
-        int arrondi = TAILLE_BANDE_HAUTE/2;
-        roundedBoxRGBA(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + cp->rect_moving.h, arrondi, cp->bg_color.r, cp->bg_color.g, cp->bg_color.b, cp->bg_color.a);
-        affiche_bande_arrondis_en_haut(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + TAILLE_BANDE_HAUTE, arrondi, cp->color_bande_haute);
-        roundedRectangleRGBA(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + cp->rect_moving.h, arrondi, 0, 0, 0, 255);
-        drawPaletteColorPicker(renderer, cp);
-        renderText(renderer, "Color Picker", cp->rect_moving.x + cp->rect_moving.w/2, cp->rect_moving.y + TAILLE_BANDE_HAUTE/2, cp->bg_color, fonts[5]);
-        renderImageButton(renderer, &cp->boutton_quitter);
+    // Contour du picker
+    int arrondi = TAILLE_BANDE_HAUTE/2;
+    roundedBoxRGBA(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + cp->rect_moving.h, arrondi, cp->bg_color.r, cp->bg_color.g, cp->bg_color.b, cp->bg_color.a);
+    affiche_bande_arrondis_en_haut(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + TAILLE_BANDE_HAUTE, arrondi, cp->color_bande_haute);
+    roundedRectangleRGBA(renderer, cp->rect_moving.x, cp->rect_moving.y, cp->rect_moving.x + cp->rect_moving.w, cp->rect_moving.y + cp->rect_moving.h, arrondi, 0, 0, 0, 255);
+    drawPaletteColorPicker(renderer, cp);
+    renderText(renderer, "Color Picker", cp->rect_moving.x + cp->rect_moving.w/2, cp->rect_moving.y + TAILLE_BANDE_HAUTE/2, cp->bg_color, fonts[5]);
+    renderImageButton(renderer, &cp->boutton_quitter);
     }
 }
 
@@ -124,6 +131,7 @@ void choix_color_in_picker (Color_picker* cp, int x_souris_px, int y_souris_px){
         cp->selected_color.r = x_souris_px - cp->rect_moving.x - MARGES_INTERIEURS;
         cp->selected_color.g = y_souris_px - cp->rect_moving.y - TAILLE_BANDE_HAUTE - MARGES_INTERIEURS;
         cp->selected_color.b = 255 - cp->selected_color.r;
+        *cp->color_dest = cp->selected_color;
         cp->picker_clicked = true;
     }
 }
@@ -135,6 +143,7 @@ void handle_event_color_picker_MOUSEBUTTONDOWN (Color_picker* cp, int x_souris_p
             int index = (x_souris_px - cp->rect_moving.x - MARGES_INTERIEURS) / (TAILLE_COULEURS_CLASSIQUES + cp->espace_entre_classic_colors);
             if (index >= 0 && index < 8 && TAILLE_COULEURS_CLASSIQUES >= (x_souris_px - cp->rect_moving.x - MARGES_INTERIEURS) % (TAILLE_COULEURS_CLASSIQUES + cp->espace_entre_classic_colors)) {
                 cp->selected_color = classic_colors[index];
+                *cp->color_dest = cp->selected_color;
             }
         }
         if (x_souris_px >= cp->rect_moving.x && x_souris_px <= cp->rect_moving.x + cp->rect_moving.w && 
@@ -144,20 +153,24 @@ void handle_event_color_picker_MOUSEBUTTONDOWN (Color_picker* cp, int x_souris_p
     }
 }
 
-void handle_event_color_picker_MOUSEBUTTONUP (Color_picker* cp, int x_souris_px, int y_souris_px){
+bool handle_event_color_picker_MOUSEBUTTONUP (Color_picker* cp, int x_souris_px, int y_souris_px){
+    bool clic_utile = false;
+    if (cp->dragging_picker || cp->picker_clicked) clic_utile = true;
     cp->dragging_picker = false;
     cp->picker_clicked = false;
     if (abs(cp->boutton_x - x_souris_px) <= cp->boutton_taille/2 && abs(cp->boutton_y - y_souris_px) <= cp->boutton_taille/2) {
         cp->show_picker = !cp->show_picker;
+        clic_utile = true;
         if (cp->show_picker){
             cp->rect_moving = cp->rect_initial;
             cp->boutton_quitter.rect = cp->boutton_quitter_rect_base;
         }
-        return;
     }
     if (is_souris_sur_rectangle(cp->boutton_quitter.rect, x_souris_px, y_souris_px)){
         cp->show_picker = 0;
+        clic_utile = true;
     }
+    return clic_utile;
 }
 
 void handle_event_color_picker_SDL_MOUSEMOTION (SDL_Event event, Color_picker* cp, int x_souris_px, int y_souris_px){

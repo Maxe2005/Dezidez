@@ -4,7 +4,9 @@
     "entrees_expressions.h": "c",
     "grapheur.h": "c",
     "sdl2_gfxprimitives.h": "c",
-    "cmath": "c"
+    "cmath": "c",
+    "sdl.h": "c",
+    "string.h": "c"
   },
 
   "github.copilot.chat.commitMessageGeneration.instructions": [

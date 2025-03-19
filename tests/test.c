@@ -7,7 +7,7 @@ int main() {
     SDL_Window *window = SDL_CreateWindow("Color Picker", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, FEN_X, FEN_Y, SDL_WINDOW_SHOWN);
     SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     init_font(fonts);
-    Color_picker color_picker = init_color_picker(renderer, 100, 100, 60, (SDL_Color){255, 0, 0 , 255});
+    Color_picker color_picker = init_color_picker(renderer, 100, 100, 60, NULL, (SDL_Color){255, 0, 0 , 255});
 
     int x,y;
     SDL_Event event;

@@ -289,6 +289,9 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     // Affichage de la bande droite
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
 
+    for (int j = 0; j < bande_entrees->nb_expressions; j++) {
+        affiche_interface_color_picker(ren, bande_entrees->expressions[j]->color_picker);
+    }
 }
 
 void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size) {
@@ -361,7 +364,7 @@ void Grapheur (SDL_Renderer* ren){
     change_color_mode(colors, 1);
 
     Bande_entrees* bande_entrees = malloc(sizeof(Bande_entrees));
-    init_bande_entrees(bande_entrees, colors);
+    init_bande_entrees(ren, bande_entrees, colors);
 
     Graph* graph = malloc(sizeof(Graph));
     *graph = init_graph(&bande_entrees->expressions[0]->fonction);
@@ -369,75 +372,15 @@ void Grapheur (SDL_Renderer* ren){
     actions_apres_resize_bande_entrees(graph, bande_entrees);
 
     SDL_StartTextInput();
-    int is_event_backspace_used = 0;
+    bool is_event_backspace_used = false;
     int x_souris_px, y_souris_px;
-    int running = 1;
-    SDL_Event event;
-    time_t current_time;
+    bool running = true;
 
     while (running) {
-        current_time = time(NULL);
-        
         affiche_interface(ren, graph, bande_entrees, colors);
 
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) running = 0;
+        handle_all_events(ren, bande_entrees, graph, &running, &x_souris_px, &y_souris_px, &is_event_backspace_used);
 
-            if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
-                FEN_X = event.window.data1;
-                FEN_Y = event.window.data2;
-                bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
-                int x = graph->x;
-                int y = graph->y;
-                resize_contours_graph(graph);
-                graph->axe_x->taille_grad *= graph->x / x;
-                graph->axe_y->taille_grad *= graph->y / y;
-                resize_navigation(graph);
-                resize_bande_haut(bande_entrees);
-            }
-
-            if (event.type == SDL_MOUSEMOTION) {
-                x_souris_px = event.motion.x;
-                y_souris_px = event.motion.y;
-                handle_event_bande_haut_MOUSEMOTION (event, bande_entrees, x_souris_px, y_souris_px);
-                handle_event_graph_MOUSEMOTION (event, graph, x_souris_px, y_souris_px);
-            }
-
-            if (event.type == SDL_MOUSEWHEEL) {
-                handle_event_bande_haut_MOUSEWHEEL (event, bande_entrees, x_souris_px, y_souris_px);
-                handle_event_graph_MOUSEWHEEL (event, graph, x_souris_px, y_souris_px);
-            }
-
-            if (event.type == SDL_MOUSEBUTTONUP) {
-                handle_event_bande_haut_MOUSEBUTTONUP (event, bande_entrees, x_souris_px, y_souris_px);
-                handle_event_graph_MOUSEBUTTONUP (event, graph, x_souris_px, y_souris_px);
-            }
-        
-            if (event.type == SDL_MOUSEBUTTONDOWN) {
-                handle_event_graph_MOUSEBUTTONDOWN (event, graph, x_souris_px, y_souris_px);
-            }
-
-            if (event.type == SDL_TEXTINPUT) {
-                handle_event_bande_haut_TEXTINPUT (event, bande_entrees);
-            }
-        
-            if (event.type == SDL_KEYDOWN) {
-                is_event_backspace_used = handle_event_bande_haut_KEYDOWN (event, bande_entrees);
-            }
-
-            if (event.type == SDL_KEYUP) {
-                handle_event_bande_haut_KEYUP (event, bande_entrees);
-
-                if (!is_event_backspace_used && event.key.keysym.sym == SDLK_BACKSPACE){
-                    ecran_acceuil(ren);
-                    running = 0;
-                }
-
-                if (event.key.keysym.sym == SDLK_c){
-                    resize_recentrer(graph, &bande_entrees->expressions[0]->fonction);
-                }
-            }
-        }
         // Animation de l'agrandissement
         if (bande_entrees->expanding && bande_entrees->surface.h < TAILLE_BANDE_EXPRESSIONS_MAX) {
             bande_entrees->surface.h += (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
@@ -446,6 +389,7 @@ void Grapheur (SDL_Renderer* ren){
             bande_entrees->surface.h -= (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
             actions_apres_resize_bande_entrees(graph, bande_entrees);
         }
+
         updateDisplay(ren);
     }
     free(graph);

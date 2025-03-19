@@ -73,10 +73,12 @@ void handle_event_bande_haut_KEYUP (SDL_Event event, Bande_entrees* bande_entree
 }
 
 void handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_entrees* bande_entrees, int x_souris_px, int y_souris_px){
-    if (is_souris_sur_rectangle(bande_entrees->surface, x_souris_px, y_souris_px)){
-        for (int i = 0; i < bande_entrees->nb_expressions; i++) {
-            if (bande_entrees->expressions[i]->visible) {
+    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
+        if (bande_entrees->expressions[i]->visible) {
+            if (is_souris_sur_rectangle(bande_entrees->surface, x_souris_px, y_souris_px)){
                 handle_event_entrees_expressions_MOUSEMOTION(event, bande_entrees->expressions[i], x_souris_px, y_souris_px);
+            } else {
+                handle_event_color_picker_SDL_MOUSEMOTION(event, bande_entrees->expressions[i]->color_picker, x_souris_px, y_souris_px);
             }
         }
     }
@@ -91,6 +93,14 @@ void handle_event_bande_haut_MOUSEBUTTONUP (SDL_Event event, Bande_entrees* band
     }
     if (!clic_utile && is_souris_sur_rectangle(bande_entrees->surface, x_souris_px, y_souris_px)) {
         bande_entrees->expanding = !bande_entrees->expanding;
+    }
+}
+
+void handle_event_bande_haut_MOUSEBUTTONDOWN (SDL_Event event, Bande_entrees* bande_entrees, int x_souris_px, int y_souris_px){
+    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
+        if (bande_entrees->expressions[i]->visible) {
+            handle_event_color_picker_MOUSEBUTTONDOWN(bande_entrees->expressions[i]->color_picker, x_souris_px, y_souris_px);
+        }
     }
 }
 
@@ -113,6 +123,9 @@ void action_apres_modif_offset (Bande_entrees* bande_entrees){
         placement_pour_affichage_avec_offset(bande_entrees->expressions[i], bande_entrees->scroll_offset);
         bande_entrees->expressions[i]->visible = (bande_entrees->expressions[i]->rect_affiche.y + bande_entrees->expressions[i]->rect_affiche.h > bande_entrees->surface.y &&
             bande_entrees->expressions[i]->rect_affiche.y < bande_entrees->surface.y + bande_entrees->surface.h);
+        if (!bande_entrees->expressions[i]->visible && bande_entrees->expressions[i]->color_picker->show_picker){
+            bande_entrees->expressions[i]->color_picker->show_picker = 0;
+        }
     }
 }
 
@@ -128,9 +141,9 @@ void handle_event_entrees_expressions_MOUSEMOTION (SDL_Event event, Expression_f
     }
 }
 
-bool handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
+int handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Expression_fonction* expression, int x_souris_px, int y_souris_px) {
     // Vérifier si on clique sur un champ
-    bool clic_utile = false;
+    int clic_utile = 0;
     int au_moins_un_champs_selectionne = 0;
     for (int i = 0; i < NB_ENTREES; i++) {
         if (is_souris_sur_rectangle(expression->champs_entrees[i]->champs_texte->rect, x_souris_px, y_souris_px)) {
@@ -138,12 +151,13 @@ bool handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Expression
             expression->champs_entrees[i]->cursorVisible = 1;
             expression->champs_entrees[i]->lastCursorToggle = SDL_GetTicks();
             au_moins_un_champs_selectionne = 1;
-            clic_utile = true;
+            clic_utile += 1;
         }
     }
     if (!au_moins_un_champs_selectionne) { // Si clic à côté, on regarde si on quitte un champs et si c'est le cas, on charge la valeur de ce champs. PS : l' entree_selectionnee sera également remise à SELECTION_NULL
         execute_champs_select_and_change_focus(expression, SELECTION_NULL);
     }
+    clic_utile += handle_event_color_picker_MOUSEBUTTONUP(expression->color_picker, x_souris_px, y_souris_px);
     return clic_utile;
 }
 
@@ -200,3 +214,66 @@ void handle_event_entrees_expressions_KEYUP (SDL_Event event, Expression_fonctio
     }
 }
 
+
+
+void handle_all_events (SDL_Renderer* ren, Bande_entrees* bande_entrees, Graph* graph, bool* running, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) *running = false;
+
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+            FEN_X = event.window.data1;
+            FEN_Y = event.window.data2;
+            bande_entrees->surface.w = FEN_X - TAILLE_BANDE_DROITE;
+            int x = graph->x;
+            int y = graph->y;
+            resize_contours_graph(graph);
+            graph->axe_x->taille_grad *= graph->x / x;
+            graph->axe_y->taille_grad *= graph->y / y;
+            resize_navigation(graph);
+            resize_bande_haut(bande_entrees);
+        }
+
+        if (event.type == SDL_MOUSEMOTION) {
+            *x_souris_px = event.motion.x;
+            *y_souris_px = event.motion.y;
+            handle_event_bande_haut_MOUSEMOTION (event, bande_entrees, *x_souris_px, *y_souris_px);
+            handle_event_graph_MOUSEMOTION (event, graph, *x_souris_px, *y_souris_px);
+        }
+
+        if (event.type == SDL_MOUSEWHEEL) {
+            handle_event_bande_haut_MOUSEWHEEL (event, bande_entrees, *x_souris_px, *y_souris_px);
+            handle_event_graph_MOUSEWHEEL (event, graph, *x_souris_px, *y_souris_px);
+        }
+
+        if (event.type == SDL_MOUSEBUTTONUP) {
+            handle_event_bande_haut_MOUSEBUTTONUP (event, bande_entrees, *x_souris_px, *y_souris_px);
+            handle_event_graph_MOUSEBUTTONUP (event, graph, *x_souris_px, *y_souris_px);
+        }
+
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
+        }
+
+        if (event.type == SDL_TEXTINPUT) {
+            handle_event_bande_haut_TEXTINPUT (event, bande_entrees);
+        }
+
+        if (event.type == SDL_KEYDOWN) {
+            *is_event_backspace_used = handle_event_bande_haut_KEYDOWN (event, bande_entrees);
+        }
+
+        if (event.type == SDL_KEYUP) {
+            handle_event_bande_haut_KEYUP (event, bande_entrees);
+
+            if (!is_event_backspace_used && event.key.keysym.sym == SDLK_BACKSPACE){
+                ecran_acceuil(ren);
+                running = 0;
+            }
+
+            if (event.key.keysym.sym == SDLK_c){
+                resize_recentrer(graph, &bande_entrees->expressions[0]->fonction);
+            }
+        }
+    }
+}

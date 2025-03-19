@@ -133,3 +133,7 @@ void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int
     filledPieRGBA(renderer, x2 - radius, y1 + radius, radius, 180, 360, color.r, color.g, color.b, color.a);
     boxRGBA(renderer, x1 + radius, y1, x2 - radius, y1 + radius, color.r, color.g, color.b, color.a);
 }
+
+int nb_alea(int min, int max){
+    return min + rand() % (max-min +1);
+}

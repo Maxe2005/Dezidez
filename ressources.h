@@ -10,6 +10,7 @@
 #include "gestionGraphique.h"
 #include <SDL2/SDL_image.h>
 #include <SDL2/SDL2_gfxPrimitives.h>
+// Inclusion de "color_picker.h" à la fin pour éviter les inclusion en boucle
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
@@ -159,6 +160,13 @@ void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int 
  */
 void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color);
 
+/**
+ * Génère un nombre aléatoire compris entre les valeurs min et max (incluses).
+ * @param min La valeur minimale possible (borne incluse).
+ * @param max La valeur maximale possible (borne incluse).
+ * @return Un entier aléatoire compris entre min et max.
+ */
+int nb_alea(int min, int max);
 
 
 // Fonctions définies dans menus.c mais utilisées dans plusieurs fichiers (pour éviter les inclusions circulaires)
@@ -167,5 +175,7 @@ void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  */
 void ecran_acceuil (SDL_Renderer* ren);
+
+#include "color_picker.h"
 
 #endif

@@ -58,6 +58,7 @@ typedef struct {
     SDL_Rect rect_initial; // L'espace pris par la bande d'expression sans offset
     SDL_Rect rect_affiche; // L'espace pris par la bande d'expression avec offset
     bool visible;
+    Color_picker* color_picker;
 } Expression_fonction;
 
 typedef struct {
@@ -68,6 +69,7 @@ typedef struct {
     int espace_entre_entrees;
     int marge_entree_gauche;
     int height_bande_expression;
+    int taille_color_picker;
 } Parametres_bandes_entrees;
 
 typedef struct {
@@ -99,10 +101,11 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
 
 /**
  * Initialise la bande d'entrées
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_entrees La bande d'entrées à initialiser
  * @param colors Les couleurs de l'interface
  */
-void init_bande_entrees (Bande_entrees* bande_entrees, Colors* colors);
+void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors);
 
 /**
  * Insère un caractère dans une chaine de caractères
@@ -129,12 +132,13 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
 
 /**
  * Initialise les positions des champs d'entrées (et des textes descrictifs des entrées) dans la bande haute
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
  * @param surface_bande_haut La surface totale de la bande haute
  * @param colors Les couleurs de l'interface
  */
-void init_placement_entrees (Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors);
+void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors);
 
 /**
  * Charge la valeur présente dans le champs de saisie dans la valeur de la borne inférieur de la fonction
