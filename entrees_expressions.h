@@ -16,6 +16,7 @@
 #define CURSOR_BLINK_TIME 500
 #define NB_EXPRESSION_MAX 5 // Le nombre de fonction maximum affichables en simultané
 #define RAYON_BAS_BANDE_HAUT 20
+#define TAILLE_BARRE_BASSE_DE_BANDE_HAUT ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT)
 
 
 typedef enum { // ! L'ordre est important pour l'initialisation des champs d'entrées. Il doit correspondre à celui de l'initialisation des champs d'entrées et la SELECTION_NULL doit être en dernier

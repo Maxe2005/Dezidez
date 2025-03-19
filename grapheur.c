@@ -285,7 +285,7 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     }
 
     // Dessiner le bas arrondi de la bande haute
-    affiche_bande_arrondis_en_bas(ren, bande_entrees->surface.x, bande_entrees->surface.y + bande_entrees->surface.h - ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT), bande_entrees->surface.x + bande_entrees->surface.w, bande_entrees->surface.y + bande_entrees->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
+    affiche_bande_arrondis_en_bas(ren, bande_entrees->surface.x, bande_entrees->surface.y + bande_entrees->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_entrees->surface.x + bande_entrees->surface.w, bande_entrees->surface.y + bande_entrees->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
     // Affichage de la bande droite
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
 
@@ -354,8 +354,7 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
 void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entrees){
     graph->origine_y_apres_bande_haut = bande_entrees->surface.y + bande_entrees->surface.h;
     for (int i = 0; i < bande_entrees->nb_expressions; i++) {
-        bande_entrees->expressions[i]->visible = (bande_entrees->expressions[i]->rect_affiche.y + bande_entrees->expressions[i]->rect_affiche.h > bande_entrees->surface.y &&
-            bande_entrees->expressions[i]->rect_affiche.y < bande_entrees->surface.y + bande_entrees->surface.h);
+        cacher_expression_si_nessessaire(bande_entrees, bande_entrees->expressions[i]);
     }
 }
 

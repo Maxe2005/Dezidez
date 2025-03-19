@@ -33,6 +33,7 @@ typedef struct {
     int espace_entre_classic_colors;
     ImageButton boutton_quitter;
     SDL_Rect boutton_quitter_rect_base;
+    int boutton_quitter_pourcentage_du_header;
 } Color_picker;
 
 extern SDL_Color classic_colors[];
@@ -89,8 +90,9 @@ void choix_color_in_picker (Color_picker* cp, int x_souris_px, int y_souris_px);
  * @param cp Le color picker affiché
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
+ * @return 1 si le <clic souris> à été géré, 0 sinon
  */
-void handle_event_color_picker_MOUSEBUTTONDOWN (Color_picker* cp, int x_souris_px, int y_souris_px);
+bool handle_event_color_picker_MOUSEBUTTONDOWN (Color_picker* cp, int x_souris_px, int y_souris_px);
 
 /**
  * Gère l'évènement MOUSEBUTTONUP relatif au color picker
@@ -107,7 +109,8 @@ bool handle_event_color_picker_MOUSEBUTTONUP (Color_picker* cp, int x_souris_px,
  * @param cp Le color picker affiché
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
+ * @return 1 si le <mouvement de la souris> à été géré, 0 sinon
  */
-void handle_event_color_picker_SDL_MOUSEMOTION (SDL_Event event, Color_picker* cp, int x_souris_px, int y_souris_px);
+bool handle_event_color_picker_SDL_MOUSEMOTION (SDL_Event event, Color_picker* cp, int x_souris_px, int y_souris_px);
 
 #endif

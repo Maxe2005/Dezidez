@@ -227,33 +227,6 @@ void execute_champs_select_and_change_focus (Expression_fonction* expression, Se
     expression->entree_selectionnee = nouvelle_entree;
 }
 
-/*
-void valider_modif_taille_map(Session_modif_map* session) {
-    int width = atoi(session->sous_menu_modif_taille_map->width_text);
-    int height = atoi(session->sous_menu_modif_taille_map->height_text);
-    if (width >= TAILLE_MIN_MAP && width <= TAILLE_MAX_MAP && height >= TAILLE_MIN_MAP && height <= TAILLE_MAX_MAP) {
-        playSoundEffect(musique->select);
-        *session->map_totale = modif_taille_map(session->map_totale, width, height);
-        nouveau_zoom(session->map, session->map_totale, session->zoom, session->position_zoom_x, session->position_zoom_y);
-        session->message->button_base.label = "La map à bien été redimentionnée";
-        session->message->couleur_message = (SDL_Color){255, 255, 255, 255};
-        session->message->couleur_fond = (SDL_Color){0, 255, 0, 150};
-        session->is_modif_taille_map = 0;
-        SDL_StopTextInput();
-    } else {
-        char *buffer = malloc(100); // Allouer un espace mémoire suffisant
-        if (buffer) {
-            snprintf(buffer, 100, "Les dimensions doivent être entre %d et %d !", TAILLE_MIN_MAP, TAILLE_MAX_MAP);
-            session->message->button_base.label = buffer;
-        }        session->message->couleur_message = (SDL_Color){0, 0, 0, 255};
-        session->message->couleur_fond = (SDL_Color){255, 50, 0, 200};
-    }
-    session->message->temps_affichage = 3;
-    session->message->is_visible = 1;
-    session->message->start_time = time(NULL);
-}
-*/
-
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
     expression->rect_affiche.y = expression->rect_initial.y - offset;
     for (int i = 0; i < 3; i++) {
