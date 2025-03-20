@@ -13,10 +13,13 @@
 #define MAX_LEN_STR 20
 #define MAX_LEN_ENTREES_BORNES 8
 #define NB_ENTREES 3
+#define NB_ELEMENTS_PAR_EXPRESSION 7
 #define CURSOR_BLINK_TIME 500
 #define NB_EXPRESSION_MAX 5 // Le nombre de fonction maximum affichables en simultané
 #define RAYON_BAS_BANDE_HAUT 20
 #define TAILLE_BARRE_BASSE_DE_BANDE_HAUT ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT)
+#define WIDTH_CHAMPS_BORNES 150
+#define WIDTH_CHAMP_EXPRESSION 300
 
 //extern Message message;
 
@@ -57,6 +60,11 @@ typedef struct {
 } Fonction;
 
 typedef struct {
+    ImageButton bt;
+    SDL_Rect rect_base;
+} Button_mvt;
+
+typedef struct {
     Fonction fonction;
     Entree_texte* borne_inf;
     Entree_texte* borne_sup;
@@ -69,17 +77,24 @@ typedef struct {
     SDL_Rect rect_affiche; // L'espace pris par la bande d'expression avec offset
     bool visible;
     Color_picker* color_picker;
+    Button_mvt button_deplacement;
+    Button_mvt button_visibilite;
+    Button_mvt button_delete;
 } Expression_fonction;
 
 typedef struct {
-    int width_entrees_bornes;
-    int width_entree_expression;
+    int width_elements[NB_ELEMENTS_PAR_EXPRESSION + 1]; // Largeur de tous les éléments affichés de gauche à droite sur la bande d'expression avec le minimum en x de la bande haute en 0 ième position (d'ou le '+1')
+    //int width_entrees_bornes;
+    //int width_entree_expression;
     int height_entrees_pourcentage; // La taille en y des entrées en pourcentage de la taille en y de la bande d'expression
     int height_texte_desctriptif;
-    int espace_entre_entrees;
-    int marge_entree_gauche;
+    int espace_entre_elements;
+    //int marge_entree_gauche;
     int height_bande_expression;
     int taille_color_picker;
+    int taille_button_deplacement;
+    int taille_button_visibilite;
+    int taille_button_delete;
 } Parametres_bandes_entrees;
 
 typedef struct {
@@ -98,8 +113,8 @@ typedef struct {
 float f (float x);
 float g (float x);
 float h (float x);
-float i (float x);
-float j (float x);
+float k (float x);
+float l (float x);
 
 /**
  * Affiche la bande haute de l'interface
@@ -133,6 +148,42 @@ void insert_char(char text[], int i, char c);
 void remove_char(char text[], int i);
 
 /**
+ * Initialise le button déplacement de la bande d'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande de l'expression, donc les entrées à modifier
+ * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
+ * @param colors Les couleurs de l'interface
+ */
+void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+
+/**
+ * Initialise le button qui affiche/cache la courbe
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande de l'expression, donc les entrées à modifier
+ * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
+ * @param colors Les couleurs de l'interface
+ */
+void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+
+/**
+ * Initialise le button qui supprime l'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande de l'expression, donc les entrées à modifier
+ * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
+ * @param colors Les couleurs de l'interface
+ */
+void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+
+/**
+ * Initialise les 3 champs d'entrées de la bande d'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande de l'expression, donc les entrées à modifier
+ * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
+ * @param colors Les couleurs de l'interface
+ */
+void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+
+/**
  * Initialise les titres de la bande descriptive
  * @param bande_entrees La bande d'entrées dans laquelle ce trouve la bande descriptive
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
@@ -141,7 +192,7 @@ void remove_char(char text[], int i);
 void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors);
 
 /**
- * Initialise les positions des champs d'entrées (et des textes descrictifs des entrées) dans la bande haute
+ * Initialise les positions des éléments de la bande d'expression donnée
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
@@ -184,7 +235,14 @@ void placement_pour_affichage_avec_offset (Expression_fonction* expression, int 
  */
 void resize_bande_haut (Bande_entrees* bande_entrees);
 
-
+/**
+ * Calcule la première coordonnée x du <num_element>ème élément (de gauche à droite) de la bande d'expression
+ * @param tab Le tableau avec la première position de la bande en x et les width de chaque élément dans l'ordre
+ * @param espaces L'actuelle taille des espaces inter-éléments
+ * @param num_element Le numéro de l'élément voulu
+ * @return La position en x en pixel de la première coordonnée x du <num_element>ème élément
+ */
+int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_element);
 
 /**
  * Redimmentionne la bande haute en fonction de la taille de la fenêtre et des autres éléments de la fenêtre à l'instant t
@@ -192,5 +250,7 @@ void resize_bande_haut (Bande_entrees* bande_entrees);
  * @param endroit_erreur rectangle où l'erreur a été enregestré
  */
 void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
+
+
 
 #endif

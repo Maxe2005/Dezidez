@@ -8,6 +8,9 @@
 #define TAILLE_INTER_PARAHRAPHE 30
 #define MARGE 20
 
+typedef enum { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT } TextAlignX;
+typedef enum { ALIGN_TOP, ALIGN_MIDDLE, ALIGN_BOTTOM } TextAlignY;
+
 // Fonction pour afficher du texte centré dans un rectangle avec gestion du retour à la ligne
 void render_text_wrapped(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect rect, SDL_Color color) {
     int space_width, word_width, word_height;
@@ -94,6 +97,79 @@ void render_text_wrapped(SDL_Renderer *renderer, TTF_Font *font, const char *tex
     free(text_copy);
 }
 
+
+void render_text_wrapped_2(SDL_Renderer *renderer, TTF_Font *font, const char *text, SDL_Rect rect, SDL_Color color, TextAlignX align_x, TextAlignY align_y) {
+    int space_width, word_width, word_height;
+    TTF_SizeText(font, " ", &space_width, NULL);
+    char buffer[1024] = "";
+    char *text_copy = strdup(text);
+    char *word = strtok(text_copy, " ");
+    int x = rect.x, y = rect.y;
+    int total_height = 0, line_count = 0;
+    char *lines[100];
+    int line_heights[100];
+    
+    while (word) {
+        if (strcmp(word, "\n") == 0) { // Retour à la ligne forcé par le '\n'
+            if (buffer[0] == '\0') {
+                line_heights[line_count-1] += TAILLE_INTER_PARAHRAPHE;
+                total_height += TAILLE_INTER_PARAHRAPHE;
+            } else {
+                buffer[strlen(buffer)-1] = '\0'; // Supprimer l'espace inutile car pas de mot suivant
+                lines[line_count] = strdup(buffer);
+                line_heights[line_count] = word_height;
+                total_height += word_height;
+                line_count++;
+
+                buffer[0] = '\0';  // Réinitialiser la ligne
+            }
+            x = rect.x;
+        } else {
+            TTF_SizeText(font, word, &word_width, &word_height);
+            if (x + word_width > rect.x + rect.w - 2 * MARGE) {
+                if (buffer[0] == '\0'){
+                    printf("Attention ! La longeur du rectangle dans lequel doit être affiché le texte est trop petite par rapport à la taille d'un (ou plusieurs) mot(s) du texte (faire attention à la taille de la font !)\nLe texte n'a donc pas été affiché !\n");
+                    return;
+                }
+                buffer[strlen(buffer) - 1] = '\0';
+                lines[line_count] = strdup(buffer);
+                line_heights[line_count] = word_height;
+                total_height += word_height;
+                line_count++;
+                buffer[0] = '\0';
+                x = rect.x;
+            }
+            strcat(buffer, word);
+            strcat(buffer, " ");
+            x += word_width + space_width;
+        }
+        word = strtok(NULL, " ");
+    }
+    if (buffer[0] != '\0') {
+        lines[line_count] = strdup(buffer);
+        line_heights[line_count] = word_height;
+        total_height += word_height;
+        line_count++;
+    }
+    if (align_y == ALIGN_MIDDLE) y += (rect.h - total_height) / 2;
+    else if (align_y == ALIGN_BOTTOM) y += rect.h - total_height;
+    
+    for (int i = 0; i < line_count; i++) {
+        SDL_Surface *surface = TTF_RenderUTF8_Blended(font, lines[i], color);
+        SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
+        SDL_Rect dst = {rect.x, y, surface->w, surface->h};
+        if (align_x == ALIGN_CENTER) dst.x += (rect.w - surface->w) / 2;
+        else if (align_x == ALIGN_RIGHT) dst.x += rect.w - surface->w;
+        SDL_RenderCopy(renderer, texture, NULL, &dst);
+        SDL_FreeSurface(surface);
+        SDL_DestroyTexture(texture);
+        y += line_heights[i];
+        free(lines[i]);
+    }
+    free(text_copy);
+}
+
+
 int main() {
     SDL_Init(SDL_INIT_VIDEO);
     TTF_Init();
@@ -134,7 +210,7 @@ int main() {
         SDL_RenderDrawRect(renderer, &rect);
 
         // Afficher le texte centré dans le rectangle
-        render_text_wrapped(renderer, font, text, rect, color);
+        render_text_wrapped_2(renderer, font, text, rect, color, ALIGN_CENTER, ALIGN_BOTTOM);
 
         SDL_RenderPresent(renderer);
     }

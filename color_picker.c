@@ -174,13 +174,11 @@ bool handle_event_color_picker_MOUSEBUTTONUP (Color_picker* cp, int x_souris_px,
 bool handle_event_color_picker_SDL_MOUSEMOTION (SDL_Event event, Color_picker* cp, int x_souris_px, int y_souris_px){
     bool is_MOUSEMOTION_used = false;
     if (cp->dragging_picker) {
-        if (x_souris_px >= cp->rect_moving.x && x_souris_px <= cp->rect_moving.x + cp->rect_moving.w && 
-                y_souris_px >= cp->rect_moving.y && y_souris_px <= cp->rect_moving.y + TAILLE_BANDE_HAUTE) {
-            cp->rect_moving.x += event.motion.xrel;
-            cp->rect_moving.y += event.motion.yrel;
-            cp->boutton_quitter.rect.x += event.motion.xrel;
-            cp->boutton_quitter.rect.y += event.motion.yrel;
-        } else cp->dragging_picker = false;
+        if (event.motion.x <= 0 || event.motion.x >= FEN_X-2 ||  event.motion.y <= 0 || event.motion.y >= FEN_Y-2) cp->dragging_picker = false;
+        cp->rect_moving.x += event.motion.xrel;
+        cp->rect_moving.y += event.motion.yrel;
+        cp->boutton_quitter.rect.x += event.motion.xrel;
+        cp->boutton_quitter.rect.y += event.motion.yrel;
     } else if (cp->picker_clicked){
         choix_color_in_picker(cp, event.button.x, event.button.y);
     }
