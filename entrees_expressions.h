@@ -15,7 +15,7 @@
 #define NB_ENTREES 3
 #define NB_ELEMENTS_PAR_EXPRESSION 7
 #define CURSOR_BLINK_TIME 500
-#define NB_EXPRESSION_MAX 5 // Le nombre de fonction maximum affichables en simultané
+#define NB_EXPRESSIONS_MAX 20 // Le nombre de fonction maximum affichables en simultané
 #define RAYON_BAS_BANDE_HAUT 20
 #define TAILLE_BARRE_BASSE_DE_BANDE_HAUT ((RAYON_BAS_BANDE_HAUT < 10) ? 10 : RAYON_BAS_BANDE_HAUT)
 #define WIDTH_CHAMPS_BORNES 150
@@ -99,10 +99,11 @@ typedef struct {
     int taille_button_deplacement;
     int taille_button_visibilite;
     int taille_button_delete;
+    int taille_button_new_expression;
 } Parametres_bandes_entrees;
 
 typedef struct {
-    Expression_fonction* expressions[NB_EXPRESSION_MAX];
+    Expression_fonction* expressions[NB_EXPRESSIONS_MAX];
     int nb_expressions; // La taille à l'instant t du tableau <expressions>
     Button* texte_descriptif_borne_inf;
     Button* texte_descriptif_borne_sup;
@@ -111,7 +112,8 @@ typedef struct {
     int scroll_offset;
     SDL_Rect surface; // Le recantgle occupé par la bande
     Parametres_bandes_entrees params;
-} Bande_entrees;
+    Button_mvt button_new_expression; // Le bouton pour ajouter une nouvelle expression à tracer sur le graphique
+} Bande_haute;
 
 
 float f (float x);
@@ -123,16 +125,16 @@ float l (float x);
 /**
  * Affiche la bande haute de l'interface
  * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param bande_entrees La bande d'entrées à afficher
+ * @param bande_haute La bande d'entrées à afficher
  */
-void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees);
+void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute);
 
 /**
  * Initialise la bande d'entrées
  * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param bande_entrees La bande d'entrées à initialiser
+ * @param bande_haute La bande d'entrées à initialiser
  */
-void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees);
+void init_bande_haute (SDL_Renderer* ren, Bande_haute* bande_haute);
 
 /**
  * Insère un caractère dans une chaine de caractères
@@ -174,6 +176,13 @@ void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression,
 void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params);
 
 /**
+ * Initialise le button pour ajouter une nouvelle expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande d'expression
+ */
+void init_button_new_expression (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
  * Initialise les 3 champs d'entrées de la bande d'expression
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
@@ -183,10 +192,10 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
 
 /**
  * Initialise les titres de la bande descriptive
- * @param bande_entrees La bande d'entrées dans laquelle ce trouve la bande descriptive
+ * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande descriptive
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
  */
-void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params);
+void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params);
 
 /**
  * Initialise les positions des éléments de la bande d'expression donnée
@@ -212,6 +221,12 @@ void charge_valeur_borne_inf (Expression_fonction* expression);
 void charge_valeur_borne_sup (Expression_fonction* expression);
 
 /**
+ * Transforme l'expression str en fonction et l'assigne à la fonction de l'expression
+ * @param expression La bande de l'expression
+ */
+void execute_expression (Expression_fonction* expression);
+
+/**
  * Regarde s'il faut executer une action en quittant le focus d'un certain champs avant d'en focus un autre (ou pas)
  * @param expression La bande de l'expression
  * @param nouvelle_entree Le prochain champs focus (au aucun si SELECTION_NULL)
@@ -227,9 +242,9 @@ void placement_pour_affichage_avec_offset (Expression_fonction* expression, int 
 
 /**
  * Redimmentionne la bande haute en fonction de la taille de la fenêtre et des autres éléments de la fenêtre à l'instant t
- * @param bande_entrees La bande d'entrées dans laquelle ce trouve les bande descriptive et expressions
+ * @param bande_haute La bande d'entrées dans laquelle ce trouve les bande descriptive et expressions
  */
-void resize_bande_haut (Bande_entrees* bande_entrees);
+void resize_bande_haut (Bande_haute* bande_haute);
 
 /**
  * Calcule la première coordonnée x du <num_element>ème élément (de gauche à droite) de la bande d'expression
@@ -255,24 +270,29 @@ void free_bande_expression (Expression_fonction* expression);
 
 /**
  * Supprime la bande d'expression donnée
- * @param bande_entrees La bande d'entrées dans laquelle ce trouve la bande d'expression
+ * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande d'expression
  * @param num_expression Le numéro de l'expression à supprimer
  */
-void suppr_bande_expression (Bande_entrees* bande_entrees, int num_expression);
+void suppr_bande_expression (Bande_haute* bande_haute, int num_expression);
 
 /**
  * Actions à effectuer après une modification de l'offset
- * @param bande_entrees La bande d'entrées à afficher
+ * @param bande_haute La bande d'entrées à afficher
  */
-void action_apres_modif_offset (Bande_entrees* bande_entrees);
+void action_apres_modif_offset (Bande_haute* bande_haute);
 
 /**
  * Cache la bande d'expression et tous ses composants si elle ne doit plus être visible
- * @param bande_entrees La bande d'entrées à afficher
+ * @param bande_haute La bande d'entrées à afficher
  * @param expression La bande de l'expression, donc les entrées à modifier
  */
-void cacher_expression_si_nessessaire (Bande_entrees* bande_entrees, Expression_fonction* expression);
+void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonction* expression);
 
-
+/**
+ * Ajoute une nouvelle bande d'expression à la bande haute
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande d'expression
+ */
+void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute);
 
 #endif

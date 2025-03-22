@@ -64,13 +64,13 @@ typedef struct {
     SDL_Color bande_droite;
     SDL_Color bande_haute_expressions;
     SDL_Color bande_haute_description;
-    SDL_Color bg_champ_entree;
-    SDL_Color bg_champ_entree_hover;
     SDL_Color texte_champ_entree;
     SDL_Color texte_descriptifs_bande_haut;
     SDL_Color bg_bandes_expression_1;
     SDL_Color bg_bandes_expression_2;
     SDL_Color bande_bas_de_bande_haut;
+    SDL_Color button_new_expression;
+    SDL_Color button_new_expression_hover;
 } Colors;
 extern Colors* colors;
 
@@ -169,12 +169,6 @@ void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int
 int nb_alea(int min, int max);
 
 
-// Fonctions définies dans menus.c mais utilisées dans plusieurs fichiers (pour éviter les inclusions circulaires)
-/**
- * Début du lancement du jeu
- * @param ren Un pointeur sur une structure contenant l'état du rendu
- */
-void ecran_acceuil (SDL_Renderer* ren);
 
 #include "color_picker.h"
 

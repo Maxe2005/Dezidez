@@ -17,6 +17,13 @@ typedef struct {
 } Background;
 
 /**
+ * Début du lancement du jeu
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param gr_ele Les éléments du grapheur
+ */
+void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele);
+
+/**
  * Affiche le titre de la page d'accueil
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  */
@@ -45,28 +52,32 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]);
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bg L'image de fond
  * @param running Un pointeur sur un entier qui permet de quitter la boucle de jeu
+ * @param gr_ele Les éléments du grapheur
  */
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running);
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele);
 
 /**
  * Affiche une page de texte scrollable
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param Text Le texte à afficher
  * @param titre Le titre de la page
+ * @return 1 si on revient sur la page d'accueil, 0 si on ferme la fenêtre
  */
-void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre);
+int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre);
 
 /**
  * Tout est dans le titre !
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @return 1 si on revient sur la page d'accueil, 0 si on ferme la fenêtre
  */
-void ecran_remerciements (SDL_Renderer* ren);
+int ecran_remerciements (SDL_Renderer* ren);
 
 /**
  * Affiche, sous forme de texte déroulant, le mode d'emploi du grapheur d'expressions fonctionnelles
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @return 1 si on revient sur la page d'accueil, 0 si on ferme la fenêtre
  */
-void ecran_mode_emploi (SDL_Renderer* ren);
+int ecran_mode_emploi (SDL_Renderer* ren);
 
 /**
  * Initialise l'image de fond contenue dans Ressources/background/

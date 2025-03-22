@@ -1,6 +1,6 @@
 #include "menus.h"
 
-void ecran_acceuil (SDL_Renderer* ren){
+void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele){
     // Initialisation des boutons
     Button button_mode_emploi, button_remerciements, button_grapheur;
     Button* buttons[NB_BOUTONS_ACCUEIL];
@@ -20,7 +20,7 @@ void ecran_acceuil (SDL_Renderer* ren){
         affiche_boutons_accueil(ren, buttons);
         updateDisplay(ren);
 
-        handle_events_accueil(buttons, ren, bg, &running);
+        handle_events_accueil(buttons, ren, bg, &running, gr_ele);
     }
     free_background(bg);
 }
@@ -94,7 +94,7 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
     }
 }
 
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running) {
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *running = 0;
@@ -123,6 +123,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
             for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
                 if (x >= buttons[i]->rect.x && x <= buttons[i]->rect.x + buttons[i]->rect.w &&
                     y >= buttons[i]->rect.y && y <= buttons[i]->rect.y + buttons[i]->rect.h) {
+                    int mode_quitter = 1; // Si 0 on ferme la fenêtre, si 1 on reste sur le menu principal
                     switch (i) {
                         case 0:
                             ecran_mode_emploi(ren);
@@ -131,10 +132,10 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                             ecran_remerciements(ren);
                             break;
                         case 2:
-                            Grapheur(ren);
+                            mode_quitter = Grapheur(ren, gr_ele);
                             break;
                     }
-                    *running = 0;
+                    if (!mode_quitter) *running = 0;
                     return;
                 }
             }
@@ -142,29 +143,28 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
         
         if (e.type == SDL_KEYUP) {
             char lancement = e.key.keysym.sym;
+            int mode_quitter = 1; // Si 0 on ferme la fenêtre, si 1 on reste sur le menu principal
             switch (lancement) {
                 case SDLK_SPACE:case SDLK_g:
-                    Grapheur(ren); 
-                    *running = 0;
+                    mode_quitter = Grapheur(ren, gr_ele);
                     break;
                 case SDLK_r:
-                    ecran_remerciements(ren);
-                    *running = 0;
+                    mode_quitter = ecran_remerciements(ren);
                     break;
                 case SDLK_m:
-                    ecran_mode_emploi(ren);
-                    *running = 0;
+                    mode_quitter = ecran_mode_emploi(ren);
                     break;
                 default:
                     break;
             }
+            if (!mode_quitter) *running = 0;
         }
     }
 }
 
 
 
-void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
+int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
     // Texte des remerciements
     int space_entre_lignes = 20;
     int taille_ligne_y = 30;
@@ -210,6 +210,7 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
     bouton_retour.taille_bonus_hover_y = 0;
 
     int scroll_offset = 0; // Décalage vertical du scrolling
+    int mode_quitter = 0; // Les différentes façons de quitter l'ecrant texte : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
     int running = 1;
     SDL_Event event;
 
@@ -231,7 +232,7 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
         updateDisplay(ren);
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) running = 0;
+            if (event.type == SDL_QUIT) return 0; // Quitter la fenêtre
 
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
                 FEN_X = event.window.data1;
@@ -250,15 +251,15 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
 
             if (event.type == SDL_KEYUP) {
                 if (event.key.keysym.sym == SDLK_BACKSPACE){
-                    ecran_acceuil(ren);
                     running = 0;
+                    return 1; // On revient à l'écran d'accueil
                 }
             }
         
             if (event.type == SDL_MOUSEBUTTONUP){
                 if (is_souris_sur_rectangle(bouton_retour.rect, event.motion.x, event.motion.y)){
-                    ecran_acceuil(ren);
                     running = 0;
+                    return 1; // On revient à l'écran d'accueil
                 }
             }
         
@@ -279,7 +280,7 @@ void ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
     }
 }
 
-void ecran_remerciements (SDL_Renderer* ren){
+int ecran_remerciements (SDL_Renderer* ren){
     const char* creditsText[] = {"Merci à tous ceux qui ont contribué ...",
         " ",
         " ",
@@ -325,10 +326,11 @@ void ecran_remerciements (SDL_Renderer* ren){
         " ",
         NULL};
     
-        ecran_text(ren, creditsText, "Remerciements");
+    int a = ecran_text(ren, creditsText, "Remerciements");
+    return a;
 }
 
-void ecran_mode_emploi (SDL_Renderer* ren){
+int ecran_mode_emploi (SDL_Renderer* ren){
     const char* manuelText[] = {"Voici le manuel d'utilisation de ce",
         "grapheur d'expressions fonctionnelles",
         " ",
@@ -375,7 +377,8 @@ void ecran_mode_emploi (SDL_Renderer* ren){
         " ",
         NULL};
     
-        ecran_text(ren, manuelText, "Mode d'emploi");
+    int a = ecran_text(ren, manuelText, "Mode d'emploi");
+    return a;
 }
 
 

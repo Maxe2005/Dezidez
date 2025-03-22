@@ -39,20 +39,27 @@ typedef struct {
     bool souris_pressee;
 } Graph;
 
+typedef struct {
+    Graph* graph;
+    Bande_haute* bande_haute;
+} Grapheur_elements;
+
 #include "events.h"
 
 /**
- * Fonction mathématique f(x) pour du test
- * @param x La valeur de x
- * @return La valeur de f(x)
+ * Initialise l'interface du grapheur
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param gr_ele Les éléments du grapheur
  */
-float f (float x);
+void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele);
 
 /**
  * Fonction principale du grapheur
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param gr_ele Les éléments du grapheur
+ * @return 1 s'il faut fermer la fenêtre, 2 s'il faut retourner à l'écran d'accueil
  */
-void Grapheur (SDL_Renderer* ren);
+int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele);
 
 /**
  * Redimensionne le graphique et le centre sur la fonction donnée
@@ -86,9 +93,9 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
  * Affiche l'interface utilisateur
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param graph Le graphique à afficher
- * @param bande_entrees La bande d'entrées à afficher
+ * @param bande_haute La bande d'entrées à afficher
  */
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_entrees);
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute);
 
 /**
  * Change le mode de couleur
@@ -167,9 +174,9 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
 /**
  * Actions à effectuer après avoir chager la taille de la bande des entrées
  * @param graph Le graphique à afficher
- * @param bande_entrees La bande d'entrées à afficher
+ * @param bande_haute La bande d'entrées à afficher
  */
-void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entrees);
+void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
 
 /**
  * Initialisation des constantes pour la structure message
