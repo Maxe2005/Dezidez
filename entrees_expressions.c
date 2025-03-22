@@ -18,7 +18,7 @@ float l (float x) {
     return 2 - x;
 }
 
-void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors){
+void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
     int num_element_du_premier_champs = 3;
     bande_entrees->texte_descriptif_borne_inf = malloc(sizeof(Button));
@@ -42,7 +42,7 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
     }
 }
 
-void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
+void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params){
     expression->button_deplacement.bt.image = load_image(ren, "Icons/angles_up_down.png");
     expression->button_deplacement.rect_base.h = params.taille_button_deplacement;
     expression->button_deplacement.rect_base.w = expression->button_deplacement.rect_base.h;
@@ -55,8 +55,10 @@ void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression
     expression->button_deplacement.bt.pourcentage_place = 70;
 }
 
-void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
-    expression->button_visibilite.bt.image = load_image(ren, "Icons/oeil.png");
+void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params){
+    expression->image_button_visible = load_image(ren, "Icons/oeil.png");
+    expression->image_button_invisible = load_image(ren, "Icons/oeil_barre.png");
+    expression->button_visibilite.bt.image = expression->image_button_visible;
     expression->button_visibilite.rect_base.h = params.taille_button_visibilite;
     expression->button_visibilite.rect_base.w = expression->button_visibilite.rect_base.h;
     expression->button_visibilite.rect_base.y = expression->rect_initial.y + (expression->rect_initial.h - expression->button_visibilite.rect_base.h) / 2;;
@@ -65,18 +67,14 @@ void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression,
     expression->button_visibilite.bt.is_survolable = 1;
     expression->button_visibilite.bt.hovered = 0;
     expression->button_visibilite.bt.color_base = expression->bg_color;
-    if (expression->numero % 2 == 0) {
-        expression->button_deplacement.bt.color_hover = colors->bg_bandes_expression_2;
-    } else {
-        expression->button_deplacement.bt.color_hover = colors->bg_bandes_expression_1;
-    }
+    expression->button_visibilite.bt.color_hover = expression->bg_color_oppo;
     expression->button_visibilite.bt.radius = expression->button_visibilite.rect_base.w / 3;
     expression->button_visibilite.bt.pourcentage_place = 70;
     expression->button_visibilite.bt.taille_bonus_hover_x = 0;
     expression->button_visibilite.bt.taille_bonus_hover_y = 0;
 }
 
-void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
+void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params){
     expression->button_delete.bt.image = load_image(ren, "Icons/poubelle.png");
     expression->button_delete.rect_base.h = params.taille_button_delete;
     expression->button_delete.rect_base.w = expression->button_delete.rect_base.h;
@@ -89,11 +87,11 @@ void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Par
     expression->button_delete.bt.color_hover = (SDL_Color){255, 0, 0, 255};
     expression->button_delete.bt.radius = expression->button_delete.rect_base.w / 3;
     expression->button_delete.bt.pourcentage_place = 70;
-    expression->button_delete.bt.taille_bonus_hover_x = -10;
-    expression->button_delete.bt.taille_bonus_hover_y = -10;
+    expression->button_delete.bt.taille_bonus_hover_x = 0;
+    expression->button_delete.bt.taille_bonus_hover_y = 0;
 }
 
-void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors){
+void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params){
     int num_element_du_premier_champs = 3;
     expression->borne_inf = malloc(sizeof(Entree_texte));
     expression->borne_sup = malloc(sizeof(Entree_texte));
@@ -114,23 +112,24 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
         but[j]->champs_texte->is_survolable = 1;
         but[j]->champs_texte->hovered = 0;
         but[j]->champs_texte->color_text = colors->texte_champ_entree;
-        but[j]->champs_texte->color_base = colors->bg_champ_entree;
-        but[j]->champs_texte->color_hover = colors->bg_champ_entree_hover;
+        but[j]->champs_texte->color_base = expression->bg_color_oppo;//colors->bg_champ_entree;
+        but[j]->champs_texte->color_hover = but[j]->champs_texte->color_base;
+        but[j]->champs_texte->color_hover.a = 150;
         but[j]->champs_texte->font_text = fonts[1];
         but[j]->champs_texte->font_text_hover = fonts[2];
         but[j]->champs_texte->taille_bonus_hover_x = 0;
         but[j]->champs_texte->taille_bonus_hover_y = 0;
-        but[j]->champs_texte->radius = 0;
+        but[j]->champs_texte->radius = but[j]->position_initiale.h / 3;
         but[j]->cursorVisible = 0;
         but[j]->position_cursor = 0;
         but[j]->lastCursorToggle = SDL_GetTicks();
         strcpy(but[j]->text, "");
-        expression->champs_entrees[j] = malloc(sizeof(Entree_texte));
+        //expression->champs_entrees[j] = malloc(sizeof(Entree_texte));
         expression->champs_entrees[j] = but[j];
     }
 }
 
-void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors){
+void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut){
     expression->entree_selectionnee = SELECTION_NULL;
     expression->rect_initial.x = surface_bande_haut.x;
     expression->rect_initial.h = params.height_bande_expression;
@@ -139,18 +138,20 @@ void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression,
     expression->rect_affiche = expression->rect_initial;
     if (expression->numero % 2 == 0){
         expression->bg_color = colors->bg_bandes_expression_1;
+        expression->bg_color_oppo = colors->bg_bandes_expression_2;
     } else {
         expression->bg_color = colors->bg_bandes_expression_2;
+        expression->bg_color_oppo = colors->bg_bandes_expression_1;
     }
 
     // Bouton de déplacement inter-expressions
-    init_button_deplacement(ren, expression, params, colors);
+    init_button_deplacement(ren, expression, params);
 
     // Bouton pour afficher/cacher la courbe
-    init_button_visibilite(ren, expression, params, colors);
+    init_button_visibilite(ren, expression, params);
     
     // Les champs d'entrées
-    init_champs_entrees(ren, expression, params, colors);
+    init_champs_entrees(ren, expression, params);
 
     // La couleur :
     expression->color_picker = malloc(sizeof(Color_picker));
@@ -159,7 +160,7 @@ void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression,
                                                         params.taille_color_picker, &expression->fonction.color, classic_colors[expression->numero % NB_COULEURS_CLASSIQUES]);
 
     // Bouton de suppression de l'expression
-    init_button_delete(ren, expression, params, colors);
+    init_button_delete(ren, expression, params);
 }
 
 int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_element){
@@ -171,7 +172,7 @@ int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_el
     return x;
 }
 
-void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors){
+void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees){
     bande_entrees->expanding = false;
     bande_entrees->scroll_offset = 0;
     bande_entrees->surface.x = 0;
@@ -199,7 +200,7 @@ void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
     bande_entrees->params.height_texte_desctriptif = TAILLE_BANDE_DESCRIPTIONS - 10;
     bande_entrees->params.espace_entre_elements = (FEN_X - TAILLE_BANDE_DROITE - calcul_pos(bande_entrees->params.width_elements, 0, NB_ELEMENTS_PAR_EXPRESSION+1)) / (NB_ELEMENTS_PAR_EXPRESSION + 1);
 
-    init_placement_bande_descriptive(bande_entrees, bande_entrees->params, colors);
+    init_placement_bande_descriptive(bande_entrees, bande_entrees->params);
 
     float (*fx[])(float) = {f,g,h,k,l};
     const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
@@ -207,7 +208,8 @@ void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
     for (int i = 0; i < 5; i++) {
         bande_entrees->expressions[i] = malloc(sizeof(Expression_fonction));
         bande_entrees->expressions[i]->numero = i;
-        init_placement_entrees(ren, bande_entrees->expressions[i], bande_entrees->params, bande_entrees->surface, colors);
+        bande_entrees->expressions[i]->fonction.visible = true;
+        init_placement_entrees(ren, bande_entrees->expressions[i], bande_entrees->params, bande_entrees->surface);
         bande_entrees->expressions[i]->fonction.borne_inf = -4;
         bande_entrees->expressions[i]->fonction.borne_sup = 4;
         bande_entrees->expressions[i]->fonction.f = fx[i];
@@ -355,7 +357,26 @@ void placement_pour_affichage_avec_offset (Expression_fonction* expression, int 
     expression->button_delete.bt.rect.y = expression->button_delete.rect_base.y - offset;
 }
 
-void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors){
+void action_apres_modif_offset (Bande_entrees* bande_entrees){
+    if (bande_entrees->scroll_offset < 0) bande_entrees->scroll_offset = 0;
+    int max_offset = (bande_entrees->nb_expressions - 1) * bande_entrees->params.height_bande_expression;
+    if (bande_entrees->scroll_offset > max_offset) bande_entrees->scroll_offset = max_offset;
+    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
+        placement_pour_affichage_avec_offset(bande_entrees->expressions[i], bande_entrees->scroll_offset);
+        init_placement_color_picker(bande_entrees->expressions[i]->color_picker);
+        cacher_expression_si_nessessaire(bande_entrees, bande_entrees->expressions[i]);
+    }
+}
+
+void cacher_expression_si_nessessaire (Bande_entrees* bande_entrees, Expression_fonction* expression){
+    expression->visible = (expression->rect_affiche.y + expression->rect_affiche.h > bande_entrees->surface.y &&
+        expression->rect_affiche.y < bande_entrees->surface.y + bande_entrees->surface.h);
+    if (!expression->visible && expression->color_picker->show_picker){
+        expression->color_picker->show_picker = 0;
+    }
+}
+
+void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees){
     // Fond de la bande haute des champs
     affiche_bande_arrondis_en_bas(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_entrees->surface.y + bande_entrees->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_haute_expressions);
 
@@ -397,4 +418,52 @@ void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors
     renderButton(ren, bande_entrees->texte_descriptif_expression);
 }
 
+void free_bande_expression (Expression_fonction* expression){
+    free(expression->borne_inf->champs_texte);
+    free(expression->borne_inf);
+    free(expression->borne_sup->champs_texte);
+    free(expression->borne_sup);
+    free(expression->expression->champs_texte);
+    free(expression->expression);
+    free(expression->color_picker);
+    SDL_DestroyTexture(expression->button_deplacement.bt.image);
+    SDL_DestroyTexture(expression->button_delete.bt.image);
+    SDL_DestroyTexture(expression->button_visibilite.bt.image);
+    SDL_DestroyTexture(expression->image_button_visible);
+    SDL_DestroyTexture(expression->image_button_invisible);
+    free(expression);
+}
 
+void suppr_bande_expression (Bande_entrees* bande_entrees, int num_expression){
+    free_bande_expression(bande_entrees->expressions[num_expression]);
+    for (int i = num_expression; i < bande_entrees->nb_expressions - 1; i++) {
+        bande_entrees->expressions[i] = bande_entrees->expressions[i+1];
+        bande_entrees->expressions[i]->numero = i;
+        if (bande_entrees->expressions[i]->numero % 2 == 0){
+            bande_entrees->expressions[i]->bg_color = colors->bg_bandes_expression_1;
+            bande_entrees->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_2;
+        } else {
+            bande_entrees->expressions[i]->bg_color = colors->bg_bandes_expression_2;
+            bande_entrees->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_1;
+        }
+        bande_entrees->expressions[i]->rect_initial.y -= bande_entrees->params.height_bande_expression;
+        for (int j = 0; j < 3; j++) {
+            bande_entrees->expressions[i]->champs_entrees[j]->position_initiale.y -= bande_entrees->params.height_bande_expression;
+            
+            bande_entrees->expressions[i]->champs_entrees[j]->champs_texte->color_base = bande_entrees->expressions[i]->bg_color_oppo;
+            bande_entrees->expressions[i]->champs_entrees[j]->champs_texte->color_hover = bande_entrees->expressions[i]->champs_entrees[j]->champs_texte->color_base;
+            bande_entrees->expressions[i]->champs_entrees[j]->champs_texte->color_hover.a = 150;
+        }
+        bande_entrees->expressions[i]->color_picker->boutton_y -= bande_entrees->params.height_bande_expression;
+        bande_entrees->expressions[i]->button_deplacement.rect_base.y -= bande_entrees->params.height_bande_expression;
+        bande_entrees->expressions[i]->button_visibilite.rect_base.y -= bande_entrees->params.height_bande_expression;
+        bande_entrees->expressions[i]->button_delete.rect_base.y -= bande_entrees->params.height_bande_expression;
+
+        bande_entrees->expressions[i]->button_deplacement.bt.color_base = bande_entrees->expressions[i]->bg_color;
+        bande_entrees->expressions[i]->button_visibilite.bt.color_base = bande_entrees->expressions[i]->bg_color;
+        bande_entrees->expressions[i]->button_visibilite.bt.color_hover = bande_entrees->expressions[i]->bg_color_oppo;
+        bande_entrees->expressions[i]->button_delete.bt.color_base = bande_entrees->expressions[i]->bg_color;
+    }
+    bande_entrees->nb_expressions--;
+    action_apres_modif_offset(bande_entrees);
+}

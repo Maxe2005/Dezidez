@@ -1,6 +1,7 @@
 #include "ressources.h"
 
 TTF_Font* fonts[NB_FONTS] = {NULL};
+Colors* colors = NULL;
 int FEN_X = 1100;
 int FEN_Y = 800;
 

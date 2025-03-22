@@ -169,7 +169,7 @@ Graph init_graph (Fonction* fonction_defaut){
     return graph;
 }
 
-void change_color_mode (Colors* colors, int color_mode){
+void change_color_mode (int color_mode){
     if (color_mode == 0){
         colors->bg = (SDL_Color){255, 255, 255, 255};
         colors->axes = (SDL_Color){0, 0, 0, 255};
@@ -182,12 +182,12 @@ void change_color_mode (Colors* colors, int color_mode){
     colors->bande_droite = (SDL_Color){100, 100, 100, 255};
     colors->bande_haute_expressions = (SDL_Color){200, 200, 200, 255};
     colors->bande_haute_description = (SDL_Color){150, 150, 150, 255};
-    colors->bg_champ_entree = (SDL_Color){150, 150, 150, 255};
-    colors->bg_champ_entree_hover = (SDL_Color){150, 150, 150, 150};
+    //colors->bg_champ_entree = (SDL_Color){150, 150, 150, 255};
+    //colors->bg_champ_entree_hover = (SDL_Color){150, 150, 150, 150};
     colors->texte_champ_entree = (SDL_Color){0, 0, 0, 255};
     colors->texte_descriptifs_bande_haut = (SDL_Color){255, 255, 255, 255};
     colors->bg_bandes_expression_1 = colors->bande_haute_expressions;
-    colors->bg_bandes_expression_2 = (SDL_Color){150, 150, 150, 150};
+    colors->bg_bandes_expression_2 = (SDL_Color){150, 150, 150, 255};
     colors->bande_bas_de_bande_haut = (SDL_Color){200, 200, 200, 255};
 }
 
@@ -268,11 +268,11 @@ float recherche_meilleur_echelle_grad (float max, float min){
     return 1;
 }
 
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_entrees, Colors* colors){
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_entrees){
     SDL_SetRenderDrawColor(ren, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
     SDL_RenderClear(ren);
 
-    affiche_bande_haut(ren, bande_entrees, colors);
+    affiche_bande_haut(ren, bande_entrees);
     // Rectangle pour cacher les bande d'expression qui ne sont qu'a moitié sur la bande haute. 
     boxRGBA(ren, bande_entrees->surface.x, bande_entrees->surface.y + bande_entrees->surface.h - RAYON_BAS_BANDE_HAUT, bande_entrees->surface.x + bande_entrees->surface.w, bande_entrees->surface.y + bande_entrees->surface.h + bande_entrees->params.height_bande_expression, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
 
@@ -280,7 +280,9 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     affiche_axes_graph(ren, graph, colors->axes);
 
     for (int i = 0; i < bande_entrees->nb_expressions; i++) {
-        tracer_fonction(ren, graph, bande_entrees->expressions[i]->fonction);
+        if (bande_entrees->expressions[i]->fonction.visible){
+            tracer_fonction(ren, graph, bande_entrees->expressions[i]->fonction);
+        }
     }
 
     // Dessiner le bas arrondi de la bande haute
@@ -288,9 +290,6 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_en
     // Affichage de la bande droite
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
     
-
-
-
     if (message.is_visible){
         if (time(NULL) - message.start_time > message.temps_affichage){
             message.is_visible = 0;
@@ -380,11 +379,11 @@ void init_const_message(){
 
 
 void Grapheur (SDL_Renderer* ren){
-    Colors* colors = malloc(sizeof(Colors));
-    change_color_mode(colors, 1);
+    colors = malloc(sizeof(Colors));
+    change_color_mode(1);
 
     Bande_entrees* bande_entrees = malloc(sizeof(Bande_entrees));
-    init_bande_entrees(ren, bande_entrees, colors);
+    init_bande_entrees(ren, bande_entrees);
 
     Graph* graph = malloc(sizeof(Graph));
     *graph = init_graph(&bande_entrees->expressions[0]->fonction);
@@ -400,7 +399,7 @@ void Grapheur (SDL_Renderer* ren){
     bool running = true;
 
     while (running) {
-        affiche_interface(ren, graph, bande_entrees, colors);
+        affiche_interface(ren, graph, bande_entrees);
 
         handle_all_events(ren, bande_entrees, graph, &running, &x_souris_px, &y_souris_px, &is_event_backspace_used);
 

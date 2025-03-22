@@ -72,7 +72,7 @@ typedef struct {
     SDL_Color bg_bandes_expression_2;
     SDL_Color bande_bas_de_bande_haut;
 } Colors;
-
+extern Colors* colors;
 
 /**
  * Initialise les différentes polices de caractère avec les tailles correspondantes

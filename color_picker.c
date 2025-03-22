@@ -182,11 +182,14 @@ bool handle_event_color_picker_SDL_MOUSEMOTION (SDL_Event event, Color_picker* c
     } else if (cp->picker_clicked){
         choix_color_in_picker(cp, event.button.x, event.button.y);
     }
-    if (is_souris_sur_rectangle(cp->boutton_quitter.rect, x_souris_px, y_souris_px)){
-        cp->boutton_quitter.hovered = 1;
-    } else cp->boutton_quitter.hovered = 0;
-    if (is_souris_sur_rectangle(cp->rect_moving, x_souris_px, y_souris_px)){
-        is_MOUSEMOTION_used = true;
+    if (cp->show_picker){
+        if (is_souris_sur_rectangle(cp->boutton_quitter.rect, x_souris_px, y_souris_px)){
+            cp->boutton_quitter.hovered = 1;
+        } else cp->boutton_quitter.hovered = 0;
+        
+        if (is_souris_sur_rectangle(cp->rect_moving, x_souris_px, y_souris_px)){
+            is_MOUSEMOTION_used = true;
+        }
     }
     return is_MOUSEMOTION_used;
 }

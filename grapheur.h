@@ -86,15 +86,15 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
  * Affiche l'interface utilisateur
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param graph Le graphique à afficher
+ * @param bande_entrees La bande d'entrées à afficher
  */
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_entrees, Colors* colors);
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_entrees* bande_entrees);
 
 /**
  * Change le mode de couleur
- * @param colors Les couleurs à modifier
  * @param color_mode Le mode de couleur à appliquer
  */
-void change_color_mode (Colors* colors, int color_mode);
+void change_color_mode (int color_mode);
 
 /**
  * @param renderer Un pointeur sur une structure contenant l'état du rendu
@@ -175,5 +175,6 @@ void actions_apres_resize_bande_entrees (Graph* graph, Bande_entrees* bande_entr
  * Initialisation des constantes pour la structure message
  */
 void init_const_message();
+
 
 #endif

@@ -116,23 +116,6 @@ void handle_event_bande_haut_MOUSEWHEEL (SDL_Event event, Bande_entrees* bande_e
         action_apres_modif_offset(bande_entrees);
     }
 }
-void action_apres_modif_offset (Bande_entrees* bande_entrees){
-    if (bande_entrees->scroll_offset < 0) bande_entrees->scroll_offset = 0;
-    int max_offset = (bande_entrees->nb_expressions - 1) * bande_entrees->params.height_bande_expression;
-    if (bande_entrees->scroll_offset > max_offset) bande_entrees->scroll_offset = max_offset;
-    for (int i = 0; i < bande_entrees->nb_expressions; i++) {
-        placement_pour_affichage_avec_offset(bande_entrees->expressions[i], bande_entrees->scroll_offset);
-        init_placement_color_picker(bande_entrees->expressions[i]->color_picker);
-        cacher_expression_si_nessessaire(bande_entrees, bande_entrees->expressions[i]);
-    }
-}
-void cacher_expression_si_nessessaire (Bande_entrees* bande_entrees, Expression_fonction* expression){
-    expression->visible = (expression->rect_affiche.y + expression->rect_affiche.h > bande_entrees->surface.y &&
-        expression->rect_affiche.y < bande_entrees->surface.y + bande_entrees->surface.h);
-    if (!expression->visible && expression->color_picker->show_picker){
-        expression->color_picker->show_picker = 0;
-    }
-}
 
 
 void handle_event_entrees_expressions_MOUSEMOTION (SDL_Event event, Bande_entrees* bande_entrees, Expression_fonction* expression, int x_souris_px, int y_souris_px, int is_MOUSEMOTION_used) {
@@ -140,6 +123,10 @@ void handle_event_entrees_expressions_MOUSEMOTION (SDL_Event event, Bande_entree
         expression->champs_entrees[i]->champs_texte->hovered = 0;
     }
     expression->color_picker->hovered = 0;
+    expression->button_deplacement.bt.hovered = 0;
+    expression->button_visibilite.bt.hovered = 0;
+    expression->button_delete.bt.hovered = 0;
+    expression->button_delete.bt.pourcentage_place = 70;
     if (y_souris_px < bande_entrees->surface.y + bande_entrees->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT &&
             !is_MOUSEMOTION_used && is_souris_sur_rectangle(bande_entrees->surface, x_souris_px, y_souris_px)){
         // Souris sur un bouton ?
@@ -150,6 +137,16 @@ void handle_event_entrees_expressions_MOUSEMOTION (SDL_Event event, Bande_entree
         }
         if (abs(expression->color_picker->boutton_x - x_souris_px) <= expression->color_picker->boutton_taille/2 && abs(expression->color_picker->boutton_y_affiche - y_souris_px) <= expression->color_picker->boutton_taille/2) {
             expression->color_picker->hovered = 1;
+        }
+        if (is_souris_sur_rectangle(expression->button_deplacement.bt.rect, x_souris_px, y_souris_px)) {
+            expression->button_deplacement.bt.hovered = 1;
+        }
+        if (is_souris_sur_rectangle(expression->button_visibilite.bt.rect, x_souris_px, y_souris_px)) {
+            expression->button_visibilite.bt.hovered = 1;
+        }
+        if (is_souris_sur_rectangle(expression->button_delete.bt.rect, x_souris_px, y_souris_px)) {
+            expression->button_delete.bt.hovered = 1;
+            expression->button_delete.bt.pourcentage_place = 50;
         }
     }
 }
@@ -176,6 +173,21 @@ bool handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Bande_entr
                 expression->color_picker->rect_moving = expression->color_picker->rect_initial;
                 expression->color_picker->boutton_quitter.rect = expression->color_picker->boutton_quitter_rect_base;
             }
+        }
+        if (is_souris_sur_rectangle(expression->button_deplacement.bt.rect, x_souris_px, y_souris_px)) {
+            // TODO
+            clic_utile = true;
+        }
+        if (is_souris_sur_rectangle(expression->button_visibilite.bt.rect, x_souris_px, y_souris_px)) {
+            expression->fonction.visible = !expression->fonction.visible;
+            clic_utile = true;
+            if (expression->fonction.visible){
+                expression->button_visibilite.bt.image = expression->image_button_visible;
+            } else expression->button_visibilite.bt.image = expression->image_button_invisible;
+        }
+        if (is_souris_sur_rectangle(expression->button_delete.bt.rect, x_souris_px, y_souris_px)) {
+            suppr_bande_expression(bande_entrees, expression->numero);
+            clic_utile = true;
         }
     }
     if (!au_moins_un_champs_selectionne) { // Si clic à côté, on regarde si on quitte un champs et si c'est le cas, on charge la valeur de ce champs. PS : l' entree_selectionnee sera également remise à SELECTION_NULL

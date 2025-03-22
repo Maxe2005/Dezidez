@@ -56,6 +56,7 @@ typedef struct {
     float borne_sup; // Le maximum de l'intervale de définition choisi
     float fx_max; // Le maximum de la fonction sur l'interval choisi
     float fx_min; // Le minimum de la fonction sur l'interval choisi
+    bool visible; // Pour savoir si la courbe est affichée ou non sur le graph
     SDL_Color color;
 } Fonction;
 
@@ -72,6 +73,7 @@ typedef struct {
     SelectionEntree entree_selectionnee;
     Entree_texte* champs_entrees[NB_ENTREES];
     SDL_Color bg_color;
+    SDL_Color bg_color_oppo; // La couleur opposée à celle de bg_color
     int numero; // Le numéro unique à chaque expression et représentant l'ordre dans lequel il est dans la liste déroulante
     SDL_Rect rect_initial; // L'espace pris par la bande d'expression sans offset
     SDL_Rect rect_affiche; // L'espace pris par la bande d'expression avec offset
@@ -80,6 +82,8 @@ typedef struct {
     Button_mvt button_deplacement;
     Button_mvt button_visibilite;
     Button_mvt button_delete;
+    SDL_Texture* image_button_visible;
+    SDL_Texture* image_button_invisible;
 } Expression_fonction;
 
 typedef struct {
@@ -120,17 +124,15 @@ float l (float x);
  * Affiche la bande haute de l'interface
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_entrees La bande d'entrées à afficher
- * @param colors Les couleurs de l'interface
  */
-void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors);
+void affiche_bande_haut (SDL_Renderer* ren, Bande_entrees* bande_entrees);
 
 /**
  * Initialise la bande d'entrées
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_entrees La bande d'entrées à initialiser
- * @param colors Les couleurs de l'interface
  */
-void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees, Colors* colors);
+void init_bande_entrees (SDL_Renderer* ren, Bande_entrees* bande_entrees);
 
 /**
  * Insère un caractère dans une chaine de caractères
@@ -152,44 +154,39 @@ void remove_char(char text[], int i);
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
- * @param colors Les couleurs de l'interface
  */
-void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+void init_button_deplacement (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params);
 
 /**
  * Initialise le button qui affiche/cache la courbe
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
- * @param colors Les couleurs de l'interface
  */
-void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+void init_button_visibilite (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params);
 
 /**
  * Initialise le button qui supprime l'expression
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
- * @param colors Les couleurs de l'interface
  */
-void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+void init_button_delete (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params);
 
 /**
  * Initialise les 3 champs d'entrées de la bande d'expression
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
- * @param colors Les couleurs de l'interface
  */
-void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, Colors* colors);
+void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params);
 
 /**
  * Initialise les titres de la bande descriptive
  * @param bande_entrees La bande d'entrées dans laquelle ce trouve la bande descriptive
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
- * @param colors Les couleurs de l'interface
  */
-void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params, Colors* colors);
+void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_bandes_entrees params);
 
 /**
  * Initialise les positions des éléments de la bande d'expression donnée
@@ -197,9 +194,8 @@ void init_placement_bande_descriptive (Bande_entrees* bande_entrees, Parametres_
  * @param expression La bande de l'expression, donc les entrées à modifier
  * @param params Les paramètres de taille et d'espacement pour le positionnement des textes
  * @param surface_bande_haut La surface totale de la bande haute
- * @param colors Les couleurs de l'interface
  */
-void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut, Colors* colors);
+void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut);
 
 /**
  * Charge la valeur présente dans le champs de saisie dans la valeur de la borne inférieur de la fonction
@@ -250,6 +246,32 @@ int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_el
  * @param endroit_erreur rectangle où l'erreur a été enregestré
  */
 void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
+
+/**
+ * Permet de nettoyer la mémoire allouée pour une bande d'expression
+ * @param expression La bande d'expression à nettoyer
+ */
+void free_bande_expression (Expression_fonction* expression);
+
+/**
+ * Supprime la bande d'expression donnée
+ * @param bande_entrees La bande d'entrées dans laquelle ce trouve la bande d'expression
+ * @param num_expression Le numéro de l'expression à supprimer
+ */
+void suppr_bande_expression (Bande_entrees* bande_entrees, int num_expression);
+
+/**
+ * Actions à effectuer après une modification de l'offset
+ * @param bande_entrees La bande d'entrées à afficher
+ */
+void action_apres_modif_offset (Bande_entrees* bande_entrees);
+
+/**
+ * Cache la bande d'expression et tous ses composants si elle ne doit plus être visible
+ * @param bande_entrees La bande d'entrées à afficher
+ * @param expression La bande de l'expression, donc les entrées à modifier
+ */
+void cacher_expression_si_nessessaire (Bande_entrees* bande_entrees, Expression_fonction* expression);
 
 
 

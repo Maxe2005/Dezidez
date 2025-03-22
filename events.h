@@ -149,19 +149,6 @@ void handle_event_entrees_expressions_KEYDOWN(SDL_Event event, Expression_foncti
 void handle_event_entrees_expressions_TEXTINPUT(SDL_Event event, Expression_fonction* expression);
 
 /**
- * Actions à effectuer après une modification de l'offset
- * @param bande_entrees La bande d'entrées à afficher
- */
-void action_apres_modif_offset (Bande_entrees* bande_entrees);
-
-/**
- * Cache la bande d'expression et tous ses composants si elle ne doit plus être visible
- * @param bande_entrees La bande d'entrées à afficher
- * @param expression La bande de l'expression, donc les entrées à modifier
- */
-void cacher_expression_si_nessessaire (Bande_entrees* bande_entrees, Expression_fonction* expression);
-
-/**
  * Gère tous les évènement par type
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_entrees La bande d'entrées affiché
