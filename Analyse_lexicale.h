@@ -87,6 +87,6 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
 
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
- * @param Element : chaine de caractère 
+ * @param Element : chaine de caractère de la forme (-0546516545)
  */
 typejeton TokenReelNegatif (char *Element);
