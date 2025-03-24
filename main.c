@@ -6,16 +6,15 @@
 
 
 int main (){
-    char str[100]  = "2x + 1" ;
+    char str[TailleMax]  = "2x + 1" ;
     int lenExpression = strlen(str);
-    char buffer[100];
+    char buffer[TailleMax];
     ExpressionSansLesEspaces(str,lenExpression,buffer);
-    
-    printf("Sans les espaces : %s",str);
-
     MultiplicationImplicite(str,lenExpression,buffer);
+
+    typejeton jetontest;
+    jetontest = TokenFonction("sin");
     
-    printf("Avec multiplication implicite : %s",str);
     return 0;
 }
 
