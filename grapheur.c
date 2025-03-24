@@ -74,6 +74,7 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
 
     // Axe des abscisses
     int y_axis_pos = graph->origine_y + graph->y - 5;
+    graph->y_axis_pos = y_axis_pos;
     if (graph->axe_y->max <= 0) {
         y_axis_pos = graph->origine_y + 5;
     }
@@ -271,7 +272,7 @@ float recherche_meilleur_echelle_grad (float max, float min){
 }
 
 void affichage_graph_evaluateur(SDL_Renderer* ren, Graph* graph){
-    for (int i=0; i<=graph->nombre_evaluateur; i++) {
+    for (int i=0; i<graph->nombre_evaluateur; i++) {
         renderButton(ren, &graph->liste_evaluateurs[i].bouton_evaluateur);
 }
 }

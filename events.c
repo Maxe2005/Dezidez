@@ -27,7 +27,7 @@ void handle_event_graph_MOUSEBUTTONUP (SDL_Event event, Graph* graph, int x_sour
     if (event.button.button == SDL_BUTTON_RIGHT){
         handle_event_graph_MOUSEBUTTONUP_RIGHT(event, graph, x_souris_px, y_souris_px);
     }
-    else if (event.button.button == SDL_BUTTON_RIGHT){
+    if (event.button.button == SDL_BUTTON_LEFT){
         handle_event_graph_MOUSEBUTTONUP_LEFT(event, graph, x_souris_px, y_souris_px, bande_haute);
     }
 
@@ -44,15 +44,18 @@ void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Event event, Graph* graph, int x
 void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
     Evaluateur affichage_evaluateur;
     int valeur_pixel_x = x_souris_px;
-    float valeur_en_x = valeur_pixel_x * graph->axe_x->echelle_grad / graph->axe_x->taille_grad;
+    float valeur_en_x = (valeur_pixel_x * graph->axe_x->echelle_grad / graph->axe_x->taille_grad )+ graph->axe_x->min;
     Fonction Expression_evaluation = bande_haute->expressions[0]->fonction ;
-    float valeur_en_y = Expression_evaluation.f(valeur_en_x);
-    int valeur_pixel_y = valeur_en_y * graph->axe_y->taille_grad / graph->axe_y->echelle_grad;
+    float valeur_en_y = Expression_evaluation.f(valeur_en_x );
+    int valeur_pixel_y = graph->origine_y + (graph->axe_y->max - valeur_en_y) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
+    int taille_graph_y = ((FEN_Y - graph->origine_y_apres_bande_haut)* graph->axe_y->taille_grad / graph->axe_y->echelle_grad);
+    printf("\n,       %d",graph->y_axis_pos - HEADER_HEIGHT - valeur_pixel_y);
     char formatted_string[100];
     sprintf(formatted_string, "f(%.2f)=%.2f", valeur_en_x, valeur_en_y);
     affichage_evaluateur.bouton_evaluateur.label = formatted_string;
     affichage_evaluateur.bouton_evaluateur.font_text = fonts[5];
-    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x,valeur_pixel_y,FEN_X/16,FEN_Y/16};
+    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x, valeur_pixel_y - graph->y_axis_pos,FEN_X/16,FEN_Y/16};
+    //affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x,graph->origine_y_apres_bande_haut + taille_graph_y - valeur_pixel_y - (FEN_Y - graph->y_axis_pos),FEN_X/16,FEN_Y/16};
     affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
     affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){255, 0, 0, 255};
     affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
@@ -337,9 +340,8 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
 
         if (event.type == SDL_MOUSEBUTTONUP) {
             handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
-            if (event.button.button == SDL_BUTTON_RIGHT) {
-                handle_event_graph_MOUSEBUTTONUP (event, graph, *x_souris_px, *y_souris_px, bande_haute);
-            }
+            handle_event_graph_MOUSEBUTTONUP (event, graph, *x_souris_px, *y_souris_px, bande_haute);
+            
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {

@@ -45,6 +45,8 @@ typedef struct {
     int centre_y; // Position en pixel du centre (ou de l'origine du graphique)
     bool souris_pressee;
     int mode_clic_souris;
+    int y_axis_pos;
+    
     Evaluateur liste_evaluateurs[NB_EVALUATEUR_MAX];
     int nombre_evaluateur;
 } Graph;
