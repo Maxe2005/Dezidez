@@ -48,7 +48,9 @@ void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_s
     Fonction Expression_evaluation = bande_haute->expressions[0]->fonction ;
     float valeur_en_y = Expression_evaluation.f(valeur_en_x);
     int valeur_pixel_y = valeur_en_y * graph->axe_y->taille_grad / graph->axe_y->echelle_grad;
-    affichage_evaluateur.bouton_evaluateur.label = "f(%.2f)=%.2f",valeur_en_x,valeur_en_y;
+    char formatted_string[100];
+    sprintf(formatted_string, "f(%.2f)=%.2f", valeur_en_x, valeur_en_y);
+    affichage_evaluateur.bouton_evaluateur.label = formatted_string;
     affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x,valeur_pixel_y,FEN_X/16,FEN_Y/16};
     affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
     affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){255, 0, 0, 255};
