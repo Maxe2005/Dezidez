@@ -20,8 +20,7 @@ int main (){
 
 
     typejeton jetontest;
-    jetontest = TokenReelPositif("18");
-    
+    jetontest = TokenOperateur("-");
     return 0;
 }
 

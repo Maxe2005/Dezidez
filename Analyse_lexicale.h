@@ -84,3 +84,9 @@ void afficherchainecarac(char Strdecoupee[][TailleNombreMax], int size);
  * @param Strdecoupee : la taille du tableau de chaines à afficher
  */
 void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]);
+
+/**
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
+ * @param Element : chaine de caractère 
+ */
+typejeton TokenReelNegatif (char *Element);
