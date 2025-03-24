@@ -196,6 +196,26 @@ typejeton TokenReelPositif (char *Element){
     fonct.valeur.reel = atof(Element);
     return fonct;
 }  
-         
+
+typejeton TokenReelNegatif (char *Element){
+    typejeton fonct;
+    int tailleElement = strlen(Element);
+    char buffer[100];
+    char debug;
+    int i;
+    int j=0;
+    memset(buffer, '\0', sizeof(buffer));
+    
+    //on parcour l'Element pour garder que le nombre
+    for ( i = 0; i < tailleElement; i++){
+        if (Element[i] != '(' && Element[i] != ')' ){
+            buffer[j++]=Element[i];
+            //memset(buffer, '\0', sizeof(buffer));
+        }
+    }
+    fonct.lexem = REEL;
+    fonct.valeur.reel = atof(buffer);
+    return fonct;
+}  
 
 

@@ -63,3 +63,9 @@ typejeton TokenVariable (char *Element);
  * @param Element : chaine de caractère 
  */
 typejeton TokenReelPositif (char *Element);
+
+/**
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
+ * @param Element : chaine de caractère 
+ */
+typejeton TokenReelNegatif (char *Element);
