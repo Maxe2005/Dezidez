@@ -8,7 +8,7 @@
 #include <float.h>
 #include "Structures.h"
 
-int operateur(int tailletab, typejeton *tab);
+Node operateur(typejeton *tab, int debut, int fin);
 bool parenthese(int tailletab, typejeton *tab);
 
 

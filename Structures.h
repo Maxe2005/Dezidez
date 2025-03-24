@@ -41,3 +41,23 @@ typedef struct Node
 } Node;
 
 typedef Node *Arbre;
+
+typedef enum {
+    //ERREUR FONCTION 20X
+    PROBLEME_PARENTHESES_FONCTIONS, // cos(.... , cos.....
+    
+    // ERREUR OPERATEUR 21X
+    OPERATEURS_A_LA_SUITE, // ++,**,/*
+    MANQUE_OPERATEUR, // 3+
+
+    // ERREUR PARENTHESES 22X
+    PARENTHESE_FERMEE_1_ER_JETON = 221 ,// )......
+    PARENTHESE_VIDE = 222, // ()
+    PROBLEMES_NOMBRE_PARENTHESES, // ((.....), ((()))))))))))
+
+    // ERREUR REEL 23X
+    REELS_DAFFILE = 231 // 2,3,4
+
+    
+    
+    } typeerreur;
