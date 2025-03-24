@@ -1,6 +1,8 @@
 {
     "files.associations": {
         "evaluateur.h": "c",
-        "math.h": "c"
+        "math.h": "c",
+        "structures.h": "c",
+        "stdio.h": "c"
     }
 }
