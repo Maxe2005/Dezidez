@@ -51,11 +51,14 @@ void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_s
     char formatted_string[100];
     sprintf(formatted_string, "f(%.2f)=%.2f", valeur_en_x, valeur_en_y);
     affichage_evaluateur.bouton_evaluateur.label = formatted_string;
+    affichage_evaluateur.bouton_evaluateur.font_text = fonts[5];
     affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x,valeur_pixel_y,FEN_X/16,FEN_Y/16};
     affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
     affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){255, 0, 0, 255};
     affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
     affichage_evaluateur.bouton_evaluateur.radius = 20;
+    affichage_evaluateur.bouton_evaluateur.hovered = 0;
+
 
     //Fonction Expression_evaluation = bande_haute->expressions[0]->fonction ;
     
