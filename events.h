@@ -26,13 +26,48 @@ void handle_event_graph_MOUSEWHEEL(SDL_Event event, Graph* graph, int x_souris_p
 void handle_event_graph_MOUSEBUTTONDOWN(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
 
 /**
- * Gère l'évènement MOUSEBUTTONUP relatif au graphique
+ * Gère l'évènement MOUSEBUTTONUP du graphique et renvoie vers MOUSEBUTTONUP_RIGHT ou MOUSEBUTTON_LEFT en fonction du besoin
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @param bande_haute La bande d'entrées du graphique
+ */
+void handle_event_graph_MOUSEBUTTONUP(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+
+
+
+/**
+ * Gère l'évènement MOUSEBUTTONUP_RIGHT du graphique
  * @param event L'événement à gérer
  * @param graph Le graphique affiché
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
  */
-void handle_event_graph_MOUSEBUTTONUP(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
+void handle_event_graph_MOUSEBUTTONUP_RIGHT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
+
+
+/**
+ * Gère l'évènement MOUSEBUTTONUP_LEFT du graphique
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @param bande_haute La bande d'entrées du graphique
+ */
+void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px,Bande_haute* bande_haute);
+
+
+/**
+ * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @param bande_haute La bande d'entrées du graphique
+ */
+void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+
 
 /**
  * Gère l'évènement MOUSEMOTION relatif au graphique

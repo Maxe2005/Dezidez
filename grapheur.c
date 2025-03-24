@@ -127,10 +127,12 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
         float borne_inf = (fonction.borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction.borne_inf;;
         float step_size = (borne_sup - borne_inf) / nb_pts;
         float x, y_sur_graph, x_sur_graph;
+        float valeur;
         for (int i = 0; i < nb_pts; i++) {
             x = borne_inf + i * step_size;
-            if (fonction.f(x) >= graph->axe_y->min && fonction.f(x) <= graph->axe_y->max){
-                y_sur_graph = graph->origine_y + (graph->axe_y->max - fonction.f(x)) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
+            float valeur = fonction.f(x);
+            if (valeur >= graph->axe_y->min && valeur <= graph->axe_y->max){
+                y_sur_graph = graph->origine_y + (graph->axe_y->max - valeur) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
                 if (y_sur_graph > graph->origine_y_apres_bande_haut){
                     x_sur_graph = graph->origine_x + (0-graph->axe_x->min + x) / graph->axe_x->echelle_grad * graph->axe_x->taille_grad;
                     draw_thick_point(ren, x_sur_graph, y_sur_graph, 3);
@@ -142,7 +144,7 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
 
 Graph init_graph (Fonction* fonction_defaut){
     Graph graph;
-
+    
     // Axe x
     graph.axe_x = malloc(sizeof(Axe));
     graph.axe_x->font_texte_grad = NULL;
@@ -165,7 +167,7 @@ Graph init_graph (Fonction* fonction_defaut){
             axes[i]->font_texte_grad = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", text_size);
         }
     }
-    
+    graph.nombre_evaluateur = 0;
     return graph;
 }
 
@@ -268,6 +270,12 @@ float recherche_meilleur_echelle_grad (float max, float min){
     return 1;
 }
 
+void affichage_graph_evaluateur(SDL_Renderer* ren, Graph* graph){
+    for (int i=0; i<=graph->nombre_evaluateur; i++) {
+        renderButton(ren, &graph->liste_evaluateurs[i].bouton_evaluateur);
+}
+}
+
 void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute){
     SDL_SetRenderDrawColor(ren, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
     SDL_RenderClear(ren);
@@ -284,7 +292,7 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haut
             tracer_fonction(ren, graph, bande_haute->expressions[i]->fonction);
         }
     }
-
+    affichage_graph_evaluateur(ren,graph);
     // Dessiner le bas arrondi de la bande haute
     affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
     renderImageButton(ren, &bande_haute->button_new_expression.bt);

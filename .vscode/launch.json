@@ -60,6 +60,52 @@
             "programOutput": true,
             "exceptions": true
         }
+        },
+        {
+            "name": "ARTHUR LE GOAT",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/main.exe",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}",
+            "environment": [],
+            "externalConsole": true,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ],
+            "miDebuggerPath": "C:/mingw-w64/bin/gdb.exe",  // Chemin vers ton gdb.exe
+            "preLaunchTask": "Build and run", // Nom de la tâche de compilation dans tasks.json
+            "serverLaunchTimeout": 10000,
+            "miDebuggerArgs": "-q",
+            "logging": {
+                "moduleLoad": false,
+                "trace": true
+            },
+            "intelliSenseMode": "gcc-x86",
+            "configurations": [
+                {
+                    "name": "Linux",
+                    "includePath": [
+                        "/usr/include/c++/7",
+                        "/usr/include/x86_64-linux-gnu/c++/7",
+                        "/usr/include/c++/7/backward",
+                        "/usr/lib/gcc/x86_64-linux-gnu/7/include",
+                        "/usr/local/include",
+                        "/usr/include"
+                    ],
+                    "defines": ["_DEBUG"],
+                    "compilerPath": "/usr/bin/gcc",
+                    "cStandard": "c11",
+                    "cppStandard": "c++17",
+                    "intelliSenseMode": "gcc-x86"
+                }
+            ]
         }
     ]
 }

@@ -68,7 +68,32 @@
         },
         "problemMatcher": ["$gcc"],
         "detail": "Generated task for building all .c files with gcc"
-      }
+      },
+      {
+        "label": "Build and run",
+        "type": "shell",
+        "command": "gcc",
+        "args": [
+            "-o", "main", 
+            "*.c", 
+            "SDL2_gfx/*.c", 
+            "-Iinclude", 
+            "-Llib", 
+            "-lmingw32", 
+            "-lSDL2main", 
+            "-lSDL2", 
+            "-lSDL2_ttf", 
+            "-lSDL2_mixer", 
+            "-lSDL2_image"
+        ],
+        "group": {
+            "kind": "build",
+            "isDefault": true
+        },
+        "problemMatcher": ["$gcc"],
+        "detail": "Generated task by Debugger"
+    }
+
     ],
     "version": "2.0.0"
   }

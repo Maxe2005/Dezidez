@@ -11,6 +11,7 @@
 #define TAILLE_GRADUATION_MIN 40
 #define TAILLE_GRADUATION_MAX 100
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
+#define NB_EVALUATEUR_MAX 10
 
 extern Message message;
 
@@ -27,6 +28,12 @@ typedef struct {
 } Axe;
 
 typedef struct {
+    Button bouton_evaluateur;
+    ImageButton boutton_quitter;
+}Evaluateur;
+
+
+typedef struct {
     Axe* axe_x;
     Axe* axe_y;
     float x; // Largeur du graph en pixels
@@ -37,6 +44,9 @@ typedef struct {
     int centre_x; // Position en pixel du centre (ou de l'origine du graphique)
     int centre_y; // Position en pixel du centre (ou de l'origine du graphique)
     bool souris_pressee;
+    int mode_clic_souris;
+    Evaluateur liste_evaluateurs[NB_EVALUATEUR_MAX];
+    int nombre_evaluateur;
 } Graph;
 
 typedef struct {
