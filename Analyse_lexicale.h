@@ -4,6 +4,7 @@
 #include <string.h>
 
 #define TailleMax 100
+#define TailleNombreMax 100
 /*à faire*/
 /**
  * Retire tout les espaces de l'expression
@@ -26,6 +27,13 @@ int IsInTab(char *tab, int size, char element);
   * @param element : Element recherché
  */
 int IsInTab2(char *tab[], int size, char *element);
+/**
+ * Renvoie 1 si l'element recherché est dans le tableau de chaine de caractère sinon renvoie 0
+ * @param tab : tableau de chaine de caractère
+ * @param size : La taille du tableau
+  * @param element : Element recherché
+ */
+int IsInTab3(char *tab[], int size, char *element);
  /**
  * Prend l'expression en paramètre et rajoute tout les * implicite qui ne sont pas marque
  * @param Expression : chaine de caractère qui contient l'expression sans les espaces
@@ -63,3 +71,16 @@ typejeton TokenVariable (char *Element);
  * @param Element : chaine de caractère 
  */
 typejeton TokenReelPositif (char *Element);
+/**
+ * Permet d'afficher le contenu d'un tableau de chaines de caractères
+ * @param Strdecoupee : le tableau de chaines à afficher
+ * @param size : la taille du tableau de chaines à afficher
+ */
+void afficherchainecarac(char Strdecoupee[][TailleNombreMax], int size);
+/**
+ * Permet de modifier le tableau Strdecoupee, pour découper la formule str de base
+ * @param Strdecoupee : le tableau de chaines à afficher
+ * @param SizeExpression : la taille du tableau de chaines à afficher
+ * @param Strdecoupee : la taille du tableau de chaines à afficher
+ */
+void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]);

@@ -65,6 +65,15 @@ int IsInTab2(char *tab[], int size, char *element) {
     return 0;
 }
 
+int IsInTab3(char *tab[], int size, char *element) {
+    for (int i = 0; i < size; i++) {
+        if (strcmp(tab[i], element) == 0) {
+            return 1;
+        }
+    }
+    return 0;
+}
+
 
 
 
@@ -196,6 +205,104 @@ typejeton TokenReelPositif (char *Element){
     fonct.valeur.reel = atof(Element);
     return fonct;
 }  
-         
+
+void afficherchainecarac(char Strdecoupee[][100], int size) {
+    for (int i = 0; i < size; i++) {
+        if (Strdecoupee[i] != NULL) {  // Vérifie que l'élément n'est pas NULL
+            printf("Strdecoupee[%d] = \"%s\"\n", i, Strdecoupee[i]);
+        }
+    }
+}
+
+
+void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]) {
+    char buffer[TailleMax];
+    char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
+    int lenchiffre = 11;
+    char *op[] = {"+","-","*","/","**"};
+    int lenop = 5;
+    char *fonction[] = {"abs", "sin", "sqrt", "log", "cos", "tan", "exp", "entier", "val_neg", "sinc"};
+    int lenfonction = 10;
+    char *alphabet[] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
+    int lenalphabet = 26;
+    char *parenthese[] = {"(",")"};
+    int lenparenthese = 2;
+    
+    int i;
+    int indiceinjection = 0;
+
+    // Initialisation de Strdecoupee avec des chaînes vides
+    for (int j = 0; j < TailleMax; j++) {
+        Strdecoupee[j][0] = '\0';
+    }
+
+    for (i = 0; i < SizeExpression; i++) {
+        // Si on a atteint la fin de la chaîne, on sort
+        if (str[i] == '\0') break;
+        
+        char strenchainedecarac[2] = {str[i], '\0'};
+        strcpy(buffer, strenchainedecarac);
+
+        // Traitement des nombres
+        if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
+            int longueurdunombre = 0;
+            char reschiffre[TailleNombreMax] = "";
+
+            // Continue tant que tu trouves des chiffres
+            while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
+                strenchainedecarac[0] = str[i + longueurdunombre];
+                strenchainedecarac[1] = '\0';
+                strcpy(buffer, strenchainedecarac);
+                
+                if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
+                    strcat(reschiffre, buffer);
+                    longueurdunombre++;
+                } else {
+                    break;
+                }
+            }
+            
+            strcpy(Strdecoupee[indiceinjection], reschiffre);
+            indiceinjection++;
+            i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
+        }
+
+        // Gestion des opérateurs
+
+        else if (IsInTab3(op, lenop, buffer) == 1) {
+            strcpy(Strdecoupee[indiceinjection], buffer);
+            indiceinjection++;
+        }
+
+        // Gestion des parenthèses
+
+        else if (IsInTab3(parenthese, lenparenthese, buffer) == 1) {
+            strcpy(Strdecoupee[indiceinjection], buffer);
+            indiceinjection++;
+        }
+
+        else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
+            int longueurident = 0;
+            char residentificateur[TailleNombreMax] = "";
+
+            while (i + longueurident < SizeExpression && str[i + longueurident] != '\0') {
+                strenchainedecarac[0] = str[i + longueurident];
+                strenchainedecarac[1] = '\0';
+                strcpy(buffer, strenchainedecarac);
+                
+                if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
+                    strcat(residentificateur, buffer);
+                    longueurident++;
+                } else {
+                    break;
+                }
+            }
+            
+            strcpy(Strdecoupee[indiceinjection], residentificateur);
+            indiceinjection++;
+            i = i + longueurident - 1;
+        }
+    }
+}
 
 
