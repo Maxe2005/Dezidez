@@ -232,7 +232,7 @@ int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
         updateDisplay(ren);
 
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) return 0; // Quitter la fenêtre
+            if (event.type == SDL_QUIT) return 1; // Quitter la fenêtre
 
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
                 FEN_X = event.window.data1;
@@ -412,6 +412,8 @@ void resize_background (Background* bg){
         bg->dstRect.y = (FEN_Y - bg->dstRect.h) / 2;
     }
     if (bg->is_filtre){
+        bg->filtre.x = 0;
+        bg->filtre.y = 0;
         bg->filtre.w = FEN_X;
         bg->filtre.h = FEN_Y;
     }

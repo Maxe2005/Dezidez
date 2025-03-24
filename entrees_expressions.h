@@ -88,12 +88,9 @@ typedef struct {
 
 typedef struct {
     int width_elements[NB_ELEMENTS_PAR_EXPRESSION + 1]; // Largeur de tous les éléments affichés de gauche à droite sur la bande d'expression avec le minimum en x de la bande haute en 0 ième position (d'ou le '+1')
-    //int width_entrees_bornes;
-    //int width_entree_expression;
     int height_entrees_pourcentage; // La taille en y des entrées en pourcentage de la taille en y de la bande d'expression
     int height_texte_desctriptif;
-    int espace_entre_elements;
-    //int marge_entree_gauche;
+    float espace_entre_elements;
     int height_bande_expression;
     int taille_color_picker;
     int taille_button_deplacement;

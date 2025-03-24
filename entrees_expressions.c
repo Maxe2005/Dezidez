@@ -95,8 +95,8 @@ void init_button_new_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->button_new_expression.bt.image = load_image(ren, "Icons/ajout.png");
     bande_haute->button_new_expression.bt.rect.h = bande_haute->params.taille_button_new_expression;
     bande_haute->button_new_expression.bt.rect.w = bande_haute->button_new_expression.bt.rect.h;
-    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.2*bande_haute->button_new_expression.bt.rect.h;
-    bande_haute->button_new_expression.bt.rect.x = bande_haute->surface.x + bande_haute->surface.w - 1.2*bande_haute->button_new_expression.bt.rect.w;
+    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.3*bande_haute->button_new_expression.bt.rect.h;
+    bande_haute->button_new_expression.bt.rect.x = bande_haute->surface.x + bande_haute->surface.w - 1.3*bande_haute->button_new_expression.bt.rect.w;
     bande_haute->button_new_expression.bt.is_survolable = 1;
     bande_haute->button_new_expression.bt.hovered = 0;
     bande_haute->button_new_expression.bt.color_base = colors->button_new_expression;
@@ -244,7 +244,7 @@ void init_bande_haute (SDL_Renderer* ren, Bande_haute* bande_haute){
 
 void resize_bande_haut (Bande_haute* bande_haute){
     bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
-    bande_haute->params.espace_entre_elements = (FEN_X - TAILLE_BANDE_DROITE - calcul_pos(bande_haute->params.width_elements, 0, NB_ELEMENTS_PAR_EXPRESSION)) / (NB_ELEMENTS_PAR_EXPRESSION + 1);
+    bande_haute->params.espace_entre_elements = (FEN_X - TAILLE_BANDE_DROITE - calcul_pos(bande_haute->params.width_elements, 0, NB_ELEMENTS_PAR_EXPRESSION+1)) / (NB_ELEMENTS_PAR_EXPRESSION + 1);
 
     int num_element_du_premier_champs = 3;
     Button* but[] = {bande_haute->texte_descriptif_borne_inf, bande_haute->texte_descriptif_borne_sup, bande_haute->texte_descriptif_expression};
@@ -278,7 +278,7 @@ void resize_bande_haut (Bande_haute* bande_haute){
         bande_haute->expressions[i]->button_delete.rect_base.x = calcul_pos(bande_haute->params.width_elements, bande_haute->params.espace_entre_elements, NB_ELEMENTS_PAR_EXPRESSION);
         bande_haute->expressions[i]->button_delete.bt.rect.x = calcul_pos(bande_haute->params.width_elements, bande_haute->params.espace_entre_elements, NB_ELEMENTS_PAR_EXPRESSION);
     }
-    bande_haute->button_new_expression.bt.rect.x = bande_haute->surface.x + bande_haute->surface.w - 1.15*bande_haute->button_new_expression.rect_base.w;
+    bande_haute->button_new_expression.bt.rect.x = bande_haute->surface.x + bande_haute->surface.w - 1.15*bande_haute->button_new_expression.bt.rect.w;
 }
 
 

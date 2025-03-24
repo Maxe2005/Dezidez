@@ -80,7 +80,7 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
             handle_event_entrees_expressions_MOUSEMOTION(event, bande_haute, bande_haute->expressions[i], x_souris_px, y_souris_px, is_MOUSEMOTION_used);
         }
     }
-    if (is_souris_sur_rectangle(bande_haute->button_new_expression.bt.rect, x_souris_px, y_souris_px)) {
+    if (!is_MOUSEMOTION_used && is_souris_sur_rectangle(bande_haute->button_new_expression.bt.rect, x_souris_px, y_souris_px)) {
         bande_haute->button_new_expression.bt.hovered = 1;
     } else bande_haute->button_new_expression.bt.hovered = 0;
     return is_MOUSEMOTION_used;
