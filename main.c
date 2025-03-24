@@ -13,7 +13,7 @@ int main (){
     MultiplicationImplicite(str,lenExpression,buffer);
 
     typejeton jetontest;
-    jetontest = TokenFonction("sin");
+    jetontest = TokenReelPositif("18");
     
     return 0;
 }

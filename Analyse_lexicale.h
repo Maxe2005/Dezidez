@@ -1,5 +1,6 @@
 #include "Structures.h"
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #define TailleMax 100
@@ -41,13 +42,24 @@ void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer);
 int ComparaisonString(char *element1,char *element2);
 
 /**
- * Renvoie le bon Token correrspon dans au string rentré en paramètre dans le cas de fonction
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de fonction
  * @param Element : chaine de caractère 
  */
 typejeton TokenFonction (char *Element);
 
 /**
- * Renvoie le bon Token correrspon dans au string rentré en paramètre dans le cas d'opérateur
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'opérateur
  * @param Element : chaine de caractère 
  */
 typejeton TokenOperateur (char *Element);
+
+/**
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de variable
+ * @param Element : chaine de caractère 
+ */
+typejeton TokenVariable (char *Element);
+/**
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel POSITIF'
+ * @param Element : chaine de caractère 
+ */
+typejeton TokenReelPositif (char *Element);

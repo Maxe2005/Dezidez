@@ -103,7 +103,7 @@ void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer){
 typejeton TokenFonction (char *Element){
     char *fonction[] = {"abs","sin","cos","sqrt","log","tan","exp","entier","sinc"};
     typejeton fonct;
-    if (IsInTab2(fonction,strlen(fonction),Element)){// on regarde si c'est une fonction
+    if (IsInTab2(fonction,9,Element)){// on regarde si c'est une fonction
         fonct.lexem = FONCTION;
         if (ComparaisonString(Element,"abs")){
             fonct.valeur.fonction = ABS;
@@ -134,15 +134,16 @@ typejeton TokenFonction (char *Element){
         }
         else {
             //Erreur Unkown fonction
+            printf("ERREUR");
         }
     }  
     return fonct;     
 }
 
 typejeton TokenOperateur (char *Element){
-    char *fonction[] = {"+","-","*","/","**"};
+    char *operation[] = {"+","-","*","/","**"};
     typejeton fonct;
-    if (IsInTab2(fonction,strlen(fonction),Element)){// on regarde si c'est une fonction
+    if (IsInTab2(operation,5,Element)){
         fonct.lexem = OPERATEUR;
         if (ComparaisonString(Element,"+")){
             fonct.valeur.operateur = PLUS;
@@ -160,9 +161,41 @@ typejeton TokenOperateur (char *Element){
             fonct.valeur.operateur = DIV;
         }
         else {
+            printf("ERREUR");
             //Erreur Unkown fonction
         }
     }  
     return fonct;     
 }
+
+
+typejeton TokenVariable (char *Element){
+    char *var[] = {"x","y"};
+    typejeton fonct;
+    if (IsInTab2(var,2,Element)){
+        fonct.lexem = VARIABLE;
+        if (ComparaisonString(Element,"y")){
+            fonct.valeur.variable = 'y';
+        }
+        else if (ComparaisonString(Element,"x")){
+            fonct.valeur.variable = 'x';
+        }
+        else{
+            printf("ERREUR");
+            //Erreur
+        }
+    }  
+    return fonct;     
+}
+
+
+typejeton TokenReelPositif (char *Element){
+    typejeton fonct;
+    fonct.lexem = REEL;
+    
+    fonct.valeur.reel = atof(Element);
+    return fonct;
+}  
+         
+
 
