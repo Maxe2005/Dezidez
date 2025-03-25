@@ -32,15 +32,16 @@ typedef struct {
     int line_count; // Nombre de lignes
 } WrappedText;
 
-typedef struct {
+typedef struct Line {
     WrappedText wrapped_text;
     int y_position;
     int is_title; // Pour savoir si le texte est un titre : 0 si non, 1 si titre 1, 2 si titre 2 
     int is_list; // Pour savoir si le texte est une liste : 0 si non, 1 si liste à puce, 2 si liste numérotée
+    Line ligne_suivante; 
 } Line;
 
 typedef struct {
-    Line *lines;
+    Line fist_line;
     int nb_lines;
     int total_height;
 } MarkdownText;
@@ -197,39 +198,39 @@ MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS], const char *filename) {
     int nb_lignes = compter_nb_lignes(filename);
     if (nb_lignes == 0) return md_txt;
     char line[NB_MAX_CHAR_PAR_LIGNE];
-    Line lines[nb_lignes];
-    int line_count = 0, y_offset = 0;
+    Line first_line;
+    Line current_line = first_line;
+    int y_offset = 0;
     while (fgets(line, sizeof(line), file)) {
-        if (line_count >= nb_lignes) break;
         if (strlen(line) > NB_MAX_CHAR_PAR_LIGNE){
             printf("Attention ! Une ligne du fichier dépace le nombre maximal de caractères par ligne !\nLe fichier markdown n'a donc pas été chargé !\n");
             fclose(file);
             return md_txt;
         }
-        lines[line_count].y_position = y_offset;
-        lines[line_count].is_title = (strncmp(line, "# ", 2) == 0);
-        lines[line_count].is_list = (strncmp(line, "- ", 2) == 0);
+        current_line.y_position = y_offset;
+        current_line.is_title = (strncmp(line, "# ", 2) == 0);
+        current_line.is_list = (strncmp(line, "- ", 2) == 0);
         line[strlen(line)-1] = '\0'; // suppression du retour à la ligne du fichier 
-        lines[line_count].wrapped_text = text_wrapper(fonts[0], line + (lines[line_count].is_title || lines[line_count].is_list ? 2 : 0), SCREEN_WIDTH - 2*MARGE);
-        y_offset += lines[line_count].wrapped_text.total_height;
-        line_count++;
+        current_line.wrapped_text = text_wrapper(fonts[0], line + (current_line.is_title || current_line.is_list ? 2 : 0), SCREEN_WIDTH - 2*MARGE);
+        y_offset += current_line.wrapped_text.total_height;
+        current_line = current_line.ligne_suivante;
     }
-    md_txt.lines = lines;
+    md_txt.fist_line = first_line;
     md_txt.nb_lines = nb_lignes;
     md_txt.total_height = y_offset;
     fclose(file);
     return md_txt;
 }
 
-void render_markdown(SDL_Renderer *renderer, MarkdownText md_txt, int scroll_offset) {
+void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_offset) {
     SDL_Color white = {255, 255, 255, 255};
-    for (int i = 0; i < md_txt.nb_lines; i++) {
-        Line line = md_txt.lines[i];
-        if (md_txt.lines[i].y_position + scroll_offset + LINE_HEIGHT < 0) continue;
-        if (md_txt.lines[i].y_position + scroll_offset > SCREEN_HEIGHT) break;
-        SDL_Rect rect = {MARGE, md_txt.lines[i].y_position + scroll_offset, SCREEN_WIDTH - 2*MARGE, SCREEN_HEIGHT};
-        TextAlignX align_x = md_txt.lines[i].is_list ? ALIGN_LEFT : ALIGN_CENTER_X;
-        render_text_wrapped(renderer, md_txt.lines[i].wrapped_text, rect, white, align_x, ALIGN_TOP);
+    Line current_line = md_txt->fist_line;
+    for (int i = 0; i < md_txt->nb_lines; i++) {
+        if (current_line.y_position + scroll_offset + LINE_HEIGHT < 0) continue;
+        if (current_line.y_position + scroll_offset > SCREEN_HEIGHT) break;
+        SDL_Rect rect = {MARGE, current_line.y_position + scroll_offset, SCREEN_WIDTH - 2*MARGE, SCREEN_HEIGHT};
+        TextAlignX align_x = current_line.is_list ? ALIGN_LEFT : ALIGN_CENTER_X;
+        render_text_wrapped(renderer, current_line.wrapped_text, rect, white, align_x, ALIGN_TOP);
         SDL_RenderPresent(renderer);
     }
 }
@@ -259,7 +260,7 @@ int main(int argc, char *argv[]) {
 
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
-    render_markdown(renderer, md_txt, scroll_offset);
+    render_markdown(renderer, &md_txt, scroll_offset);
     SDL_RenderPresent(renderer);
 
     while (running) {
