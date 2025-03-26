@@ -59,11 +59,11 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
 /**
  * Affiche une page de texte scrollable
  * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param Text Le texte à afficher
+ * @param markdown_file Le texte à afficher
  * @param titre Le titre de la page
  * @return 1 si on revient sur la page d'accueil, 0 si on ferme la fenêtre
  */
-int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre);
+int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre);
 
 /**
  * Tout est dans le titre !

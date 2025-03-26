@@ -10,7 +10,7 @@ int main (int argc, char *argv[]){
     IMG_Init(IMG_INIT_JPG);
 
     initTTF();
-    SDL_Window* window = SDL_CreateWindow("DEZIDEZ", SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, FEN_X, FEN_Y, SDL_WINDOW_RESIZABLE);
+    SDL_Window* window = createWindow("DEZIDEZ", FEN_X, FEN_Y);
     SDL_Renderer* ren = createRenderer(window);
     
     init_font(fonts);

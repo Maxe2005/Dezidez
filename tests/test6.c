@@ -9,7 +9,6 @@
 #define FEN_Y 600
 
 #define NB_MAX_CHAR_PAR_LIGNE 1024
-#define NB_MAX_MOTS_PAR_LIGNE 100
 #define SCROLL_SPEED 20 // Vitesse de scroll
 
 #define TAILLE_INTER_PARAHRAPHE 50
