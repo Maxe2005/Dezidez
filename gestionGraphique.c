@@ -267,7 +267,7 @@ WrappedText text_wrapper (TTF_Font *font, const char *text, int x_max) {
             TTF_SizeText(font, word, &word_width, &word_height);
             if (x + word_width > x_max) {
                 if (buffer[0] == '\0'){
-                    printf("Attention ! La longeur du rectangle dans lequel doit être affiché le texte est trop petite par rapport à la taille d'un (ou plusieurs) mot(s) du texte (faire attention à la taille de la font !)\nLe texte n'a donc pas été affiché !\n");
+                    printf("Attention ! La longeur du rectangle dans lequel doit être affiché le texte est trop petite par rapport à la taille d'un (ou plusieurs) mot(s) du texte (faire attention à la taille de la font !)\nLe texte n'a donc pas été affiché !\n\n");
                     wrapped_text.is_erreur = true;
                     free(text_copy);
                     return wrapped_text;
@@ -345,7 +345,7 @@ int compter_nb_lignes (const char *filename) {
     return nb_lines;
 }
 
-MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename) {
+MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename, int marge) {
     MarkdownText md_txt;
     FILE *file = fopen(filename, "r");
     if (!file) {
@@ -375,9 +375,9 @@ MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename)
                 else break;
             }
             if (line[current_line->is_title] == '#') { // Erreur : titre trop grand
-                current_line->wrapped_text = text_wrapper(fonts[0], line, FEN_X - 2*MARGE_MD);
+                current_line->wrapped_text = text_wrapper(fonts[0], line, FEN_X - 2*marge);
             } else { // C'est bien un titre connu
-                current_line->wrapped_text = text_wrapper(fonts[current_line->is_title], line + current_line->is_title + 1, FEN_X - 2*MARGE_MD);
+                current_line->wrapped_text = text_wrapper(fonts[current_line->is_title], line + current_line->is_title + 1, FEN_X - 2*marge);
             }
         } else {
             if (strncmp(line, "- ", 2) == 0){
@@ -388,7 +388,7 @@ MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename)
                     exit(1);
                 }
                 sprintf(ele_list, "• %s", line + 2);
-                current_line->wrapped_text = text_wrapper(fonts[0], ele_list, FEN_X - 2*MARGE_MD);
+                current_line->wrapped_text = text_wrapper(fonts[0], ele_list, FEN_X - 2*marge);
             } else {
                 if (strncmp(line, "* ", 2) == 0) {
                     current_line->is_list = 2;
@@ -406,10 +406,10 @@ MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename)
                         snprintf(ele_list, strlen(line) + 4 + 10, "%d. %s", last_num + 1, line + 2);
                     }
                 
-                    current_line->wrapped_text = text_wrapper(fonts[0], ele_list, FEN_X - 2*MARGE_MD);
+                    current_line->wrapped_text = text_wrapper(fonts[0], ele_list, FEN_X - 2*marge);
                     free(ele_list);
                 } else {
-                    current_line->wrapped_text = text_wrapper(fonts[0], line, FEN_X - 2*MARGE_MD);
+                    current_line->wrapped_text = text_wrapper(fonts[0], line, FEN_X - 2*marge);
                 }
             }
         }
@@ -424,7 +424,7 @@ MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename)
     return md_txt;
 }
 
-void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_offset) {
+void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_offset, int marge) {
     SDL_Color white = {255, 255, 255, 255};
     Line* current_line = &md_txt->fist_line;
     for (int i = 0; i < md_txt->nb_lines; i++) {
@@ -433,7 +433,7 @@ void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_of
             continue;
         }
         if (current_line->y_position - scroll_offset > FEN_Y) break;
-        SDL_Rect rect = {MARGE_MD, current_line->y_position - scroll_offset, FEN_X - 2*MARGE_MD, FEN_Y};
+        SDL_Rect rect = {marge, current_line->y_position - scroll_offset, FEN_X - 2*marge, FEN_Y};
         TextAlignX align_x = current_line->is_list ? ALIGN_LEFT : ALIGN_CENTER_X;
         render_text_wrapped(renderer, current_line->wrapped_text, rect, white, align_x, ALIGN_TOP);
         current_line = current_line->ligne_suivante;

@@ -126,10 +126,10 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     int mode_quitter = 1; // Si 0 on ferme la fenêtre, si 1 on reste sur le menu principal
                     switch (i) {
                         case 0:
-                            ecran_mode_emploi(ren);
+                            mode_quitter = ecran_mode_emploi(ren);
                             break;
                         case 1:
-                            ecran_remerciements(ren);
+                            mode_quitter = ecran_remerciements(ren);
                             break;
                         case 2:
                             mode_quitter = Grapheur(ren, gr_ele);
@@ -196,7 +196,8 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     TTF_Font *font_title_2_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_2_SIZE_MD);
     TTF_Font *fonts_md [NB_FONTS_MD] = {font_text_md, font_title_1_md, font_title_2_md};
 
-    MarkdownText md_txt = charge_markdown(fonts_md, markdown_file);
+    int marge = FEN_X / 7;
+    MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);
 
     int taille_header = 100;
     int scroll_offset_min = -40; // Décalage vertical minimum du scrolling
@@ -208,7 +209,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     while (running) {
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
-                mode_quitter = 0; // Quitter la fenêtre
+                mode_quitter = 1; // Quitter la fenêtre
                 running = 0;
             }
 
@@ -217,7 +218,8 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
                 FEN_Y = event.window.data2;
                 resize_background(bg);
                 free_MarkdownText(&md_txt);
-                md_txt = charge_markdown(fonts_md, markdown_file);
+                marge = FEN_X / 7;
+                md_txt = charge_markdown(fonts_md, markdown_file, marge);
             }
 
             if (event.type == SDL_MOUSEWHEEL) {
@@ -233,14 +235,14 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
 
             if (event.type == SDL_KEYUP) {
                 if (event.key.keysym.sym == SDLK_BACKSPACE){
-                    mode_quitter = 1; // On revient à l'écran d'accueil
+                    mode_quitter = 2; // On revient à l'écran d'accueil
                     running = 0;
                 }
             }
         
             if (event.type == SDL_MOUSEBUTTONUP){
                 if (is_souris_sur_rectangle(bouton_retour.rect, event.motion.x, event.motion.y)){
-                    mode_quitter = 1; // On revient à l'écran d'accueil
+                    mode_quitter = 2; // On revient à l'écran d'accueil
                     running = 0;
                 }
             }
@@ -259,7 +261,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
         affiche_background(ren, bg);
-        render_markdown(ren, &md_txt, scroll_offset - taille_header);
+        render_markdown(ren, &md_txt, scroll_offset - taille_header, marge);
         renderHeader(ren, titre, fonts[3], FEN_X, taille_header);
         renderImageButton(ren, &bouton_retour);
         updateDisplay(ren);
@@ -270,7 +272,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     free_MarkdownText(&md_txt);
     SDL_DestroyTexture(bouton_retour.image);
     free(bg);
-    return mode_quitter;
+    return mode_quitter - 1;
 }
 
 int ecran_remerciements (SDL_Renderer* ren){

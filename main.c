@@ -14,6 +14,7 @@ int main (int argc, char *argv[]){
     SDL_Renderer* ren = createRenderer(window);
     
     init_font(fonts);
+    init_tous_les_json();
 
     Grapheur_elements grapheur_ele;
     grapheur_ele.bande_haute = malloc(sizeof(Bande_haute));

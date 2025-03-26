@@ -12,7 +12,7 @@
 #define TAILLE_INTER_PARAHRAPHE 50
 
 // Paramètres pour l'affichage du Markdown (MD)
-#define MARGE_MD 50
+#define MARGE_MD 150
 #define FONT_TEXT_SIZE_MD 20
 #define FONT_TITRE_1_SIZE_MD 34
 #define FONT_TITRE_2_SIZE_MD 28
@@ -114,17 +114,19 @@ int compter_nb_lignes (const char *filename);
  * Charge un fichier markdown et le découpe en lignes de texte
  * @param fonts Les polices de caractères
  * @param filename Le nom du fichier
+ * @param marge La marge à gauche et à droite du texte
  * @return Une structure contenant les lignes de texte découpées
  */
-MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename);
+MarkdownText charge_markdown(TTF_Font *fonts[NB_FONTS_MD], const char *filename, int marge);
 
 /**
  * Affiche un texte markdown sur un renderer
  * @param renderer Le renderer sur lequel afficher le texte
  * @param md_txt Le texte markdown à afficher
  * @param scroll_offset Le décalage de scroll
+ * @param marge La marge à gauche et à droite du texte
  */
-void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_offset);
+void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_offset, int marge);
 
 /**
  * Libère la mémoire allouée pour une structure WrappedText
