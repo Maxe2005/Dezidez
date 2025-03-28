@@ -238,6 +238,7 @@ void afficherchainecarac(char Strdecoupee[][100], int size) {
 
 void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]) {
     char buffer[TailleMax];
+    char bufferneg[TailleMax];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
     int lenchiffre = 11;
     char *op[] = {"+","-","*","/","**"};
@@ -261,7 +262,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
         // Si on a atteint la fin de la chaîne, on sort
         if (str[i] == '\0') break;
         
-        char strenchainedecarac[2] = {str[i], '\0'};
+        char strenchainedecarac[2] = {str[i], '\0'}; //on met le caractère étudier dans le buffer
         strcpy(buffer, strenchainedecarac);
 
         // Traitement des nombres
@@ -288,11 +289,42 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
             i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
         }
 
+        // Traitement des nombres negatifs
+        if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
+            int longueurdunombre = 2;
+            char reschiffre[TailleNombreMax] = "(-";
+            // on skip la parenthèse le - qui sont déja rajouter
+            // Continue tant que tu trouves des chiffres
+            while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
+                strenchainedecarac[0] = str[i + longueurdunombre];
+                strenchainedecarac[1] = '\0';
+                strcpy(buffer, strenchainedecarac);
+                
+                if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
+                    strcat(reschiffre, buffer);
+                    longueurdunombre++;
+                } else {
+                    if (str[i + longueurdunombre] == ')'){
+                        strcat(reschiffre, buffer); 
+                        break;
+                    } else { //Erreur 
+                        printf("Erreur"); // parenthèse manquante
+                        break;
+                    }
+                }
+            }
+            
+            strcpy(Strdecoupee[indiceinjection], reschiffre);
+            indiceinjection++;
+            i = i + longueurdunombre;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit (on fait +1 pour skip la dernière parenthèse déjà traité)
+        }
+
         // Gestion des opérateurs
 
         else if (IsInTab3(op, lenop, buffer) == 1) {
             strcpy(Strdecoupee[indiceinjection], buffer);
             indiceinjection++;
+            //y'a un problème d'indice dans l'expression de teste on a 2 fois '-'
         }
 
         // Gestion des parenthèses
@@ -301,7 +333,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
             strcpy(Strdecoupee[indiceinjection], buffer);
             indiceinjection++;
         }
-
+        //gestion des fonction ??
         else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
             int longueurident = 0;
             char residentificateur[TailleNombreMax] = "";

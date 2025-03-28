@@ -6,7 +6,7 @@
 
 
 int main (){
-    char str[TailleMax]  = "223.348x + 759 - 365..." ;
+    char str[TailleMax]  = "223.348x + 759 - (-365)..." ;
     int lenExpression = strlen(str);
     char buffer[TailleMax];
     char Strdecoupee[TailleMax][TailleNombreMax];

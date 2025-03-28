@@ -5,7 +5,7 @@
 
 #define TailleMax 100
 #define TailleNombreMax 100
-/*à faire*/
+
 /**
  * Retire tout les espaces de l'expression
  * @param Expression : chaine de caractère qui contient l'expression 
@@ -78,11 +78,11 @@ typejeton TokenReelPositif (char *Element);
  */
 void afficherchainecarac(char Strdecoupee[][TailleNombreMax], int size);
 /**
- * Permet de modifier le tableau Strdecoupee, pour découper la formule str de base
- * @param Strdecoupee : le tableau de chaines à afficher
- * @param SizeExpression : la taille du tableau de chaines à afficher
- * @param Strdecoupee : la taille du tableau de chaines à afficher
- */
+ * Permet de transformer une expression en un tableau de Token
+ * @param Str : Expression mathématique sans espace et avec les multiplication implicite
+ * @param SizeExpression : la taille de l'expression 
+ * @param Strdecoupee : tableau de sortie qui sera rempli de Token 
+ */ 
 void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]);
 
 /**
