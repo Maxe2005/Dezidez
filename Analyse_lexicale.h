@@ -59,8 +59,15 @@ typejeton TokenFonction (char *Element);
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'opérateur
  * @param Element : chaine de caractère 
  */
+
 typejeton TokenOperateur (char *Element);
 
+/**
+ * Renvoie le bon Token correrspond dans au string rentré dans le cas des parentheses
+ * @param Element : chaine de caractère 
+ */
+
+typejeton TokenParenthese (char *Element);
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de variable
  * @param Element : chaine de caractère 
@@ -83,10 +90,25 @@ void afficherchainecarac(char Strdecoupee[][TailleNombreMax], int size);
  * @param SizeExpression : la taille du tableau de chaines à afficher
  * @param Strdecoupee : la taille du tableau de chaines à afficher
  */
-void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]);
-
+void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax], typejeton TokenList[TailleMax]);
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
  * @param Element : chaine de caractère 
  */
 typejeton TokenReelNegatif (char *Element);
+/**
+ * Donne la taille d'un tableau de chaine de carac
+ * @param Strdecoupee : tableau de chaine de carac 
+ */
+int lenStrList (char Strdecoupee[TailleMax][TailleNombreMax]);
+/**
+ * Permet d'afficher un jeton unique
+ * @param jeton : jeton de type typejeton 
+ */
+void afficher_jeton(typejeton jeton);
+/**
+ * Permet d'afficher un jeton unique
+ * @param tableau : tableau de jeton
+ * @param taille : taille du tableau
+ */
+void afficher_tableau_jetons(typejeton tableau[], int taille);

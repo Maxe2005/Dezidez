@@ -177,6 +177,26 @@ typejeton TokenOperateur (char *Element){
     return fonct;     
 }
 
+typejeton TokenParenthese (char *Element){
+    char *operation[] = {"(",")"};
+    typejeton fonct;
+    if (IsInTab2(operation,5,Element)){
+        if (ComparaisonString(Element,"(")){
+            fonct.lexem = PAR_OUV;
+        }
+        else if (ComparaisonString(Element,")")){
+            fonct.lexem = PAR_FERM;
+        }
+        else {
+            printf("ERREUR");
+            //Erreur Unkown character
+        }
+    }  
+    return fonct;     
+}
+
+
+
 
 typejeton TokenVariable (char *Element){
     char *var[] = {"x","y"};
@@ -236,7 +256,7 @@ void afficherchainecarac(char Strdecoupee[][100], int size) {
 }
 
 
-void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]) {
+void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax], typejeton TokenList[TailleMax]) {
     char buffer[TailleMax];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
     int lenchiffre = 11;
@@ -246,8 +266,12 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
     int lenfonction = 10;
     char *alphabet[] = {"a","b","c","d","e","f","g","h","i","j","k","l","m","n","o","p","q","r","s","t","u","v","w","x","y","z"};
     int lenalphabet = 26;
+    char *alphabetfonction[] = {"a","s","l","c","t","e","v"};
+    int lenalphabetfonction = 7;
     char *parenthese[] = {"(",")"};
     int lenparenthese = 2;
+    char *variables[] = {"x","y"};
+    int lenvariables = 2;
     
     int i;
     int indiceinjection = 0;
@@ -284,6 +308,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
             }
             
             strcpy(Strdecoupee[indiceinjection], reschiffre);
+            TokenList[indiceinjection]=TokenReelPositif(reschiffre);
             indiceinjection++;
             i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
         }
@@ -292,6 +317,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
 
         else if (IsInTab3(op, lenop, buffer) == 1) {
             strcpy(Strdecoupee[indiceinjection], buffer);
+            TokenList[indiceinjection]=TokenOperateur(buffer);
             indiceinjection++;
         }
 
@@ -299,31 +325,136 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
 
         else if (IsInTab3(parenthese, lenparenthese, buffer) == 1) {
             strcpy(Strdecoupee[indiceinjection], buffer);
+            TokenList[indiceinjection]=TokenParenthese(buffer);                       // IL faut faire token parenthèse
             indiceinjection++;
         }
+        
+        // Gestion des fonctions
 
-        else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
-            int longueurident = 0;
-            char residentificateur[TailleNombreMax] = "";
-
-            while (i + longueurident < SizeExpression && str[i + longueurident] != '\0') {
-                strenchainedecarac[0] = str[i + longueurident];
+        else if (IsInTab3(alphabetfonction, lenalphabetfonction, buffer) == 1){
+            int longueurfonction = 0;
+            char resfonction[TailleNombreMax] = "";
+            while (i + longueurfonction < SizeExpression && str[i + longueurfonction] != '\0' && str[i + longueurfonction] != '(' ){
+                strenchainedecarac[0] = str[i + longueurfonction];
                 strenchainedecarac[1] = '\0';
+
                 strcpy(buffer, strenchainedecarac);
-                
-                if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
-                    strcat(residentificateur, buffer);
-                    longueurident++;
-                } else {
-                    break;
-                }
+                strcat(resfonction, buffer);
+                longueurfonction++;
             }
-            
-            strcpy(Strdecoupee[indiceinjection], residentificateur);
+            if (IsInTab3(fonction, lenfonction, resfonction)==1){
+                strcpy(Strdecoupee[indiceinjection], resfonction);
+                TokenList[indiceinjection]=TokenFonction(resfonction);
+                indiceinjection++;
+                i = i + longueurfonction - 1;
+            }
+            else {
+                strcpy(Strdecoupee[indiceinjection], "fonction inconnue");
+                indiceinjection++;
+                i = i + longueurfonction - 1;
+
+            }
+        }
+
+        
+        // Gestion des variables
+
+        // faudra modifier les conditions pour quand c'est 2D et quand c'est 3D
+
+        else if (IsInTab3(variables, lenvariables, buffer) == 1) {
+            strcpy(Strdecoupee[indiceinjection], buffer);
+            TokenList[indiceinjection]=TokenVariable(buffer);
             indiceinjection++;
-            i = i + longueurident - 1;
         }
     }
+}
+
+
+
+int lenStrList (char Strdecoupee[TailleMax][TailleNombreMax]){
+    int compteur = 0;
+    for (int i=0; i<TailleMax ;i++){
+        if (Strdecoupee[i][0]!='\0'){
+            compteur++;
+        }
+    }
+    return compteur;
+}
+
+
+
+// Fonction pour afficher un jeton unique
+void afficher_jeton(typejeton jeton) {
+    printf("Lexem: ");
+    switch (jeton.lexem) {
+        case REEL:
+            printf("REEL, Valeur: %.2f\n", jeton.valeur.reel);
+            break;
+        case OPERATEUR:
+            printf("OPERATEUR, Type: ");
+            switch (jeton.valeur.operateur) {
+                case PLUS: printf("+\n"); break;
+                case MOINS: printf("-\n"); break;
+                case FOIS: printf("*\n"); break;
+                case DIV: printf("/\n"); break;
+                case PUIS: printf("^\n"); break;
+                default: printf("Inconnu\n"); break;
+            }
+            break;
+        case FONCTION:
+            printf("FONCTION, Type: ");
+            switch (jeton.valeur.fonction) {
+                case ABS: printf("ABS\n"); break;
+                case SIN: printf("SIN\n"); break;
+                case SQRT: printf("SQRT\n"); break;
+                case LOG: printf("LOG\n"); break;
+                case COS: printf("COS\n"); break;
+                case TAN: printf("TAN\n"); break;
+                case EXP: printf("EXP\n"); break;
+                case ENTIER: printf("ENTIER\n"); break;
+                case VAL_NEG: printf("VAL_NEG\n"); break;
+                case SINC: printf("SINC\n"); break;
+                default: printf("Inconnu\n"); break;
+            }
+            break;
+        case VARIABLE:
+            printf("VARIABLE, Nom: %c\n", jeton.valeur.variable);
+            break;
+        case ERREUR:
+            printf("ERREUR rencontrée\n");
+            break;
+        case FIN:
+            printf("FIN de l'analyse\n");
+            break;
+        case PAR_OUV:
+            printf("Parenthese Ouvrante: (\n");
+            break;
+        case PAR_FERM:
+            printf("Parenthese Fermante: )\n");
+            break;
+        case BAR_OUV:
+            printf("Barre Ouvrante: |\n");
+            break;
+        case BAR_FERM:
+            printf("Barre Fermante: |\n");
+            break;
+        case ABSOLU:
+            printf("ABSOLU\n");
+            break;
+        default:
+            printf("Type inconnu\n");
+            break;
+    }
+}
+
+// Fonction pour afficher un tableau de jetons
+void afficher_tableau_jetons(typejeton tableau[], int taille) {
+    printf("=== Affichage du tableau de jetons ===\n");
+    for (int i = 0; i < taille; i++) {
+        printf("Jeton %d: ", i + 1);
+        afficher_jeton(tableau[i]);
+    }
+    printf("======================================\n");
 }
 
 
