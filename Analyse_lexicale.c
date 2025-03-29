@@ -227,7 +227,7 @@ typejeton TokenReelNegatif (char *Element){
     return fonct;
 }  
 
-void afficherchainecarac(char Strdecoupee[][100], int size) {
+void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size) {
     for (int i = 0; i < size; i++) {
         if (Strdecoupee[i] != NULL) {  // Vérifie que l'élément n'est pas NULL
             printf("Strdecoupee[%d] = \"%s\"\n", i, Strdecoupee[i]);
@@ -249,7 +249,6 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
     int lenalphabet = 26;
     char *parenthese[] = {"(",")"};
     int lenparenthese = 2;
-    
     int i;
     int indiceinjection = 0;
 
@@ -258,7 +257,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
         Strdecoupee[j][0] = '\0';
     }
 
-    for (i = 0; i < SizeExpression; i++) {
+    for (i = 0; i < SizeExpression;i++) {
         // Si on a atteint la fin de la chaîne, on sort
         if (str[i] == '\0') break;
         
@@ -290,7 +289,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
         }
 
         // Traitement des nombres negatifs
-        if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
+        else if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
             int longueurdunombre = 2;
             char reschiffre[TailleNombreMax] = "(-";
             // on skip la parenthèse le - qui sont déja rajouter
@@ -322,6 +321,11 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
         // Gestion des opérateurs
 
         else if (IsInTab3(op, lenop, buffer) == 1) {
+            if (str[i]=='*' && str[i+1]=='*'){ //cas de la puissance
+                strcat(buffer,"*"); //comme ça on injecte directement la puissance
+                i++;
+            }
+            
             strcpy(Strdecoupee[indiceinjection], buffer);
             indiceinjection++;
             //y'a un problème d'indice dans l'expression de teste on a 2 fois '-'

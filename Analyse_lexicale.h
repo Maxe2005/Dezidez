@@ -76,7 +76,7 @@ typejeton TokenReelPositif (char *Element);
  * @param Strdecoupee : le tableau de chaines à afficher
  * @param size : la taille du tableau de chaines à afficher
  */
-void afficherchainecarac(char Strdecoupee[][TailleNombreMax], int size);
+void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size);
 /**
  * Permet de transformer une expression en un tableau de Token
  * @param Str : Expression mathématique sans espace et avec les multiplication implicite
