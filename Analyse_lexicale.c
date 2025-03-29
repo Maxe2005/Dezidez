@@ -238,7 +238,7 @@ void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size)
 }
 
 
-void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]) {
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
     char buffer[TailleMax];
     char bufferneg[TailleMax];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
@@ -253,11 +253,9 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
     int lenparenthese = 2;
     int i;
     int indiceinjection = 0;
+    typejeton TokenBuffer;
 
-    // Initialisation de Strdecoupee avec des chaînes vides
-    for (int j = 0; j < TailleMax; j++) {
-        Strdecoupee[j][0] = '\0';
-    }
+
 
     for (i = 0; i < SizeExpression;i++) {
         // Si on a atteint la fin de la chaîne, on sort
@@ -284,11 +282,12 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
                     break;
                 }
             }
-            
-            strcpy(Strdecoupee[indiceinjection], reschiffre);
+            TabToken[indiceinjection]=TokenReelPositif(reschiffre);
             indiceinjection++;
             i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
         }
+
+
 
         // Traitement des nombres negatifs
         else if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
@@ -314,11 +313,20 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
                     }
                 }
             }
-            
-            strcpy(Strdecoupee[indiceinjection], reschiffre);
+            TabToken[indiceinjection].lexem = FONCTION;
+            TabToken[indiceinjection].valeur.fonction = VAL_NEG;
             indiceinjection++;
+            TabToken[indiceinjection].lexem = PAR_FERM;
+            indiceinjection++;
+            TabToken[indiceinjection]=TokenReelNegatif(reschiffre);
+            indiceinjection++;
+            TabToken[indiceinjection].lexem = PAR_FERM;
+            indiceinjection++; 
             i = i + longueurdunombre;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit (on fait +1 pour skip la dernière parenthèse déjà traité)
         }
+
+
+
 
         // Gestion des opérateurs
 
@@ -328,15 +336,18 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
                 i++;
             }
             
-            strcpy(Strdecoupee[indiceinjection], buffer);
+            TabToken[indiceinjection]=TokenOperateur(buffer);
             indiceinjection++;
             //y'a un problème d'indice dans l'expression de teste on a 2 fois '-'
         }
 
-        // Gestion des parenthèses
+        // Gestion des parenthèses on fait cas par cas car plus simple pour les tokens
 
-        else if (IsInTab3(parenthese, lenparenthese, buffer) == 1) {
-            strcpy(Strdecoupee[indiceinjection], buffer);
+        else if (str[i]==')') {
+            TabToken[indiceinjection].lexem = PAR_FERM;
+            indiceinjection++;
+        }else if (str[i]=='('){
+            TabToken[indiceinjection].lexem = PAR_OUV;
             indiceinjection++;
         }
         //gestion des fonction et variable apparement
@@ -356,12 +367,12 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
                     break; 
                 }
             }
-            if (longueurident != 0){ //cas d'une variable
-                strcpy(Strdecoupee[indiceinjection], residentificateur);
+            if (longueurident != 0){ //cas d'une fonction
+                TabToken[indiceinjection]=TokenFonction(residentificateur);
                 indiceinjection++;
                 i = i + longueurident -1 ; 
-            } else { //cas d'une fonction
-                strcpy(Strdecoupee[indiceinjection], residentificateur);
+            } else { //cas d'une variable
+                TabToken[indiceinjection]=TokenVariable(residentificateur);
                 indiceinjection++;
                 i = i + longueurident ; 
             }

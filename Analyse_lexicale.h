@@ -83,7 +83,7 @@ void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size)
  * @param SizeExpression : la taille de l'expression 
  * @param Strdecoupee : tableau de sortie qui sera rempli de Token 
  */ 
-void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNombreMax]);
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]);
 
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)

@@ -6,18 +6,17 @@
 
 
 int main (){
+    typejeton TokenListe[TailleMax];
     char str[TailleMax]  = "sinc( 2) + 223.348x + 759**2 - (-365) +" ;
     int lenExpression = strlen(str);
     char buffer[TailleMax];
-    char Strdecoupee[TailleMax][TailleNombreMax];
-    printf("%d",strlen(str));
+
     ExpressionSansLesEspaces(str,lenExpression,buffer);
     MultiplicationImplicite(str,lenExpression,buffer);
 
     // On cut la STR
-    printf("%d",strlen(str));
-    CutStr(str,strlen(str),Strdecoupee);
-    afficherchainecarac(Strdecoupee, lenExpression);
+
+    CutStr(str,strlen(str),TokenListe);
 
 
     typejeton jetontest;
