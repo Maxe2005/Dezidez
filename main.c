@@ -6,17 +6,18 @@
 
 
 int main (){
-    char str[TailleMax]  = "223.348x + 759**2 - (-365)..." ;
+    char str[TailleMax]  = "sinc( 2) + 223.348x + 759**2 - (-365) +" ;
     int lenExpression = strlen(str);
     char buffer[TailleMax];
     char Strdecoupee[TailleMax][TailleNombreMax];
+    printf("%d",strlen(str));
     ExpressionSansLesEspaces(str,lenExpression,buffer);
     MultiplicationImplicite(str,lenExpression,buffer);
 
     // On cut la STR
-
-    CutStr(str,lenExpression,Strdecoupee);
-    afficherchainecarac(Strdecoupee, 10);
+    printf("%d",strlen(str));
+    CutStr(str,strlen(str),Strdecoupee);
+    afficherchainecarac(Strdecoupee, lenExpression);
 
 
     typejeton jetontest;

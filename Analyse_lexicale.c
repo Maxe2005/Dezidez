@@ -102,8 +102,10 @@ void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer){
                 j++; }
         }        
     }
+    buffer[j]='\0';
     //on remplace l'expression par le buffer
     strcpy(Expression, buffer);
+    strcat(Expression,"\0");
     // on vide le buffer
     memset(buffer, '\0', sizeof(buffer));
 }
@@ -337,7 +339,7 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
             strcpy(Strdecoupee[indiceinjection], buffer);
             indiceinjection++;
         }
-        //gestion des fonction ??
+        //gestion des fonction et variable apparement
         else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
             int longueurident = 0;
             char residentificateur[TailleNombreMax] = "";
@@ -350,14 +352,21 @@ void CutStr(char *str, int SizeExpression, char Strdecoupee[TailleMax][TailleNom
                 if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
                     strcat(residentificateur, buffer);
                     longueurident++;
-                } else {
-                    break;
+                }else {
+                    break; 
                 }
             }
+            if (longueurident != 0){ //cas d'une variable
+                strcpy(Strdecoupee[indiceinjection], residentificateur);
+                indiceinjection++;
+                i = i + longueurident -1 ; 
+            } else { //cas d'une fonction
+                strcpy(Strdecoupee[indiceinjection], residentificateur);
+                indiceinjection++;
+                i = i + longueurident ; 
+            }
             
-            strcpy(Strdecoupee[indiceinjection], residentificateur);
-            indiceinjection++;
-            i = i + longueurident - 1;
+            
         }
     }
 }
