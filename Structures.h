@@ -22,6 +22,7 @@ typedef union
     float reel;
     typefonction fonction;
     typeoperateur operateur;
+    char variable;
     //typeerreur erreur;
 } typevaleur;
 
@@ -41,3 +42,19 @@ typedef struct Node
 } Node;
 
 typedef Node *Arbre;
+
+typedef enum {
+//ERREUR FONCTION 30X
+RACINE_NEGATIVE=301, 
+LOG_NEGATIF=302,
+LOG_ZERO=303, 
+TAN_PI_SUR_2=304, 
+SINC_DIVISIION_PAR_ZERO=305, // SIN(0)/0 
+
+// ERREUR OPERATEUR 31X
+DIVISION_PAR_ZERO=311, // 0/0
+ERREUR_ZERO_PUIS_ZERO=312, // 0^0
+ERREUR_ZERRO_PUIS_NEGATIVE=313, //0^(-x) 
+
+
+} typeerreur;
