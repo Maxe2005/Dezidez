@@ -136,6 +136,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                             break;
                     }
                     if (!mode_quitter) *running = 0;
+                    buttons[i]->hovered = 0;
                     resize_background(bg);
                     resize_boutons_acceuil(buttons);
                     return;

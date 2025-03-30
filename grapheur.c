@@ -397,6 +397,7 @@ int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
     Graph* graph = gr_ele->graph;
     Bande_haute* bande_haute = gr_ele->bande_haute;
 
+    resize_fen_2D(bande_haute, graph);
     SDL_StartTextInput();
     bool is_event_backspace_used = false;
     int x_souris_px, y_souris_px;

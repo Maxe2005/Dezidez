@@ -220,7 +220,7 @@ void init_bande_haute (SDL_Renderer* ren, Bande_haute* bande_haute){
 
     float (*fx[])(float) = {f,g,h,k,l};
     const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e2", "1e-2"}};
+    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
     bande_haute->nb_expressions = 0;
     for (int i = 0; i < 1; i++) {
         bande_haute->expressions[i] = malloc(sizeof(Expression_fonction));
@@ -510,7 +510,7 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     
     float (*fx[])(float) = {f,g,h,k,l};
     const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e2", "1e-2"}};
+    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.f = fx[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5];
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
     int a = nb_alea(0,4);

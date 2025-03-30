@@ -51,7 +51,7 @@ cJSON* read_file_json (const char *filename) {
     fclose(file);
 
     if (!buffer) {
-        return EXIT_FAILURE;
+        return NULL;
     }
 
     cJSON *json = cJSON_Parse(buffer);
@@ -59,7 +59,7 @@ cJSON* read_file_json (const char *filename) {
 
     if (!json) {
         fprintf(stderr, "Erreur de parsing JSON\n");
-        return EXIT_FAILURE;
+        return NULL;
     }
     return json;
 }
@@ -101,11 +101,11 @@ typedef struct {
     char *id;
     char *text;
     SDL_Color color;
-} Button;
+} Button_2;
 
 typedef struct {
     SDL_Color background_color;
-    Button *buttons;
+    Button_2 *buttons;
     int button_count;
 } AppSettings;
 
@@ -130,7 +130,7 @@ AppSettings load_settings(const char *filename) {
     cJSON *buttons_array = cJSON_GetObjectItem(json, "buttons");
     if (buttons_array) {
         settings.button_count = cJSON_GetArraySize(buttons_array);
-        settings.buttons = malloc(settings.button_count * sizeof(Button));
+        settings.buttons = malloc(settings.button_count * sizeof(Button_2));
 
         for (int i = 0; i < settings.button_count; i++) {
             cJSON *button_json = cJSON_GetArrayItem(buttons_array, i);
