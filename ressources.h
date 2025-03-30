@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include "gestionGraphique.h"
 #include "cJSON/cJSON.h"
+#include "evaluateur.h"
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200

@@ -127,10 +127,16 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
         float borne_inf = (fonction.borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction.borne_inf;;
         float step_size = (borne_sup - borne_inf) / nb_pts;
         float x, y_sur_graph, x_sur_graph;
+        float fx;
+        int code_erreur = 0;
         for (int i = 0; i < nb_pts; i++) {
+            if (i%100 == 0){
+                printf("ok");
+            }
             x = borne_inf + i * step_size;
-            if (fonction.f(x) >= graph->axe_y->min && fonction.f(x) <= graph->axe_y->max){
-                y_sur_graph = graph->origine_y + (graph->axe_y->max - fonction.f(x)) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
+            fx = evaluateur(fonction.fonction_arbre, x, 0, &code_erreur);
+            if (fx >= graph->axe_y->min && fx <= graph->axe_y->max){
+                y_sur_graph = graph->origine_y + (graph->axe_y->max - fx) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
                 if (y_sur_graph > graph->origine_y_apres_bande_haut){
                     x_sur_graph = graph->origine_x + (0-graph->axe_x->min + x) / graph->axe_x->echelle_grad * graph->axe_x->taille_grad;
                     draw_thick_point(ren, x_sur_graph, y_sur_graph, 3);

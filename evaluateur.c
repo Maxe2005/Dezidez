@@ -1,6 +1,12 @@
 # include "evaluateur.h"
 
-
+Node creation_arbre(typejeton racine, Node* precedent, Node* suivant){
+    Node arbre;
+    arbre.jeton=racine;
+    arbre.pjeton_preced=precedent;
+    arbre.pjeton_suiv=suivant;
+    return arbre;
+}
 
 float evaluateur(Node *racine,float valeur_x, float valeur_y, int *code_erreur){
     remplacer_variable(racine,valeur_x,valeur_y, code_erreur);

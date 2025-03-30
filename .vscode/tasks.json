@@ -27,6 +27,7 @@
         "command": "/usr/bin/gcc",
         "args": [
           "*.c",
+          "cJSON/cJSON.c",
           "-o",
           "prog",
           "-g",

@@ -1,9 +1,15 @@
 #ifndef EVALUATEUR
 #define EVALUATEUR
-#define _USE_MATH_DEFINES
+
 #include <math.h>
 #include "Structures.h"
 #include <stdio.h>
+
+#define _USE_MATH_DEFINES
+#define M_PI 3.14159265358979323846
+
+Node creation_arbre(typejeton racine, Node* precedent, Node* suivant);
+
 /**
  *@brief Fonction qui évalue la valeur de demandé 
  * @param racine arbre

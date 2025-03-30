@@ -218,26 +218,9 @@ void init_bande_haute (SDL_Renderer* ren, Bande_haute* bande_haute){
 
     init_placement_bande_descriptive(bande_haute, bande_haute->params);
 
-    float (*fx[])(float) = {f,g,h,k,l};
-    const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
     bande_haute->nb_expressions = 0;
     for (int i = 0; i < 1; i++) {
-        bande_haute->expressions[i] = malloc(sizeof(Expression_fonction));
-        bande_haute->expressions[i]->numero = i;
-        bande_haute->expressions[i]->fonction.visible = true;
-        init_placement_entrees(ren, bande_haute->expressions[i], bande_haute->params, bande_haute->surface);
-        bande_haute->expressions[i]->fonction.f = fx[i];
-        strcpy(bande_haute->expressions[i]->expression->text, nom_f[i]);
-        int a = nb_alea(0,4);
-        strcpy(bande_haute->expressions[i]->borne_inf->text, interval[a][0]);
-        strcpy(bande_haute->expressions[i]->borne_sup->text, interval[a][1]);
-        charge_valeur_borne_inf(bande_haute->expressions[i]);
-        charge_valeur_borne_sup(bande_haute->expressions[i]);
-        bande_haute->expressions[i]->borne_inf->position_cursor = strlen(bande_haute->expressions[i]->borne_inf->text);
-        bande_haute->expressions[i]->borne_sup->position_cursor = strlen(bande_haute->expressions[i]->borne_sup->text);
-        bande_haute->expressions[i]->expression->position_cursor = strlen(bande_haute->expressions[i]->expression->text);
-        bande_haute->nb_expressions++;
+        ajout_bande_expression(ren, bande_haute);
     }
     init_button_new_expression(ren, bande_haute);
 }
@@ -508,10 +491,46 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    float (*fx[])(float) = {f,g,h,k,l};
     const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
+    typejeton x;
+    x.lexem=VARIABLE;
+    x.valeur.variable='x';
+    //Soustraction
+    typejeton Soustraction;
+    Soustraction.lexem=OPERATEUR;
+    Soustraction.valeur.operateur=MOINS;
+    // Sinus
+    typejeton Sinus;
+    Sinus.lexem=FONCTION;
+    Sinus.valeur.fonction=SIN;
+    // Cosinus
+    typejeton Cosinus;
+    Cosinus.lexem=FONCTION;
+    Cosinus.valeur.fonction=COS;
+    // Exp
+    typejeton Exp;
+    Exp.lexem=FONCTION;
+    Exp.valeur.fonction=EXP;
+    //Deux
+    typejeton Deux;
+    Deux.lexem=REEL;
+    Deux.valeur.reel=2;
+    Node* DEUX_ARBRE = malloc(sizeof(Node));
+    *DEUX_ARBRE = creation_arbre(Deux,NULL,NULL);
+    Node* X_ARBRE = malloc(sizeof(Node));
+    *X_ARBRE = creation_arbre(x,NULL,NULL);
+    Node* COSINUS_ARBRE = malloc(sizeof(Node));
+    *COSINUS_ARBRE = creation_arbre(Cosinus,X_ARBRE,NULL);
+    Node* SOMME_ARBRE = malloc(sizeof(Node));
+    *SOMME_ARBRE = creation_arbre(Soustraction,DEUX_ARBRE,X_ARBRE);
+    Node* EXP_ARBRE = malloc(sizeof(Node));
+    *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
+    Node* SIN_ARBRE = malloc(sizeof(Node));
+    *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
+    Node* arbres[] = {SIN_ARBRE, COSINUS_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
     const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
-    bande_haute->expressions[bande_haute->nb_expressions]->fonction.f = fx[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5];
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
     int a = nb_alea(0,4);
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, interval[a][0]);

@@ -9,7 +9,7 @@
       "request": "launch",
       "name": "Test MAX",
       "program": "${workspaceFolder}/prog",
-      "preLaunchTask": "build",
+      "preLaunchTask": "build_ubuntu",
       "stopAtEntry": false,
       "args": [],
       "cwd": "${workspaceFolder}",
@@ -37,7 +37,7 @@
       "request": "launch",
       "name": "Tests",
       "program": "${workspaceFolder}/prog",
-      "preLaunchTask": "build_test",
+      "preLaunchTask": "build_test_ubuntu",
       "stopAtEntry": false,
       "args": ["tests/markdown.md"],
       "cwd": "${workspaceFolder}",
@@ -72,7 +72,7 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "miDebuggerPath": "C:/mingw/bin/gdb.exe",
-      "preLaunchTask": "build",
+      "preLaunchTask": "build_windows",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",
