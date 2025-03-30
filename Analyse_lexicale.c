@@ -257,7 +257,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
 
 
 
-    for (i = 0; i < SizeExpression;i++) {
+    for (i = 0; i <= SizeExpression;i++) {
         // Si on a atteint la fin de la chaîne, on sort
         if (str[i] == '\0') break;
         
@@ -367,14 +367,16 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
                     break; 
                 }
             }
-            if (longueurident != 0){ //cas d'une fonction
+            if (longueurident > 1){ //cas d'une fonction
                 TabToken[indiceinjection]=TokenFonction(residentificateur);
                 indiceinjection++;
                 i = i + longueurident -1 ; 
+                printf("Fonction");
             } else { //cas d'une variable
                 TabToken[indiceinjection]=TokenVariable(residentificateur);
+                printf("Variable");
                 indiceinjection++;
-                i = i + longueurident ; 
+                i = i + longueurident -1; 
             }
             
             
@@ -382,4 +384,12 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
     }
 }
 
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax]){
+    int tailleExpression = strlen(Expression);
+    char buffert[TailleMax];
+    ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
+    MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
+    tailleExpression = strlen(Expression);
+    CutStr(Expression,tailleExpression,TabToken);//transforme l'expression en un tableau de Token 
+}
 

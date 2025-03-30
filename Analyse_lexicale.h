@@ -90,3 +90,11 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]);
  * @param Element : chaine de caractère de la forme (-0546516545)
  */
 typejeton TokenReelNegatif (char *Element);
+
+
+/**
+ * Permet de transformer une chaine de caractère en un tableau de Token.
+ * @param TabToken : Tableau de typejeton qui sera le tableau de sorti
+ * @param Expression : chaine de caractère qui est une expression mathématique (supporte les espace et des multiplication implicite entre réel et variable)
+ */
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax]);

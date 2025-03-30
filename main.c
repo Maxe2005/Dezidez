@@ -7,10 +7,13 @@
 
 int main (){
     typejeton TokenListe[TailleMax];
-    char str[TailleMax]  = "sinc( 2) + 223.348x + 759**2 - (-365) +" ;
+    char str[TailleMax]  = "cos(3x+y)+1-1" ;
+    Analyse_Lexicale(TokenListe,str);
+    /*
     int lenExpression = strlen(str);
+    
     char buffer[TailleMax];
-
+    
     ExpressionSansLesEspaces(str,lenExpression,buffer);
     MultiplicationImplicite(str,lenExpression,buffer);
 
@@ -21,10 +24,15 @@ int main (){
 
     typejeton jetontest;
     jetontest = TokenOperateur("-");
+    */
     return 0;
 }
 
 
+//pour les erreur on a
+//Fonction inconnue : 101
+//plusieurs vigules dans un float : 102
+//caractère inconnue : 103
 
 
 
