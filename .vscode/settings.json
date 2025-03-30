@@ -1,0 +1,17 @@
+{
+  "files.associations": {
+    "limits": "c",
+    "entrees_expressions.h": "c",
+    "grapheur.h": "c",
+    "sdl2_gfxprimitives.h": "c",
+    "cmath": "c",
+    "sdl.h": "c",
+    "string.h": "c"
+  },
+
+  "github.copilot.chat.commitMessageGeneration.instructions": [
+    {
+      "text": "Be extremely detailed with the file changes and the reason for the change. Add lots of emojis."
+    }
+  ]
+}

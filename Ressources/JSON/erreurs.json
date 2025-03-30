@@ -1,0 +1,10 @@
+{
+    "fr": {
+        "1": { "message": "Fichier introuvable.", "severity": "high" },
+        "2": { "message": "Mémoire insuffisante.", "severity": "medium" }
+    },
+    "en": {
+        "1": { "message": "File not found.", "severity": "high" },
+        "2": { "message": "Insufficient memory.", "severity": "medium" }
+    }
+}
