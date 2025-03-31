@@ -60,7 +60,10 @@ typedef enum {
     PARENTHESE_PAS_FERMEE = 224, // (......., .......)
 
     // ERREUR REEL 23X
-    REELS_DAFFILE = 231, // 2,3,4
+    PROBLEME_APRES_REEL = 231, // 2,3,4
+
+    //ERREUR TAILLE 24X
+    ABSENCE_FIN = 241, //debut>fin, absence token END
     } typeerreur;
 
 #endif 

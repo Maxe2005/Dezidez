@@ -11,11 +11,12 @@ Node arbrevide(){
 
 Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
     int  indoputile = minIndice(tab, debut, fin, erreur); 
-    if (parenthese(fin, tab)!= true){
+    if (parenthese(debut, fin, tab)!= true){
         *erreur = PROBLEMES_NOMBRE_PARENTHESES;
         return arbrevide(); 
     }
-    if (debut==fin){
+    if (debut>=fin){
+        //*erreur = ABSENCE_FIN; #TODO
         return arbrevide();
     }
     if (indoputile != -1){
@@ -33,7 +34,7 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 if (tab[debut + 1].lexem != PAR_OUV){
                         *erreur = PROBLEME_PARENTHESES_FONCTIONS;
                         return arbrevide();
-                }    
+                }
                 Node Fg = operateur(tab, debut + 2, fin - 1, erreur);
                 Node arbre = (Node){
                     .pjeton_preced = &Fg,
@@ -65,16 +66,17 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 *erreur = PARENTHESE_FERMEE_1_ER_JETON;
                 return arbrevide(); 
             case REEL:
-                if (tab[debut+1].lexem != FIN){
-                Fg = arbrevide();
-                Node arbre = (Node){
-                    .pjeton_preced = &Fg,
-                    .jeton = tab[indoputile]
-                    };
+                if (fin - debut == 1){
+                    // Node Fg = arbrevide();
+                    Node arbre = (Node){
+                        .pjeton_preced = NULL,
+                        .pjeton_suiv = NULL,
+                        .jeton = tab[debut]
+                       };
                 }
                 else{
-                *erreur = REELS_DAFFILE;
-                return arbrevide();
+                    *erreur = PROBLEME_APRES_REEL;
+                    return arbrevide();
                 }
         } 
     }
@@ -124,16 +126,16 @@ int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur){
 int calculTaille(typejeton *tab){
     for (int i = 0; i<TAILLE_MAX; i++){
         if (tab[i].lexem == FIN){
-            return i;
+            return (i-1);
         }
     }
     return -1;
 }
 
-bool parenthese(int tailletab, typejeton *tab){
+bool parenthese(int debut, int fin, typejeton *tab){
     int nbouv = 0;
     int nbfer = 0;
-    for (int i = 0; i < tailletab; i++){
+    for (int i = 0; i < fin - debut + 1; i++){
         if (tab[i].lexem == PAR_OUV){
             nbouv = nbouv + 1;
         }
@@ -141,6 +143,9 @@ bool parenthese(int tailletab, typejeton *tab){
             nbfer = nbfer + 1;
         }
     }
+    printf ("parentheses, nbouv=%d, nbfer=%d\n", nbouv, nbfer);
+    // printf(nbouv);
+    // printf(nbfer);
     return nbouv == nbfer;
 }
 

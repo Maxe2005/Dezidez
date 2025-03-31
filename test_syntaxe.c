@@ -8,7 +8,7 @@ void test_valide1() {
         {REEL, {.reel = 3.0}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
     printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
 }
@@ -22,9 +22,9 @@ void test_valide2() {
         {PAR_FERM, {0}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test valide 2 : %s\n", erreur ==0 ? "OK" : "ÉCHEC");
+    printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_valide3() {
@@ -34,7 +34,7 @@ void test_valide3() {
         {REEL, {.reel = 2.0}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
     printf("Test valide 3 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
 }
@@ -48,7 +48,7 @@ void test_erreur_operateurs_a_la_suite1() {
         {REEL, {.reel = 3.0}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
     printf("Test erreur opérateurs à la suite 1 : %s\n", erreur == OPERATEURS_A_LA_SUITE ? "OK" : "ÉCHEC");
 }
@@ -62,7 +62,7 @@ void test_erreur_operateurs_a_la_suite2() {
         {REEL, {.reel = 2.0}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
     printf("Test erreur opérateurs à la suite 2 : %s\n", erreur == OPERATEURS_A_LA_SUITE ? "OK" : "ÉCHEC");
 }
@@ -74,7 +74,7 @@ void test_erreur_manque_operateur() {
         {OPERATEUR, {.operateur = PLUS}},
         {FIN, {0}}
     };
-    typeerreur erreur;
+    typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
     printf("Test erreur manque opérateur : %s\n", erreur == MANQUE_OPERATEUR ? "OK" : "ÉCHEC");
 }
