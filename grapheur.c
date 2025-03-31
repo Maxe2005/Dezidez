@@ -130,9 +130,6 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
         float fx;
         int code_erreur = 0;
         for (int i = 0; i < nb_pts; i++) {
-            if (i%100 == 0){
-                printf("ok");
-            }
             x = borne_inf + i * step_size;
             fx = evaluateur(fonction.fonction_arbre, x, 0, &code_erreur);
             if (fx >= graph->axe_y->min && fx <= graph->axe_y->max){
