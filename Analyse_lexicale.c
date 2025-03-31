@@ -75,7 +75,19 @@ int IsInTab3(char *tab[], int size, char *element) {
 }
 
 
-
+int PlusieursVirgules (char * nombre){
+    int compteur = 0;
+    int res = 0;
+    for (int i = 0; i < strlen(nombre); i++){
+        if (nombre[i]== '.'){
+            compteur++;
+        }
+    }
+    if (compteur > 1){
+        res = 1;
+    }
+    return res;
+}
 
 void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer){
     char chiffre[] = "0123456789";
@@ -111,7 +123,7 @@ void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer){
 }
 
 
-typejeton TokenFonction (char *Element){
+typejeton TokenFonction (char *Element, int* erreur){
     char *fonction[] = {"abs","sin","cos","sqrt","log","tan","exp","entier","sinc"};
     typejeton fonct;
     if (IsInTab2(fonction,9,Element)){// on regarde si c'est une fonction
@@ -143,11 +155,11 @@ typejeton TokenFonction (char *Element){
         else if (ComparaisonString(Element,"sinc")){
             fonct.valeur.fonction = SINC;
         }
-        else {
-            //Erreur Unkown fonction
-            printf("ERREUR");
-        }
+        
     }  
+    else {
+        *erreur =FONCTION_INCONNUE;
+    }
     return fonct;     
 }
 
@@ -171,16 +183,12 @@ typejeton TokenOperateur (char *Element){
         else if (ComparaisonString(Element,"/")){
             fonct.valeur.operateur = DIV;
         }
-        else {
-            printf("ERREUR");
-            //Erreur Unkown fonction
-        }
     }  
     return fonct;     
 }
 
 
-typejeton TokenVariable (char *Element){
+typejeton TokenVariable (char *Element, int *erreur){
     char *var[] = {"x","y"};
     typejeton fonct;
     if (IsInTab2(var,2,Element)){
@@ -191,20 +199,23 @@ typejeton TokenVariable (char *Element){
         else if (ComparaisonString(Element,"x")){
             fonct.valeur.variable = 'x';
         }
-        else{
-            printf("ERREUR");
-            //Erreur
-        }
+        
     }  
+    else{
+        *erreur = VARIABLE_INCONNUE; 
+    }
     return fonct;     
 }
 
 
-typejeton TokenReelPositif (char *Element){
+typejeton TokenReelPositif (char *Element, int* erreur){
     typejeton fonct;
-    fonct.lexem = REEL;
-    
-    fonct.valeur.reel = atof(Element);
+    if (PlusieursVirgules(Element)){
+        *erreur = NOMBRE_INVALIDE;
+    }else{
+        fonct.lexem = REEL;
+        fonct.valeur.reel = atof(Element);
+    }
     return fonct;
 }  
 
@@ -229,16 +240,9 @@ typejeton TokenReelNegatif (char *Element){
     return fonct;
 }  
 
-void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size) {
-    for (int i = 0; i < size; i++) {
-        if (Strdecoupee[i] != NULL) {  // Vérifie que l'élément n'est pas NULL
-            printf("Strdecoupee[%d] = \"%s\"\n", i, Strdecoupee[i]);
-        }
-    }
-}
 
 
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur) {
     char buffer[TailleMax];
     char bufferneg[TailleMax];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
@@ -254,11 +258,12 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
     int i;
     int indiceinjection = 0;
     typejeton TokenBuffer;
-
+    
 
 
     for (i = 0; i <= SizeExpression;i++) {
         // Si on a atteint la fin de la chaîne, on sort
+        
         if (str[i] == '\0') break;
         
         char strenchainedecarac[2] = {str[i], '\0'}; //on met le caractère étudier dans le buffer
@@ -267,7 +272,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
         // Traitement des nombres
         if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
             int longueurdunombre = 0;
-            char reschiffre[TailleNombreMax] = "";
+            char reschiffre[TailleMax] = "";
 
             // Continue tant que tu trouves des chiffres
             while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
@@ -282,38 +287,13 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
                     break;
                 }
             }
-            TabToken[indiceinjection]=TokenReelPositif(reschiffre);
+            TabToken[indiceinjection]=TokenReelPositif(reschiffre,erreur);
             indiceinjection++;
             i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
         }
-
-
-
         // Traitement des nombres negatifs
         else if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
             int longueurdunombre = 2;
-            char reschiffre[TailleNombreMax] = "(-";
-            // on skip la parenthèse le - qui sont déja rajouter
-            // Continue tant que tu trouves des chiffres
-            /*
-            while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
-                strenchainedecarac[0] = str[i + longueurdunombre];
-                strenchainedecarac[1] = '\0';
-                strcpy(buffer, strenchainedecarac);
-                
-                if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
-                    strcat(reschiffre, buffer);
-                    longueurdunombre++;
-                } else {
-                    if (str[i + longueurdunombre] == ')'){
-                        strcat(reschiffre, buffer); 
-                        break;
-                    } else { //Erreur 
-                        printf("Erreur"); // parenthèse manquante
-                        break;
-                    }
-                }
-            }*/
             TabToken[indiceinjection].lexem = FONCTION;
             TabToken[indiceinjection].valeur.fonction = VAL_NEG;
             indiceinjection++;
@@ -350,7 +330,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
         //gestion des fonction et variable apparement
         else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
             int longueurident = 0;
-            char residentificateur[TailleNombreMax] = "";
+            char residentificateur[TailleMax] = "";
 
             while (i + longueurident < SizeExpression && str[i + longueurident] != '\0') {
                 strenchainedecarac[0] = str[i + longueurident];
@@ -365,29 +345,31 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
                 }
             }
             if (longueurident > 1){ //cas d'une fonction
-                TabToken[indiceinjection]=TokenFonction(residentificateur);
+                TabToken[indiceinjection]=TokenFonction(residentificateur, erreur);
                 indiceinjection++;
                 i = i + longueurident -1 ; 
-                printf("Fonction");
             } else { //cas d'une variable
-                TabToken[indiceinjection]=TokenVariable(residentificateur);
-                printf("Variable");
+                TabToken[indiceinjection]=TokenVariable(residentificateur, erreur);
                 indiceinjection++;
                 i = i + longueurident -1; 
             }
             
             
         }
+        else{
+            *erreur = CARACTERE_INCONNUE;         
+
+        }
     }
     TabToken[indiceinjection].lexem = FIN;
 }
 
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax]){
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur){
     int tailleExpression = strlen(Expression);
     char buffert[TailleMax];
     ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
     MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
     tailleExpression = strlen(Expression);
-    CutStr(Expression,tailleExpression,TabToken);//transforme l'expression en un tableau de Token 
+    CutStr(Expression,tailleExpression,TabToken,erreur);//transforme l'expression en un tableau de Token 
 }
 

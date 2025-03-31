@@ -4,7 +4,6 @@
 #include <string.h>
 
 #define TailleMax 100
-#define TailleNombreMax 100
 
 /**
  * Retire tout les espaces de l'expression
@@ -53,11 +52,12 @@ int ComparaisonString(char *element1,char *element2);
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de fonction
  * @param Element : chaine de caractère 
  */
-typejeton TokenFonction (char *Element);
+typejeton TokenFonction (char *Element, int* erreur);
 
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'opérateur
  * @param Element : chaine de caractère 
+ * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  */
 typejeton TokenOperateur (char *Element);
 
@@ -65,25 +65,22 @@ typejeton TokenOperateur (char *Element);
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de variable
  * @param Element : chaine de caractère 
  */
-typejeton TokenVariable (char *Element);
+typejeton TokenVariable (char *Element, int* erreur);
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel POSITIF'
  * @param Element : chaine de caractère 
+ * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  */
-typejeton TokenReelPositif (char *Element);
-/**
- * Permet d'afficher le contenu d'un tableau de chaines de caractères
- * @param Strdecoupee : le tableau de chaines à afficher
- * @param size : la taille du tableau de chaines à afficher
- */
-void afficherchainecarac(char Strdecoupee[TailleMax][TailleNombreMax], int size);
+typejeton TokenReelPositif (char *Element , int* erreur);
+
 /**
  * Permet de transformer une expression en un tableau de Token
  * @param Str : Expression mathématique sans espace et avec les multiplication implicite
  * @param SizeExpression : la taille de l'expression 
  * @param Strdecoupee : tableau de sortie qui sera rempli de Token 
+ * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  */ 
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]);
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur);
 
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
@@ -91,10 +88,18 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]);
  */
 typejeton TokenReelNegatif (char *Element);
 
+/**
+ * retourne 1 si plus d'un point dans le str nombre, 0 sinon
+ * @param nombre : str du nombre
+ */
+int PlusieursVirgules (char *nombre);
 
 /**
  * Permet de transformer une chaine de caractère en un tableau de Token.
  * @param TabToken : Tableau de typejeton qui sera le tableau de sorti
  * @param Expression : chaine de caractère qui est une expression mathématique (supporte les espace et des multiplication implicite entre réel et variable)
+ * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  */
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax]);
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax], int* erreur);
+
+//*erreur = 101;
