@@ -25,6 +25,7 @@ typedef union
     float reel;
     typefonction fonction;
     typeoperateur operateur;
+    char variable;
     //typeerreur erreur;
 } typevaleur;
 
