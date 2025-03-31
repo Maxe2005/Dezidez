@@ -50,18 +50,19 @@ void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_s
     int valeur_pixel_y = (valeur_en_y) * graph->axe_y->taille_grad / graph->axe_y->echelle_grad ;
     int max_axe_x_pixel = (graph->axe_y->max) * graph->axe_y->taille_grad / graph->axe_y->echelle_grad; 
     int distance_en_y_pixel = abs(max_axe_x_pixel-valeur_pixel_y);
-    printf("\n,       %d          %d ",valeur_pixel_y,distance_en_y_pixel);
-    char formatted_string[100];
+    //printf("\n,       %d          %d ",valeur_pixel_y,distance_en_y_pixel);
+    char* formatted_string = malloc(50 * sizeof(char));
     sprintf(formatted_string, "f(%.2f)=%.2f", valeur_en_x, valeur_en_y);
-    affichage_evaluateur.bouton_evaluateur.label = "f(x)=";
-    affichage_evaluateur.bouton_evaluateur.font_text = fonts[5];
-    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){graph->centre_x + valeur_pixel_x, distance_en_y_pixel + HEADER_HEIGHT,FEN_X/16,FEN_Y/16};
+    affichage_evaluateur.bouton_evaluateur.label = formatted_string;
+    affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
+    int width, height;
+    TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
+    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){graph->centre_x + valeur_pixel_x, distance_en_y_pixel + HEADER_HEIGHT, width + 20, height + 10};
     affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
     affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){255, 0, 0, 255};
     affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
     affichage_evaluateur.bouton_evaluateur.radius = 0;
     affichage_evaluateur.bouton_evaluateur.hovered = 0;
-    //Fonction Expression_evaluation = bande_haute->expressions[0]->fonction ;
     graph-> liste_evaluateurs[graph-> nombre_evaluateur] = affichage_evaluateur;
     graph-> nombre_evaluateur = graph-> nombre_evaluateur + 1;
 
