@@ -8,8 +8,8 @@ SDL_Color classic_colors[] = {
     {255, 255, 0, 255}, // Jaune
     {0, 255, 255, 255}, // Cyan
     {255, 0, 255, 255}, // Magenta
-    {255, 255, 255, 255}, // Blanc
-    {0, 0, 0, 255}      // Noir
+    {255, 128, 0, 255},  // Orange
+    {255, 255, 255, 255}  // Blanc
 };
 
 void drawPaletteColorPicker(SDL_Renderer *renderer, Color_picker* picker) {    

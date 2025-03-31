@@ -122,7 +122,7 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
             handle_event_entrees_expressions_MOUSEMOTION(event, bande_haute, bande_haute->expressions[i], x_souris_px, y_souris_px, is_MOUSEMOTION_used);
         }
     }
-    if (is_souris_sur_rectangle(bande_haute->button_new_expression.bt.rect, x_souris_px, y_souris_px)) {
+    if (!is_MOUSEMOTION_used && is_souris_sur_rectangle(bande_haute->button_new_expression.bt.rect, x_souris_px, y_souris_px)) {
         bande_haute->button_new_expression.bt.hovered = 1;
     } else bande_haute->button_new_expression.bt.hovered = 0;
     return is_MOUSEMOTION_used;
@@ -301,6 +301,16 @@ void handle_event_entrees_expressions_KEYUP (SDL_Event event, Expression_fonctio
 }
 
 
+void resize_fen_2D (Bande_haute* bande_haute, Graph* graph){
+    bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
+    int x = graph->x;
+    int y = graph->y;
+    resize_contours_graph(graph);
+    graph->axe_x->taille_grad *= graph->x / x;
+    graph->axe_y->taille_grad *= graph->y / y;
+    resize_navigation(graph);
+    resize_bande_haut(bande_haute);
+}
 
 int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
     SDL_Event event;
@@ -310,14 +320,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = event.window.data1;
             FEN_Y = event.window.data2;
-            bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
-            int x = graph->x;
-            int y = graph->y;
-            resize_contours_graph(graph);
-            graph->axe_x->taille_grad *= graph->x / x;
-            graph->axe_y->taille_grad *= graph->y / y;
-            resize_navigation(graph);
-            resize_bande_haut(bande_haute);
+            resize_fen_2D(bande_haute, graph);
         }
 
         if (event.type == SDL_MOUSEMOTION) {

@@ -2,6 +2,8 @@
 
 TTF_Font* fonts[NB_FONTS] = {NULL};
 Colors* colors = NULL;
+Langue langue = FR;
+Tous_les_JSON tous_les_JSON;
 int FEN_X = 1100;
 int FEN_Y = 800;
 
@@ -16,125 +18,184 @@ void init_font (TTF_Font* font[NB_FONTS]) {
     font[5] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 12); //Font de texte de graduation
 }
 
-void renderButton(SDL_Renderer *renderer, Button *button) {
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    if (button->rect.w < 2*button->radius) button->radius = button->rect.w / 2;
-    if (button->rect.h < 2*button->radius) button->radius = button->rect.h / 2;
-    if (button->is_survolable && button->hovered) {
-        SDL_Rect tmp_rect;
-        tmp_rect.w = button->rect.w + button->taille_bonus_hover_x;
-        tmp_rect.h = button->rect.h + button->taille_bonus_hover_y;
-        tmp_rect.x = button->rect.x - button->taille_bonus_hover_x/2;
-        tmp_rect.y = button->rect.y - button->taille_bonus_hover_y/2;
-
-        // Dessiner le rectangle avec des coins arrondis
-        roundedBoxRGBA(renderer, tmp_rect.x, tmp_rect.y, tmp_rect.x + tmp_rect.w, tmp_rect.y + tmp_rect.h, button->radius, button->color_hover.r, button->color_hover.g, button->color_hover.b, button->color_hover.a);
-        renderText(renderer, button->label, tmp_rect.x + tmp_rect.w/2, tmp_rect.y + tmp_rect.h/2, button->color_text, button->font_text_hover);
-    } else {
-        // Dessiner le rectangle avec des coins arrondis
-        roundedBoxRGBA(renderer, button->rect.x, button->rect.y, button->rect.x + button->rect.w, button->rect.y + button->rect.h, button->radius, button->color_base.r, button->color_base.g, button->color_base.b, button->color_base.a);
-        renderText(renderer, button->label, button->rect.x + button->rect.w/2, button->rect.y + button->rect.h/2, button->color_text, button->font_text);
-    }
-}
-
-void draw_image (SDL_Renderer *renderer, ImageButton *button, SDL_Rect rect){
-    SDL_Rect tmp_rect;
-    tmp_rect.w = rect.w * button->pourcentage_place / 100;
-    tmp_rect.h = rect.h * button->pourcentage_place / 100;
-    tmp_rect.x = rect.x + (rect.w - tmp_rect.w)/2;
-    tmp_rect.y = rect.y + (rect.h - tmp_rect.h)/2;
-    SDL_RenderCopy(renderer, button->image, NULL, &tmp_rect);
-}
-
-void renderImageButton(SDL_Renderer *renderer, ImageButton *button) {
-    SDL_SetRenderDrawBlendMode(renderer, SDL_BLENDMODE_BLEND);
-    if (button->is_survolable && button->hovered) {
-        SDL_Rect tmp_rect;
-        tmp_rect.w = button->rect.w + button->taille_bonus_hover_x;
-        tmp_rect.h = button->rect.h + button->taille_bonus_hover_y;
-        tmp_rect.x = button->rect.x - button->taille_bonus_hover_x/2;
-        tmp_rect.y = button->rect.y - button->taille_bonus_hover_y/2;
-
-        // Dessiner le rectangle avec des coins arrondis
-        roundedBoxRGBA(renderer, tmp_rect.x, tmp_rect.y, tmp_rect.x + tmp_rect.w, tmp_rect.y + tmp_rect.h, button->radius, button->color_hover.r, button->color_hover.g, button->color_hover.b, button->color_hover.a);
-        draw_image(renderer, button, tmp_rect);
-    } else {
-        // Dessiner le rectangle avec des coins arrondis
-        roundedBoxRGBA(renderer, button->rect.x, button->rect.y, button->rect.x + button->rect.w, button->rect.y + button->rect.h, button->radius, button->color_base.r, button->color_base.g, button->color_base.b, button->color_base.a);
-        draw_image(renderer, button, button->rect);
-    }
-}
-
-SDL_Texture* load_image(SDL_Renderer* renderer, const char* filename) {
-    char path[100] = "Ressources/";
-    strcat(path, filename);
-    SDL_Texture* texture = NULL;
-    SDL_Surface* loadedSurface = IMG_Load(path);
-    if (loadedSurface == NULL) {
-        printf("Unable to load image! SDL_image Error: %s\n", IMG_GetError());
-    } else {
-        texture = SDL_CreateTextureFromSurface(renderer, loadedSurface);
-        SDL_FreeSurface(loadedSurface);
-        if (texture == NULL) {
-            printf("Unable to create texture from %s! SDL Error: %s\n", path, SDL_GetError());
-        }
-    }
-    return texture;
-}
-
-void renderHeader(SDL_Renderer *renderer, char *titre) {
-    // Fond de l'en-tête
-    SDL_SetRenderDrawColor(renderer, 50, 50, 50, 255);
-    SDL_Rect header = {0, 0, FEN_X, HEADER_HEIGHT};
-    SDL_RenderFillRect(renderer, &header);
-
-    // Texte "titre"
-    SDL_Surface *surface = TTF_RenderUTF8_Solid(fonts[3], titre, (SDL_Color){255, 255, 255, 255});
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect textRect = {FEN_X / 2 - surface->w / 2, HEADER_HEIGHT / 2 - surface->h / 2, surface->w, surface->h};
-    
-    SDL_RenderCopy(renderer, texture, NULL, &textRect);
-
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
-void renderText(SDL_Renderer *renderer, const char *text, int x, int y, SDL_Color color, TTF_Font *font){
-    SDL_Surface *surface =  TTF_RenderUTF8_Solid(font, text, color);
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(renderer, surface);
-    SDL_Rect textRect = {x - surface->w/2, y - surface->h/2, surface->w, surface->h};
-
-    SDL_RenderCopy(renderer, texture, NULL, &textRect);
-
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
-}
-
-int is_souris_sur_rectangle (SDL_Rect rect, int x_souris_px, int y_souris_px){
-    return x_souris_px >= rect.x && x_souris_px <= rect.x + rect.w &&
-                    y_souris_px >= rect.y && y_souris_px <= rect.y + rect.h;
-}
-
-void affiche_bande_arrondis_en_bas (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
-    // Dessiner le rectangle principal
-    boxRGBA(renderer, x1, y1, x2, y2 - radius, color.r, color.g, color.b, color.a);
-    
-    // Dessiner le bas arrondi seulement
-    filledPieRGBA(renderer, x1 + radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    filledPieRGBA(renderer, x2 - radius, y2 - radius, radius, 0, 180, color.r, color.g, color.b, color.a);
-    boxRGBA(renderer, x1 + radius, y2 - radius, x2 - radius, y2, color.r, color.g, color.b, color.a);
-}
-
-void affiche_bande_arrondis_en_haut (SDL_Renderer* renderer, int x1, int y1, int x2, int y2, int radius, SDL_Color color){
-    // Dessiner le rectangle principal
-    boxRGBA(renderer, x1, y1 + radius, x2, y2, color.r, color.g, color.b, color.a);
-    
-    // Dessiner le haut arrondi seulement
-    filledPieRGBA(renderer, x1 + radius, y1 + radius, radius, 180, 360, color.r, color.g, color.b, color.a);
-    filledPieRGBA(renderer, x2 - radius, y1 + radius, radius, 180, 360, color.r, color.g, color.b, color.a);
-    boxRGBA(renderer, x1 + radius, y1, x2 - radius, y1 + radius, color.r, color.g, color.b, color.a);
-}
-
 int nb_alea(int min, int max){
     return min + rand() % (max-min +1);
 }
+
+char* get_lang_str(){
+    if (langue == FR) return "fr";
+    if (langue == EN) return "en";
+    return "Problème de langue";
+}
+
+cJSON* read_file_json (const char *filename) {
+    FILE *file = fopen(filename, "rb");
+    if (!file) {
+        perror("Erreur lors de l'ouverture du fichier JSON");
+        return NULL;
+    }
+
+    fseek(file, 0, SEEK_END);
+    long length = ftell(file);
+    rewind(file);
+
+    char *buffer = malloc(length + 1);
+    if (!buffer) {
+        fclose(file);
+        return NULL;
+    }
+
+    fread(buffer, 1, length, file);
+    buffer[length] = '\0';  // Ajouter le terminateur de chaîne
+
+    fclose(file);
+
+    if (!buffer) {
+        return NULL;
+    }
+
+    cJSON *json = cJSON_Parse(buffer);
+    free(buffer);
+
+    if (!json) {
+        fprintf(stderr, "Erreur de parsing JSON\n");
+        return NULL;
+    }
+    return json;
+}
+
+void init_tous_les_json () {
+    tous_les_JSON.json_erreurs = read_file_json("Ressources/JSON/erreurs.json");
+}
+
+ErrorInfo get_error_message(int code) {
+    ErrorInfo error_info;
+    strcpy(error_info.message, "Erreur inconnue");
+    strcpy(error_info.severity, "unknown");
+
+    char code_str[10];
+    sprintf(code_str, "%d", code);  // Convertit l'entier en chaîne
+
+    cJSON *lang_json = cJSON_GetObjectItem(tous_les_JSON.json_erreurs, get_lang_str());
+    if (!lang_json) return error_info; // Langue non trouvée
+
+    cJSON *error_json = cJSON_GetObjectItem(lang_json, code_str);
+    if (!error_json) return error_info; // Code erreur non trouvé
+
+    cJSON *message_json = cJSON_GetObjectItem(error_json, "message");
+    cJSON *severity_json = cJSON_GetObjectItem(error_json, "severity");
+
+    if (message_json) {
+        free(error_info.message); // Libérer l'ancienne valeur
+        error_info.message = strdup(message_json->valuestring);
+    }
+    if (severity_json) {
+        free(error_info.severity);
+        error_info.severity = strdup(severity_json->valuestring);
+    }
+    return error_info;
+}
+
+// exemple :
+typedef struct {
+    char *id;
+    char *text;
+    SDL_Color color;
+} Button_2;
+
+typedef struct {
+    SDL_Color background_color;
+    Button_2 *buttons;
+    int button_count;
+} AppSettings;
+
+AppSettings load_settings(const char *filename) {
+    AppSettings settings = {0};
+    cJSON *json = read_file_json(filename);
+    if (!json) return settings;
+
+    // Charger la couleur du fond
+    cJSON *theme = cJSON_GetObjectItem(json, "theme");
+    if (theme) {
+        cJSON *bg_color = cJSON_GetObjectItem(theme, "background_color");
+        if (bg_color) {
+            settings.background_color.r = cJSON_GetObjectItem(bg_color, "r")->valueint;
+            settings.background_color.g = cJSON_GetObjectItem(bg_color, "g")->valueint;
+            settings.background_color.b = cJSON_GetObjectItem(bg_color, "b")->valueint;
+            settings.background_color.a = cJSON_GetObjectItem(bg_color, "a")->valueint;
+        }
+    }
+
+    // Charger les boutons
+    cJSON *buttons_array = cJSON_GetObjectItem(json, "buttons");
+    if (buttons_array) {
+        settings.button_count = cJSON_GetArraySize(buttons_array);
+        settings.buttons = malloc(settings.button_count * sizeof(Button_2));
+
+        for (int i = 0; i < settings.button_count; i++) {
+            cJSON *button_json = cJSON_GetArrayItem(buttons_array, i);
+            settings.buttons[i].id = strdup(cJSON_GetObjectItem(button_json, "id")->valuestring);
+            settings.buttons[i].text = strdup(cJSON_GetObjectItem(button_json, "text")->valuestring);
+
+            cJSON *color_json = cJSON_GetObjectItem(button_json, "color");
+            settings.buttons[i].color.r = cJSON_GetObjectItem(color_json, "r")->valueint;
+            settings.buttons[i].color.g = cJSON_GetObjectItem(color_json, "g")->valueint;
+            settings.buttons[i].color.b = cJSON_GetObjectItem(color_json, "b")->valueint;
+            settings.buttons[i].color.a = cJSON_GetObjectItem(color_json, "a")->valueint;
+        }
+    }
+
+    cJSON_Delete(json);
+    return settings;
+}
+// Fonction pour libérer la mémoire des paramètres
+void free_settings(AppSettings *settings) {
+    for (int i = 0; i < settings->button_count; i++) {
+        free(settings->buttons[i].id);
+        free(settings->buttons[i].text);
+    }
+    free(settings->buttons);
+}
+void save_settings(const char *filename, const AppSettings *settings) {
+    cJSON *json = cJSON_CreateObject();
+
+    // Enregistrement de la couleur du fond
+    cJSON *theme = cJSON_CreateObject();
+    cJSON *bg_color = cJSON_CreateObject();
+    cJSON_AddNumberToObject(bg_color, "r", settings->background_color.r);
+    cJSON_AddNumberToObject(bg_color, "g", settings->background_color.g);
+    cJSON_AddNumberToObject(bg_color, "b", settings->background_color.b);
+    cJSON_AddNumberToObject(bg_color, "a", settings->background_color.a);
+    cJSON_AddItemToObject(theme, "background_color", bg_color);
+    cJSON_AddItemToObject(json, "theme", theme);
+
+    // Enregistrement des boutons
+    cJSON *buttons_array = cJSON_CreateArray();
+    for (int i = 0; i < settings->button_count; i++) {
+        cJSON *button_json = cJSON_CreateObject();
+        cJSON_AddStringToObject(button_json, "id", settings->buttons[i].id);
+        cJSON_AddStringToObject(button_json, "text", settings->buttons[i].text);
+
+        cJSON *color_json = cJSON_CreateObject();
+        cJSON_AddNumberToObject(color_json, "r", settings->buttons[i].color.r);
+        cJSON_AddNumberToObject(color_json, "g", settings->buttons[i].color.g);
+        cJSON_AddNumberToObject(color_json, "b", settings->buttons[i].color.b);
+        cJSON_AddNumberToObject(color_json, "a", settings->buttons[i].color.a);
+        cJSON_AddItemToObject(button_json, "color", color_json);
+
+        cJSON_AddItemToArray(buttons_array, button_json);
+    }
+    cJSON_AddItemToObject(json, "buttons", buttons_array);
+
+    // Sauvegarde dans un fichier
+    char *json_string = cJSON_Print(json);
+    FILE *file = fopen(filename, "w");
+    if (file) {
+        fprintf(file, "%s", json_string);
+        fclose(file);
+    }
+
+    free(json_string);
+    cJSON_Delete(json);
+}
+

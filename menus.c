@@ -126,16 +126,19 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     int mode_quitter = 1; // Si 0 on ferme la fenêtre, si 1 on reste sur le menu principal
                     switch (i) {
                         case 0:
-                            ecran_mode_emploi(ren);
+                            mode_quitter = ecran_mode_emploi(ren);
                             break;
                         case 1:
-                            ecran_remerciements(ren);
+                            mode_quitter = ecran_remerciements(ren);
                             break;
                         case 2:
                             mode_quitter = Grapheur(ren, gr_ele);
                             break;
                     }
                     if (!mode_quitter) *running = 0;
+                    buttons[i]->hovered = 0;
+                    resize_background(bg);
+                    resize_boutons_acceuil(buttons);
                     return;
                 }
             }
@@ -158,35 +161,15 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     break;
             }
             if (!mode_quitter) *running = 0;
+            resize_background(bg);
+            resize_boutons_acceuil(buttons);
         }
     }
 }
 
 
 
-int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
-    // Texte des remerciements
-    int space_entre_lignes = 20;
-    int taille_ligne_y = 30;
-
-    int nb_lignes = 0;
-    while (Text[nb_lignes] != NULL) {
-        nb_lignes++;
-    }
-    Button lignes[nb_lignes];
-    for (int i = 0; i < nb_lignes; i++) {
-        lignes[i].rect.x = 0;
-        lignes[i].rect.y = HEADER_HEIGHT + 40 + space_entre_lignes + i * (taille_ligne_y + space_entre_lignes);
-        lignes[i].rect.w = FEN_X;
-        lignes[i].rect.h = taille_ligne_y;
-        lignes[i].label = Text[i];
-        lignes[i].is_survolable = 0;
-        lignes[i].color_text = (SDL_Color){255, 255, 255, 255};
-        lignes[i].color_base = (SDL_Color){50, 50, 50, 0};
-        lignes[i].font_text = fonts[1];
-        lignes[i].radius = 0;
-    }
-
+int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     Background* bg = malloc(sizeof(Background));
     init_background(ren, "bg2.jpg", bg);
     bg->is_filtre = true;
@@ -209,39 +192,41 @@ int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
     bouton_retour.taille_bonus_hover_x = 0;
     bouton_retour.taille_bonus_hover_y = 0;
 
-    int scroll_offset = 0; // Décalage vertical du scrolling
+    TTF_Font *font_text_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TEXT_SIZE_MD);
+    TTF_Font *font_title_1_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_1_SIZE_MD);
+    TTF_Font *font_title_2_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_2_SIZE_MD);
+    TTF_Font *fonts_md [NB_FONTS_MD] = {font_text_md, font_title_1_md, font_title_2_md};
+
+    int marge = FEN_X / 7;
+    MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);
+
+    int taille_header = 100;
+    int scroll_offset_min = -40; // Décalage vertical minimum du scrolling
+    int scroll_offset = scroll_offset_min/2; // Décalage vertical du scrolling
     int mode_quitter = 0; // Les différentes façons de quitter l'ecrant texte : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
     int running = 1;
     SDL_Event event;
 
     while (running) {
-        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
-        SDL_RenderClear(ren);
-        affiche_background(ren, bg);
-        renderHeader(ren, titre);
-        renderImageButton(ren, &bouton_retour);
-        // Affichage du texte en tenant compte du scrolling
-        for (int i = 0; i < nb_lignes; i++) {
-            SDL_Rect original_rect = lignes[i].rect;
-            lignes[i].rect.y -= scroll_offset; // Appliquer le scroll
-            if (lignes[i].rect.y > HEADER_HEIGHT + BUTTON_MARGIN/2 && lignes[i].rect.y + lignes[i].rect.h/2 < FEN_Y && strcmp(lignes[i].label, " ") != 0) {
-                renderButton(ren, &(lignes[i]));
-            }
-            lignes[i].rect = original_rect; // Rétablir la position originale
-        }
-        updateDisplay(ren);
-
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) return 0; // Quitter la fenêtre
+            if (event.type == SDL_QUIT) {
+                mode_quitter = 1; // Quitter la fenêtre
+                running = 0;
+            }
 
             if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
                 FEN_X = event.window.data1;
                 FEN_Y = event.window.data2;
                 resize_background(bg);
+                free_MarkdownText(&md_txt);
+                marge = FEN_X / 7;
+                md_txt = charge_markdown(fonts_md, markdown_file, marge);
             }
 
             if (event.type == SDL_MOUSEWHEEL) {
                 scroll_offset -= event.wheel.y * SCROLL_SPEED;
+                if (scroll_offset < scroll_offset_min) scroll_offset = scroll_offset_min;
+                if (scroll_offset > md_txt.total_height - md_txt.fist_line.wrapped_text.total_height) scroll_offset = md_txt.total_height - md_txt.fist_line.wrapped_text.total_height;
             }
 
             if (event.type == SDL_KEYDOWN) {
@@ -251,15 +236,15 @@ int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
 
             if (event.type == SDL_KEYUP) {
                 if (event.key.keysym.sym == SDLK_BACKSPACE){
+                    mode_quitter = 2; // On revient à l'écran d'accueil
                     running = 0;
-                    return 1; // On revient à l'écran d'accueil
                 }
             }
         
             if (event.type == SDL_MOUSEBUTTONUP){
                 if (is_souris_sur_rectangle(bouton_retour.rect, event.motion.x, event.motion.y)){
+                    mode_quitter = 2; // On revient à l'écran d'accueil
                     running = 0;
-                    return 1; // On revient à l'écran d'accueil
                 }
             }
         
@@ -273,111 +258,31 @@ int ecran_text (SDL_Renderer* ren, const char* Text[], char* titre){
                 }
             }
         }
-        if (scroll_offset < 0) scroll_offset = 0;
-        if (scroll_offset > (nb_lignes * (taille_ligne_y + space_entre_lignes)) - (FEN_Y/2 - HEADER_HEIGHT))
-            scroll_offset = (nb_lignes * (taille_ligne_y + space_entre_lignes)) - (FEN_Y/2 - HEADER_HEIGHT);
         
+        SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
+        SDL_RenderClear(ren);
+        affiche_background(ren, bg);
+        render_markdown(ren, &md_txt, scroll_offset - taille_header, marge);
+        renderHeader(ren, titre, fonts[3], FEN_X, taille_header);
+        renderImageButton(ren, &bouton_retour);
+        updateDisplay(ren);
     }
+    for (int i = 0; i < NB_FONTS_MD; i++) {
+        TTF_CloseFont(fonts_md[i]);
+    }
+    free_MarkdownText(&md_txt);
+    SDL_DestroyTexture(bouton_retour.image);
+    free(bg);
+    return mode_quitter - 1;
 }
 
 int ecran_remerciements (SDL_Renderer* ren){
-    const char* creditsText[] = {"Merci à tous ceux qui ont contribué ...",
-        " ",
-        " ",
-        "Initiative du projet : M. José Mennesson",
-        " ",
-        " ",
-        "Développeurs :",
-        " ",
-        "Maxence CHOISEL",
-        "Arthur COPIN",
-        "Mohammed DAIB",
-        " ",
-        " ",
-        "Chef de projet : Maxence CHOISEL",
-        " ",
-        "Game Design : d'après le jeu original Pac-Man",
-        " ",
-        "Développeur moteur du jeu : Maxence CHOISEL",
-        " ",
-        "Développeur IA des fantômes : Maxence CHOISEL",
-        " ",
-        "Développeur interface utilisateur  : Arthur COPIN",
-        " ",
-        "Développeur gestion du son  : Arthur COPIN",
-        " ",
-        "Développeur système d’animation  : Mohammed DAIB",
-        " ",
-        "Développeur physique du jeu : Maxence CHOISEL",
-        " ",
-        "Développeur des cartes (level design) : ","Maxence CHOISEL",
-        " ",
-        " ",
-        "Designer graphique  : Mohammed DAIB",
-        " ",
-        "Animateur 2D  : Mohammed DAIB",
-        " ",
-        "Créateur d’effets visuels (VFX)  : Mohammed DAIB",
-        " ",
-        " ",
-        "Testeur Quality Assurance : Maxence CHOISEL",
-        " ",
-        "Développeur optimisation des performances :","Maxence CHOISEL",
-        " ",
-        NULL};
-    
-    int a = ecran_text(ren, creditsText, "Remerciements");
+    int a = ecran_text(ren, "Ressources/Md_files/Remerciements.md", "Remerciements");
     return a;
 }
 
 int ecran_mode_emploi (SDL_Renderer* ren){
-    const char* manuelText[] = {"Voici le manuel d'utilisation de ce",
-        "grapheur d'expressions fonctionnelles",
-        " ",
-        " ",
-        "Initiative du projet : M. José Mennesson",
-        " ",
-        " ",
-        "Développeurs :",
-        " ",
-        "Maxence CHOISEL",
-        "Arthur COPIN",
-        "Mohammed DAIB",
-        " ",
-        " ",
-        "Chef de projet : Maxence CHOISEL",
-        " ",
-        "Game Design : d'après le jeu original Pac-Man",
-        " ",
-        "Développeur moteur du jeu : Maxence CHOISEL",
-        " ",
-        "Développeur IA des fantômes : Maxence CHOISEL",
-        " ",
-        "Développeur interface utilisateur  : Arthur COPIN",
-        " ",
-        "Développeur gestion du son  : Arthur COPIN",
-        " ",
-        "Développeur système d’animation  : Mohammed DAIB",
-        " ",
-        "Développeur physique du jeu : Maxence CHOISEL",
-        " ",
-        "Développeur des cartes (level design) : ","Maxence CHOISEL",
-        " ",
-        " ",
-        "Designer graphique  : Mohammed DAIB",
-        " ",
-        "Animateur 2D  : Mohammed DAIB",
-        " ",
-        "Créateur d’effets visuels (VFX)  : Mohammed DAIB",
-        " ",
-        " ",
-        "Testeur Quality Assurance : Maxence CHOISEL",
-        " ",
-        "Développeur optimisation des performances :","Maxence CHOISEL",
-        " ",
-        NULL};
-    
-    int a = ecran_text(ren, manuelText, "Mode d'emploi");
+    int a = ecran_text(ren, "Ressources/Md_files/Mode_emploi.md", "Mode d'emploi");
     return a;
 }
 
@@ -412,6 +317,8 @@ void resize_background (Background* bg){
         bg->dstRect.y = (FEN_Y - bg->dstRect.h) / 2;
     }
     if (bg->is_filtre){
+        bg->filtre.x = 0;
+        bg->filtre.y = 0;
         bg->filtre.w = FEN_X;
         bg->filtre.h = FEN_Y;
     }

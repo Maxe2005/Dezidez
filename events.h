@@ -177,6 +177,13 @@ void handle_event_entrees_expressions_KEYDOWN(SDL_Event event, Expression_foncti
 void handle_event_entrees_expressions_TEXTINPUT(SDL_Event event, Expression_fonction* expression);
 
 /**
+ * Redimentionne tous les éléments de la fenêtre
+ * @param bande_haute La bande d'entrées affiché
+ * @param graph Le graphique affiché
+ */
+void resize_fen_2D (Bande_haute* bande_haute, Graph* graph);
+
+/**
  * Gère tous les évènement par type
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_haute La bande d'entrées affiché
