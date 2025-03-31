@@ -76,7 +76,7 @@ void test_erreur_manque_operateur() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur manque opérateur : %s\n", erreur == MANQUE_OPERATEUR ? "OK" : "ÉCHEC");
+    printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == MANQUE_OPERATEUR ? "OK" : "ÉCHEC", erreur);
 }
 
 // Fonction principale qui exécute tous les tests
@@ -87,4 +87,94 @@ void tester_syntaxe() {
     test_erreur_operateurs_a_la_suite1();
     test_erreur_operateurs_a_la_suite2();
     test_erreur_manque_operateur();
+}
+
+
+void test_expression_valide() {
+    typejeton tab[] = {
+        {FONCTION, {.fonction = COS}},
+        {PARENTHESE_OUVRANTE, {0}},
+        {REEL, {.reel = 3.0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {REEL, {.reel = 6.0}},
+        {OPERATEUR, {.operateur = FOIS}},
+        {VARIABLE, {.variable = 'X'}},
+        {PARENTHESE_FERMANTE, {0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {FONCTION, {.fonction = COS}},
+        {PARENTHESE_OUVRANTE, {0}},
+        {REEL, {.reel = 7.0}},
+        {PARENTHESE_FERMANTE, {0}},
+        {OPERATEUR, {.operateur = FOIS}},
+        {PARENTHESE_OUVRANTE, {0}},
+        {REEL, {.reel = 12.0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {REEL, {.reel = 3.0}},
+        {PARENTHESE_FERMANTE, {0}},
+        {FIN, {0}}
+    };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test expression valide : %s. Erreur=%d\n", erreur == 0 ? "OK" : "ÉCHEC", erreur);
+}
+
+void test_parenthese_fermee_1er_jeton() {
+    typejeton tab[] = {
+        {PARENTHESE_FERMANTE, {0}},
+        {FIN, {0}}
+    };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test parenthèse fermée 1er jeton : %s. Erreur=%d\n", erreur == PARENTHESE_FERMEE_1_ER_JETON ? "OK" : "ÉCHEC", erreur);
+}
+
+void test_membre_vide() {
+    typejeton tab[] = {
+        {REEL, {.reel = 3.0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {PARENTHESE_OUVRANTE, {0}},
+        {PARENTHESE_FERMANTE, {0}},
+        {FIN, {0}}
+    };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test membre vide : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur);
+}
+
+void test_probleme_apres_reel() {
+    typejeton tab[] = {
+        {REEL, {.reel = 3.0}},
+        {REEL, {.reel = 3.0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {REEL, {.reel = 6.0}},
+        {FIN, {0}}
+    };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test problème après réel : %s. Erreur=%d\n", erreur == PROBLEME_APRES_REEL ? "OK" : "ÉCHEC", erreur);
+}
+
+void test_probleme_parentheses_fonctions1() {
+    typejeton tab1[] = {
+        {FONCTION, {.fonction = COS}},
+        {REEL, {.reel = 5.0}},
+        {FIN, {0}}
+    };
+    
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test problème parenthèses fonctions (cos5) : %s. Erreur=%d\n", erreur == PROBLEME_PARENTHESES_FONCTIONS ? "OK" : "ÉCHEC", erreur);
+}
+
+void test_probleme_parentheses_fonctions1() {
+
+    typejeton tab2[] = {
+            {FONCTION, {.fonction = COS}},
+            {PARENTHESE_OUVRANTE, {0}},
+            {REEL, {.reel = 5.0}},
+            {FIN, {0}}
+        };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test problème parenthèses fonctions (cos(5) non fermé) : %s. Erreur=%d\n", erreur == PROBLEME_PARENTHESES_FONCTIONS ? "OK" : "ÉCHEC", erreur);
 }
