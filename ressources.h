@@ -11,6 +11,7 @@
 #include "gestionGraphique.h"
 #include "cJSON/cJSON.h"
 #include "evaluateur.h"
+#include "Analyse_lexicale.h"
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
@@ -19,7 +20,7 @@
 #define SCROLL_SPEED 30  // Vitesse du scroll
 #define SCROLL_OFFSET_MIN -100
 
-#define NB_FONTS 6
+#define NB_FONTS 8
 extern TTF_Font* fonts[NB_FONTS];
 
 extern int FEN_X;

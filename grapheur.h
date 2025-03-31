@@ -2,15 +2,16 @@
 #define GRAPHIQUE_H
 
 #include "ressources.h"
-#include "entrees_expressions.h"
+#include "bande_haute.h"
 // Il y a aussi l'include de "events.h" mais il est fait après les déclarations de structures car il en a besoins
 
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
 #define ZOOM_SPEED 5
-#define TAILLE_GRADUATION_MIN 40
+#define TAILLE_GRADUATION_MIN 50
 #define TAILLE_GRADUATION_MAX 100
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
+#define NB_EVALUATEUR_MAX 100
 
 extern Message message;
 
@@ -27,6 +28,14 @@ typedef struct {
 } Axe;
 
 typedef struct {
+    Button bouton_evaluateur;
+    ImageButton boutton_quitter;
+    int x_px; // Position en pixel du point évalué
+    int y_px; // Position en pixel du point évalué
+} Evaluateur;
+
+
+typedef struct {
     Axe* axe_x;
     Axe* axe_y;
     float x; // Largeur du graph en pixels
@@ -37,11 +46,17 @@ typedef struct {
     int centre_x; // Position en pixel du centre (ou de l'origine du graphique)
     int centre_y; // Position en pixel du centre (ou de l'origine du graphique)
     bool souris_pressee;
+    int mode_clic_souris;
+    int y_axis_pos;
+    
+    Evaluateur liste_evaluateurs[NB_EVALUATEUR_MAX];
+    int nombre_evaluateur;
 } Graph;
 
 typedef struct {
     Graph* graph;
     Bande_haute* bande_haute;
+    Bande_droite* bande_droite;
 } Grapheur_elements;
 
 #include "events.h"
@@ -94,8 +109,9 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param graph Le graphique à afficher
  * @param bande_haute La bande d'entrées à afficher
+ * @param bande_droite La bande droite affichée
  */
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute);
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute, Bande_droite* bande_droite);
 
 /**
  * Change le mode de couleur
@@ -183,5 +199,22 @@ void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
  */
 void init_const_message();
 
+/**
+ * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @param bande_haute La bande d'entrées du graphique
+ */
+void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+
+/**
+ * Supprime l'évaluateur d'index <index> de la liste des évaluateurs en un point
+ * @param graph Le graphique affiché
+ * @param index L'index de l'évaluateur à supprimer
+ */
+void suppr_evaluateur_x (Graph* graph, int index);
 
 #endif

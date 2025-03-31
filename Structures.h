@@ -1,3 +1,6 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
 //énumération des différents types de lexems existants
 typedef enum
 {
@@ -44,6 +47,12 @@ typedef struct Node
 typedef Node *Arbre;
 
 typedef enum {
+//ERREUR ANALYSE LEXICAL
+FONCTION_INCONNUE = 101 ,
+NOMBRE_INVALIDE = 102,
+CARACTERE_INCONNUE = 103,
+VARIABLE_INCONNUE = 104,
+
 //ERREUR FONCTION 30X
 RACINE_NEGATIVE=301, 
 LOG_NEGATIF=302,
@@ -56,5 +65,6 @@ DIVISION_PAR_ZERO=311, // 0/0
 ERREUR_ZERO_PUIS_ZERO=312, // 0^0
 ERREUR_ZERRO_PUIS_NEGATIVE=313, //0^(-x) 
 
-
 } typeerreur;
+
+#endif

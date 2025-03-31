@@ -2,8 +2,8 @@
 #define ENTREES_EXPRESSIONS_H
 
 #include "ressources.h"
+#include "bande_droite.h"
 
-#define TAILLE_BANDE_DROITE 100
 #define TAILLE_BANDE_DESCRIPTIONS 40 
 #define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
 #define TAILLE_BANDE_EXPRESSIONS_MIN (TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS)
@@ -60,6 +60,7 @@ typedef struct {
     SDL_Color color;
 } Fonction;
 
+// Un bouton en mouvement
 typedef struct {
     ImageButton bt;
     SDL_Rect rect_base;
@@ -112,12 +113,6 @@ typedef struct {
     Button_mvt button_new_expression; // Le bouton pour ajouter une nouvelle expression à tracer sur le graphique
 } Bande_haute;
 
-
-float f (float x);
-float g (float x);
-float h (float x);
-float k (float x);
-float l (float x);
 
 /**
  * Affiche la bande haute de l'interface

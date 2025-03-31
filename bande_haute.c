@@ -1,22 +1,6 @@
-#include "entrees_expressions.h"
+#include "bande_haute.h"
 
 Message message;
-
-float f (float x) {
-    return sin(x);
-}
-float g (float x) {
-    return cos(x);
-}
-float h (float x) {
-    return exp(x);
-}
-float k (float x) {
-    return x;
-}
-float l (float x) {
-    return 2 - x;
-}
 
 void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
@@ -337,6 +321,9 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
+        typejeton TabToken[TailleMax] = {};
+        int erreur = 0;
+        Analyse_Lexicale(TabToken, expression->expression->text, &erreur);
         expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }
@@ -562,3 +549,5 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->nb_expressions++;
     action_apres_modif_offset(bande_haute);
 }
+
+
