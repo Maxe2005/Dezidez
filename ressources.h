@@ -20,7 +20,7 @@
 #define SCROLL_SPEED 30  // Vitesse du scroll
 #define SCROLL_OFFSET_MIN -100
 
-#define NB_FONTS 6
+#define NB_FONTS 8
 extern TTF_Font* fonts[NB_FONTS];
 
 extern int FEN_X;

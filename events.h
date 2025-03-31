@@ -2,7 +2,8 @@
 #define EVENT_H
 
 #include "ressources.h"
-#include "entrees_expressions.h"
+#include "bande_haute.h"
+#include "bande_droite.h"
 #include "grapheur.h"
 
 
@@ -177,21 +178,45 @@ void handle_event_entrees_expressions_KEYDOWN(SDL_Event event, Expression_foncti
 void handle_event_entrees_expressions_TEXTINPUT(SDL_Event event, Expression_fonction* expression);
 
 /**
+ * Gère l'évènement MOUSEMOTION relatif à la bande droite de l'interface
+ * @param event L'événement à gérer
+ * @param bande_droite La bande droite affichée
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ */
+void handle_event_bande_droite_MOUSEMOTION (SDL_Event event, Bande_droite* bande_droite, int x_souris_px, int y_souris_px);
+
+/**
+ * Gère l'évènement MOUSEMOTION relatif à la bande droite de l'interface
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param event L'événement à gérer
+ * @param bande_droite La bande droite affichée
+ * @param bande_haute La bande d'entrées à afficher
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @return 0 si l'event n'est pas géré, -1 s'il faut revenir à l'accueil, 1 si l'event est géré
+ */
+int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_droite* bande_droite, Bande_haute* bande_haute, Graph* graph, int x_souris_px, int y_souris_px);
+
+/**
  * Redimentionne tous les éléments de la fenêtre
  * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
  * @param graph Le graphique affiché
  */
-void resize_fen_2D (Bande_haute* bande_haute, Graph* graph);
+void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph);
 
 /**
  * Gère tous les évènement par type
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
  * @param graph Le graphique affiché
  * @param x_souris_px La position en abssices actuelle de la souris 
  * @param y_souris_px La position en ordonnées actuelle de la souris 
  * @param is_event_backspace_used Permet de séparer (ou hiérarchiser) l'utilisation de la touche backspace pour plusieurs utilisation
  */
-int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
+int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
 
 #endif

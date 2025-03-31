@@ -284,7 +284,7 @@ void affichage_graph_evaluateur(SDL_Renderer* ren, Graph* graph){
     }
 }
 
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute){
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute, Bande_droite* bande_droite){
     SDL_SetRenderDrawColor(ren, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
     SDL_RenderClear(ren);
 
@@ -305,7 +305,7 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haut
     affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
     renderImageButton(ren, &bande_haute->button_new_expression.bt);
     // Affichage de la bande droite
-    boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
+    affiche_bande_droite(ren, bande_droite);
     
     if (message.is_visible){
         if (time(NULL) - message.start_time > message.temps_affichage){
@@ -334,11 +334,12 @@ void find_min_max(Fonction* fonction, int steps) {
     }
 
     float step_size = (fonction->borne_sup - fonction->borne_inf) / steps;
-    fonction->fx_min = fonction->fx_max = f(fonction->borne_inf); // Initialisation
+    int code_erreur;
+    fonction->fx_min = fonction->fx_max = evaluateur(fonction->fonction_arbre, fonction->borne_inf, 0, &code_erreur); // Initialisation
 
     for (int i = 1; i <= steps; i++) {
         float x = fonction->borne_inf + i * step_size;
-        float y = f(x);
+        float y = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
 
         if (y < fonction->fx_min) fonction->fx_min = y;
         if (y > fonction->fx_max) fonction->fx_max = y;
@@ -465,6 +466,7 @@ void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_el
     colors = malloc(sizeof(Colors));
     change_color_mode(1);
 
+    init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 
     *gr_ele->graph = init_graph(&gr_ele->bande_haute->expressions[0]->fonction);
@@ -478,8 +480,9 @@ void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_el
 int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
     Graph* graph = gr_ele->graph;
     Bande_haute* bande_haute = gr_ele->bande_haute;
+    Bande_droite* bande_droite = gr_ele->bande_droite;
 
-    resize_fen_2D(bande_haute, graph);
+    resize_fen_2D(bande_haute, bande_droite, graph);
     SDL_StartTextInput();
     bool is_event_backspace_used = false;
     int x_souris_px, y_souris_px;
@@ -487,9 +490,9 @@ int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
     bool running = true;
 
     while (running) {
-        affiche_interface(ren, graph, bande_haute);
+        affiche_interface(ren, graph, bande_haute, bande_droite);
 
-        mode_quitter = handle_all_events(ren, bande_haute, graph, &x_souris_px, &y_souris_px, &is_event_backspace_used);
+        mode_quitter = handle_all_events(ren, bande_haute, bande_droite, graph, &x_souris_px, &y_souris_px, &is_event_backspace_used);
         if (mode_quitter) break;
 
         // Animation de l'agrandissement

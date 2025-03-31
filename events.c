@@ -301,7 +301,35 @@ void handle_event_entrees_expressions_KEYUP (SDL_Event event, Expression_fonctio
 }
 
 
-void resize_fen_2D (Bande_haute* bande_haute, Graph* graph){
+
+void handle_event_bande_droite_MOUSEMOTION (SDL_Event event, Bande_droite* bande_droite, int x_souris_px, int y_souris_px){
+    if (is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
+        bande_droite->bouton_retour.hovered = 1;
+        bande_droite->bouton_retour.pourcentage_place = 50;
+    } else {
+        bande_droite->bouton_retour.hovered = 0;
+        bande_droite->bouton_retour.pourcentage_place = 80;
+    }
+
+    if (is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
+        bande_droite->bouton_centrer.hovered = 1;
+    } else bande_droite->bouton_centrer.hovered = 0;
+}
+
+int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_droite* bande_droite, Bande_haute* bande_haute, Graph* graph, int x_souris_px, int y_souris_px){
+    int clic_utile = 0;
+    if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
+        return -1; // Retourner à l'accueil
+    }
+    if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
+        resize_recentrer(graph, &bande_haute->expressions[0]->fonction);
+        clic_utile = 1;
+    }
+    return clic_utile;
+}
+
+
+void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph){
     bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
     int x = graph->x;
     int y = graph->y;
@@ -310,9 +338,10 @@ void resize_fen_2D (Bande_haute* bande_haute, Graph* graph){
     graph->axe_y->taille_grad *= graph->y / y;
     resize_navigation(graph);
     resize_bande_haut(bande_haute);
+    resize_bande_droite(bande_droite);
 }
 
-int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
+int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) return 1; // On quitte le grapheur
@@ -320,7 +349,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = event.window.data1;
             FEN_Y = event.window.data2;
-            resize_fen_2D(bande_haute, graph);
+            resize_fen_2D(bande_haute, bande_droite, graph);
         }
 
         if (event.type == SDL_MOUSEMOTION) {
@@ -329,6 +358,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
             bool is_MOUSEMOTION_used = false;
             is_MOUSEMOTION_used = handle_event_bande_haut_MOUSEMOTION (event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEMOTION_used) {
+                handle_event_bande_droite_MOUSEMOTION(event, bande_droite, *x_souris_px, *y_souris_px);
                 handle_event_graph_MOUSEMOTION (event, graph, *x_souris_px, *y_souris_px);
             }
         }
@@ -339,10 +369,14 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
-            bool is_MOUSEBUTTONUP_used = false;
+            int is_MOUSEBUTTONUP_used = 0;
             is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEBUTTONUP_used){
-                handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+                is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, graph, *x_souris_px, *y_souris_px);
+                if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                else if (!is_MOUSEBUTTONUP_used){
+                    handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+                }
             }
         }
 

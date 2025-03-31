@@ -16,6 +16,8 @@ void init_font (TTF_Font* font[NB_FONTS]) {
     font[3] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 35);
     font[4] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 15); //Font de texte descriptif de bande haute
     font[5] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 12); //Font de texte de graduation
+    font[6] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 18); //Font de texte de graduation
+    font[7] = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", 20); //Font de texte de graduation
 }
 
 int nb_alea(int min, int max){

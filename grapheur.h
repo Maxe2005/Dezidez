@@ -2,7 +2,7 @@
 #define GRAPHIQUE_H
 
 #include "ressources.h"
-#include "entrees_expressions.h"
+#include "bande_haute.h"
 // Il y a aussi l'include de "events.h" mais il est fait après les déclarations de structures car il en a besoins
 
 #define NB_GRAD_MIN 5
@@ -56,6 +56,7 @@ typedef struct {
 typedef struct {
     Graph* graph;
     Bande_haute* bande_haute;
+    Bande_droite* bande_droite;
 } Grapheur_elements;
 
 #include "events.h"
@@ -108,8 +109,9 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param graph Le graphique à afficher
  * @param bande_haute La bande d'entrées à afficher
+ * @param bande_droite La bande droite affichée
  */
-void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute);
+void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute, Bande_droite* bande_droite);
 
 /**
  * Change le mode de couleur

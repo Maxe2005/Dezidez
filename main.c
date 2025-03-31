@@ -18,6 +18,7 @@ int main (int argc, char *argv[]){
 
     Grapheur_elements grapheur_ele;
     grapheur_ele.bande_haute = malloc(sizeof(Bande_haute));
+    grapheur_ele.bande_droite = malloc(sizeof(Bande_droite));
     grapheur_ele.graph = malloc(sizeof(Graph));
     init_totale_interface_grapheur(ren, &grapheur_ele);
 
