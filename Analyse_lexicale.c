@@ -295,6 +295,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
             char reschiffre[TailleNombreMax] = "(-";
             // on skip la parenthèse le - qui sont déja rajouter
             // Continue tant que tu trouves des chiffres
+            /*
             while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
                 strenchainedecarac[0] = str[i + longueurdunombre];
                 strenchainedecarac[1] = '\0';
@@ -312,17 +313,13 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
                         break;
                     }
                 }
-            }
+            }*/
             TabToken[indiceinjection].lexem = FONCTION;
             TabToken[indiceinjection].valeur.fonction = VAL_NEG;
             indiceinjection++;
-            TabToken[indiceinjection].lexem = PAR_FERM;
+            TabToken[indiceinjection].lexem = PAR_OUV;
             indiceinjection++;
-            TabToken[indiceinjection]=TokenReelNegatif(reschiffre);
-            indiceinjection++;
-            TabToken[indiceinjection].lexem = PAR_FERM;
-            indiceinjection++; 
-            i = i + longueurdunombre;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit (on fait +1 pour skip la dernière parenthèse déjà traité)
+            i = i + longueurdunombre -1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit (on fait +1 pour skip la dernière parenthèse déjà traité)
         }
 
 
@@ -382,6 +379,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax]) {
             
         }
     }
+    TabToken[indiceinjection].lexem = FIN;
 }
 
 void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax]){

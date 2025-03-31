@@ -7,7 +7,7 @@
 
 int main (){
     typejeton TokenListe[TailleMax];
-    char str[TailleMax]  = "cos(3x+y)+1-1" ;
+    char str[TailleMax]  = "(-sinc(2x + 1))+10x" ;
     Analyse_Lexicale(TokenListe,str);
     /*
     int lenExpression = strlen(str);
