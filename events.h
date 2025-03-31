@@ -27,13 +27,14 @@ void handle_event_graph_MOUSEBUTTONDOWN(SDL_Event event, Graph* graph, int x_sou
 
 /**
  * Gère l'évènement MOUSEBUTTONUP du graphique et renvoie vers MOUSEBUTTONUP_RIGHT ou MOUSEBUTTON_LEFT en fonction du besoin
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param event L'événement à gérer
  * @param graph Le graphique affiché
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
  * @param bande_haute La bande d'entrées du graphique
  */
-void handle_event_graph_MOUSEBUTTONUP(SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+void handle_event_graph_MOUSEBUTTONUP(SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
 
 
 
@@ -49,24 +50,14 @@ void handle_event_graph_MOUSEBUTTONUP_RIGHT (SDL_Event event, Graph* graph, int 
 
 /**
  * Gère l'évènement MOUSEBUTTONUP_LEFT du graphique
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param event L'événement à gérer
  * @param graph Le graphique affiché
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
  * @param bande_haute La bande d'entrées du graphique
  */
-void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px,Bande_haute* bande_haute);
-
-
-/**
- * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur
- * @param event L'événement à gérer
- * @param graph Le graphique affiché
- * @param x_souris_px La position en pixel de la souris
- * @param y_souris_px La position en pixel de la souris
- * @param bande_haute La bande d'entrées du graphique
- */
-void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px,Bande_haute* bande_haute);
 
 
 /**
@@ -96,8 +87,9 @@ bool handle_event_bande_haut_MOUSEMOTION(SDL_Event event, Bande_haute* bande_hau
  * @param bande_haute La bande d'entrées à afficher
  * @param x_souris_px La position en pixel de la souris
  * @param y_souris_px La position en pixel de la souris
+ * @return 1 si le <clic souris> à été géré, 0 sinon
  */
-void handle_event_bande_haut_MOUSEBUTTONUP(SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px);
+bool handle_event_bande_haut_MOUSEBUTTONUP(SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px);
 
 /**
  * Gère l'évènement MOUSEBUTTONDOWN relatif à la bande haute

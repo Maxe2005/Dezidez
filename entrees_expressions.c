@@ -525,3 +525,5 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->nb_expressions++;
     action_apres_modif_offset(bande_haute);
 }
+
+

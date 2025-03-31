@@ -273,8 +273,14 @@ float recherche_meilleur_echelle_grad (float max, float min){
 
 void affichage_graph_evaluateur(SDL_Renderer* ren, Graph* graph){
     for (int i=0; i<graph->nombre_evaluateur; i++) {
-        renderButton(ren, &graph->liste_evaluateurs[i].bouton_evaluateur);
-}
+        if (graph->liste_evaluateurs[i].x_px + graph->liste_evaluateurs[i].bouton_evaluateur.rect.w > graph->origine_x && graph->liste_evaluateurs[i].x_px < graph->origine_x + graph->x &&
+            graph->liste_evaluateurs[i].y_px > graph->origine_y_apres_bande_haut && graph->liste_evaluateurs[i].y_px < graph->origine_y + graph->y){
+                renderButton(ren, &graph->liste_evaluateurs[i].bouton_evaluateur);
+                SDL_RenderDrawLine(ren, graph->liste_evaluateurs[i].x_px, graph->origine_y_apres_bande_haut, graph->liste_evaluateurs[i].x_px, graph->origine_y + graph->y);
+                SDL_RenderDrawLine(ren, graph->origine_x, graph->liste_evaluateurs[i].y_px, graph->origine_x + graph->x, graph->liste_evaluateurs[i].y_px);
+                renderImageButton(ren, &graph->liste_evaluateurs[i].boutton_quitter);
+        }
+    }
 }
 
 void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute){
@@ -368,6 +374,17 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
 
     resize_navigation(graph);
     resize_precision_grad(graph);
+
+    for (int i=0; i<graph->nombre_evaluateur; i++) {
+        int mvt_x = ((x_souris_px - graph->liste_evaluateurs[i].x_px) / old_taille_grad_x) * event.wheel.y * ZOOM_SPEED;
+        int mvt_y = ((y_souris_px - graph->liste_evaluateurs[i].y_px) / old_taille_grad_y) * event.wheel.y * ZOOM_SPEED;
+        graph->liste_evaluateurs[i].x_px -= mvt_x;
+        graph->liste_evaluateurs[i].y_px -= mvt_y;
+        graph->liste_evaluateurs[i].bouton_evaluateur.rect.x -= mvt_x;
+        graph->liste_evaluateurs[i].bouton_evaluateur.rect.y -= mvt_y;
+        graph->liste_evaluateurs[i].boutton_quitter.rect.x -= mvt_x;
+        graph->liste_evaluateurs[i].boutton_quitter.rect.y -= mvt_y;
+    }
 }
 
 void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute){
@@ -386,6 +403,57 @@ void init_const_message(){
     message.button_base.font_text = fonts[5];
     message.button_base.color_text = (SDL_Color) {255,255,255,255};
 
+}
+
+void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    Evaluateur affichage_evaluateur;
+    int valeur_pixel_x = x_souris_px;
+    float valeur_en_x = ((valeur_pixel_x - graph->centre_x) * graph->axe_x->echelle_grad / graph->axe_x->taille_grad);//+ graph->axe_x->min;
+    float valeur_en_y = bande_haute->expressions[0]->fonction.f(valeur_en_x);
+    int valeur_pixel_y = graph->centre_y - (valeur_en_y * graph->axe_y->taille_grad / graph->axe_y->echelle_grad);
+    affichage_evaluateur.x_px = valeur_pixel_x;
+    affichage_evaluateur.y_px = valeur_pixel_y;
+    char* formatted_string = malloc(50 * sizeof(char));
+    sprintf(formatted_string, "f(%.2f) = %.2f  ", valeur_en_x, valeur_en_y);
+    affichage_evaluateur.bouton_evaluateur.label = formatted_string;
+    affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
+    int width, height;
+    TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
+    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x, valeur_pixel_y, width + 20, height + 15};
+    affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
+    affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){150, 150, 150, 255};
+    affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
+    affichage_evaluateur.bouton_evaluateur.radius = affichage_evaluateur.bouton_evaluateur.rect.h / 4;
+    affichage_evaluateur.bouton_evaluateur.hovered = 0;
+
+    affichage_evaluateur.boutton_quitter.image = load_image(ren, "Icons/croix.png");
+    affichage_evaluateur.boutton_quitter.rect.h = affichage_evaluateur.bouton_evaluateur.rect.h/2;
+    affichage_evaluateur.boutton_quitter.rect.w = affichage_evaluateur.boutton_quitter.rect.h;
+    affichage_evaluateur.boutton_quitter.rect.x = affichage_evaluateur.bouton_evaluateur.rect.x + affichage_evaluateur.bouton_evaluateur.rect.w - affichage_evaluateur.boutton_quitter.rect.w;
+    affichage_evaluateur.boutton_quitter.rect.y = affichage_evaluateur.bouton_evaluateur.rect.y;
+    affichage_evaluateur.boutton_quitter.is_survolable = 1;
+    affichage_evaluateur.boutton_quitter.color_base = affichage_evaluateur.bouton_evaluateur.color_base;
+    affichage_evaluateur.boutton_quitter.color_hover = (SDL_Color){255, 0, 0, 255};
+    affichage_evaluateur.boutton_quitter.hovered = 0;
+    affichage_evaluateur.boutton_quitter.radius = affichage_evaluateur.boutton_quitter.rect.w / 3;
+    affichage_evaluateur.boutton_quitter.pourcentage_place = 50;
+    affichage_evaluateur.boutton_quitter.taille_bonus_hover_x = 0;
+    affichage_evaluateur.boutton_quitter.taille_bonus_hover_y = 0;
+
+    graph-> liste_evaluateurs[graph-> nombre_evaluateur] = affichage_evaluateur;
+    graph-> nombre_evaluateur = graph-> nombre_evaluateur + 1;
+}
+
+void suppr_evaluateur_x (Graph* graph, int index){
+    if (index < 0 || index >= graph->nombre_evaluateur) {
+        printf("Erreur : index hors limites dans 'suppr_evaluateur_x'\n");
+        return;
+    }
+    SDL_DestroyTexture(graph->liste_evaluateurs[index].boutton_quitter.image);
+    for (int i = index; i < graph->nombre_evaluateur - 1; i++) {
+        graph->liste_evaluateurs[i] = graph->liste_evaluateurs[i + 1];
+    }
+    graph->nombre_evaluateur--;
 }
 
 void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){

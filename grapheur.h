@@ -8,7 +8,7 @@
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
 #define ZOOM_SPEED 5
-#define TAILLE_GRADUATION_MIN 40
+#define TAILLE_GRADUATION_MIN 50
 #define TAILLE_GRADUATION_MAX 100
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
 #define NB_EVALUATEUR_MAX 100
@@ -30,7 +30,9 @@ typedef struct {
 typedef struct {
     Button bouton_evaluateur;
     ImageButton boutton_quitter;
-}Evaluateur;
+    int x_px; // Position en pixel du point évalué
+    int y_px; // Position en pixel du point évalué
+} Evaluateur;
 
 
 typedef struct {
@@ -195,5 +197,22 @@ void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
  */
 void init_const_message();
 
+/**
+ * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param event L'événement à gérer
+ * @param graph Le graphique affiché
+ * @param x_souris_px La position en pixel de la souris
+ * @param y_souris_px La position en pixel de la souris
+ * @param bande_haute La bande d'entrées du graphique
+ */
+void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute);
+
+/**
+ * Supprime l'évaluateur d'index <index> de la liste des évaluateurs en un point
+ * @param graph Le graphique affiché
+ * @param index L'index de l'évaluateur à supprimer
+ */
+void suppr_evaluateur_x (Graph* graph, int index);
 
 #endif

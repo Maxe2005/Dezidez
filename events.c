@@ -17,60 +17,57 @@ void handle_event_graph_MOUSEMOTION (SDL_Event event, Graph* graph, int x_souris
             graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
             graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
             resize_navigation(graph);
+            for (int i=0; i<graph->nombre_evaluateur; i++) {
+                graph->liste_evaluateurs[i].x_px += event.motion.xrel;
+                graph->liste_evaluateurs[i].y_px += event.motion.yrel;
+                graph->liste_evaluateurs[i].bouton_evaluateur.rect.x += event.motion.xrel;
+                graph->liste_evaluateurs[i].bouton_evaluateur.rect.y += event.motion.yrel;
+                graph->liste_evaluateurs[i].boutton_quitter.rect.x += event.motion.xrel;
+                graph->liste_evaluateurs[i].boutton_quitter.rect.y += event.motion.yrel;
+            }
         } else {
             graph->souris_pressee = false;
         }
     }
+    for (int i=0; i<graph->nombre_evaluateur; i++){
+        if (is_souris_sur_rectangle(graph->liste_evaluateurs[i].boutton_quitter.rect, x_souris_px, y_souris_px)){
+            graph->liste_evaluateurs[i].boutton_quitter.hovered = 1;
+        } else {
+            graph->liste_evaluateurs[i].boutton_quitter.hovered = 0;
+        }
+    }
 }
 
-void handle_event_graph_MOUSEBUTTONUP (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
-    if (event.button.button == SDL_BUTTON_RIGHT){
-        handle_event_graph_MOUSEBUTTONUP_RIGHT(event, graph, x_souris_px, y_souris_px);
+void handle_event_graph_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
+        y_souris_px > graph->origine_y_apres_bande_haut && y_souris_px < graph->origine_y + graph->y){
+            if (event.button.button == SDL_BUTTON_RIGHT){
+                handle_event_graph_MOUSEBUTTONUP_RIGHT(event, graph, x_souris_px, y_souris_px);
+            }
+            if (event.button.button == SDL_BUTTON_LEFT){
+                handle_event_graph_MOUSEBUTTONUP_LEFT(ren, event, graph, x_souris_px, y_souris_px, bande_haute);
+            }
     }
-    if (event.button.button == SDL_BUTTON_LEFT){
-        handle_event_graph_MOUSEBUTTONUP_LEFT(event, graph, x_souris_px, y_souris_px, bande_haute);
-    }
-
 }
 
 void handle_event_graph_MOUSEBUTTONUP_RIGHT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
     graph->souris_pressee = false;
 }
 
-void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
-    ajout_evaluateur_x ( event,  graph,  x_souris_px,  y_souris_px,  bande_haute);
+void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    bool clic_utile = false;
+    for (int i=0; i<graph->nombre_evaluateur; i++){
+        if (is_souris_sur_rectangle(graph->liste_evaluateurs[i].boutton_quitter.rect, x_souris_px, y_souris_px)){
+            suppr_evaluateur_x(graph, i);
+            clic_utile = true;
+            break;
+        }
+    }
+    if (!clic_utile){
+        ajout_evaluateur_x (ren, event,  graph,  x_souris_px,  y_souris_px,  bande_haute);
+    }
     // TODO ajouter un mode au graph pour changer l'evaluateur x y et les autres modes
 }
-void ajout_evaluateur_x (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
-    Evaluateur affichage_evaluateur;
-    int valeur_pixel_x = x_souris_px - graph->centre_x;
-    float valeur_en_x = (valeur_pixel_x * graph->axe_x->echelle_grad / graph->axe_x->taille_grad );//+ graph->axe_x->min;
-    Fonction Expression_evaluation = bande_haute->expressions[0]->fonction ;
-    float valeur_en_y = Expression_evaluation.f(valeur_en_x);
-    int valeur_pixel_y = (valeur_en_y) * graph->axe_y->taille_grad / graph->axe_y->echelle_grad ;
-    int max_axe_x_pixel = (graph->axe_y->max) * graph->axe_y->taille_grad / graph->axe_y->echelle_grad; 
-    int distance_en_y_pixel = abs(max_axe_x_pixel-valeur_pixel_y);
-    //printf("\n,       %d          %d ",valeur_pixel_y,distance_en_y_pixel);
-    char* formatted_string = malloc(50 * sizeof(char));
-    sprintf(formatted_string, "f(%.2f)=%.2f", valeur_en_x, valeur_en_y);
-    affichage_evaluateur.bouton_evaluateur.label = formatted_string;
-    affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
-    int width, height;
-    TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
-    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){graph->centre_x + valeur_pixel_x, distance_en_y_pixel + HEADER_HEIGHT, width + 20, height + 10};
-    affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
-    affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){255, 0, 0, 255};
-    affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
-    affichage_evaluateur.bouton_evaluateur.radius = 0;
-    affichage_evaluateur.bouton_evaluateur.hovered = 0;
-    graph-> liste_evaluateurs[graph-> nombre_evaluateur] = affichage_evaluateur;
-    graph-> nombre_evaluateur = graph-> nombre_evaluateur + 1;
-
-}
-
-
-
-
 
 void handle_event_graph_MOUSEBUTTONDOWN (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
     if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
@@ -131,7 +128,7 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
     return is_MOUSEMOTION_used;
 }
 
-void handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
+bool handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     bool clic_utile = false;
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
         if (!clic_utile && bande_haute->expressions[i]->visible) {
@@ -144,7 +141,9 @@ void handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, 
     }
     if (!clic_utile && is_souris_sur_rectangle(bande_haute->surface, x_souris_px, y_souris_px)) {
         bande_haute->expanding = !bande_haute->expanding;
+        clic_utile = true;
     }
+    return clic_utile;
 }
 
 bool handle_event_bande_haut_MOUSEBUTTONDOWN (SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
@@ -337,9 +336,11 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
-            handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
-            handle_event_graph_MOUSEBUTTONUP (event, graph, *x_souris_px, *y_souris_px, bande_haute);
-            
+            bool is_MOUSEBUTTONUP_used = false;
+            is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
+            if (!is_MOUSEBUTTONUP_used){
+                handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+            }
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {
