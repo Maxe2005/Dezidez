@@ -491,7 +491,7 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
+    const char* nom_f[] = {"tan(x)", "cos(x)", "exp(x)", "x", "2-x"};
     typejeton x;
     x.lexem=VARIABLE;
     x.valeur.variable='x';
@@ -499,6 +499,18 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     typejeton Soustraction;
     Soustraction.lexem=OPERATEUR;
     Soustraction.valeur.operateur=MOINS;
+    // Racine
+    typejeton Racine;
+    Racine.lexem=FONCTION;
+    Racine.valeur.fonction=SQRT;
+    // Logarithme
+    typejeton Logarithme;
+    Logarithme.lexem=FONCTION;
+    Logarithme.valeur.fonction=LOG;
+    // Tangente
+    typejeton Tangente;
+    Tangente.lexem=FONCTION;
+    Tangente.valeur.fonction=TAN;
     // Sinus
     typejeton Sinus;
     Sinus.lexem=FONCTION;
@@ -527,8 +539,14 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
     Node* SIN_ARBRE = malloc(sizeof(Node));
     *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
-    Node* arbres[] = {SIN_ARBRE, COSINUS_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
+    Node* RACINE_ARBRE = malloc(sizeof(Node));
+    *RACINE_ARBRE = creation_arbre(Racine,X_ARBRE,NULL);
+    Node* LOGARITHME_ARBRE = malloc(sizeof(Node));
+    *LOGARITHME_ARBRE = creation_arbre(Logarithme,X_ARBRE,NULL);
+    Node* TANGENTE_ARBRE = malloc(sizeof(Node));
+    *TANGENTE_ARBRE = creation_arbre(Tangente,X_ARBRE,NULL);
+    Node* arbres[] = {TANGENTE_ARBRE, RACINE_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
+    const char* interval[][2] = {{"1", "4"}, {"5", "10"}, {"1", "3"}, {"1", "3.5"}, {"1e1", "2e2"}};
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);

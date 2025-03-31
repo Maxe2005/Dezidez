@@ -119,6 +119,10 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     }
 }
 
+
+
+
+
 void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
     if (fonction.borne_sup > graph->axe_x->min && fonction.borne_inf < graph->axe_x->max){
         SDL_SetRenderDrawColor(ren, fonction.color.r, fonction.color.g, fonction.color.b, fonction.color.a);
@@ -132,6 +136,12 @@ void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
         for (int i = 0; i < nb_pts; i++) {
             x = borne_inf + i * step_size;
             fx = evaluateur(fonction.fonction_arbre, x, 0, &code_erreur);
+            if (code_erreur){
+                ErrorInfo info_erreur = get_error_message(code_erreur);
+                SDL_Rect rectangle = {3*FEN_X/8,3*FEN_Y/8,FEN_X/8,FEN_Y/16};
+                set_message(info_erreur.message,rectangle);
+                return;
+            }
             if (fx >= graph->axe_y->min && fx <= graph->axe_y->max){
                 y_sur_graph = graph->origine_y + (graph->axe_y->max - fx) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
                 if (y_sur_graph > graph->origine_y_apres_bande_haut){
@@ -363,7 +373,7 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
     resize_navigation(graph);
     resize_precision_grad(graph);
 }
-
+    
 void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute){
     graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
@@ -373,7 +383,7 @@ void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute){
 }
 
 void init_const_message(){
-    message.temps_affichage = 5;
+    message.temps_affichage = 3;
     message.button_base.is_survolable = 0;
     message.button_base.color_base = (SDL_Color) {255,0,0,255};
     message.button_base.radius = 15;
@@ -400,7 +410,7 @@ int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
     Graph* graph = gr_ele->graph;
     Bande_haute* bande_haute = gr_ele->bande_haute;
 
-    resize_fen_2D(bande_haute, graph);
+    //resize_fen_2D(bande_haute, graph);
     SDL_StartTextInput();
     bool is_event_backspace_used = false;
     int x_souris_px, y_souris_px;

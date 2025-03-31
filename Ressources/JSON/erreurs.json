@@ -1,7 +1,16 @@
 {
     "fr": {
         "1": { "message": "Fichier introuvable.", "severity": "high" },
-        "2": { "message": "Mémoire insuffisante.", "severity": "medium" }
+        "2": { "message": "Mémoire insuffisante.", "severity": "medium" },
+        "301": { "message": "Racine négative", "severity": "low" },
+        "302": { "message": "Logarithme négatif", "severity": "low"},
+        "303": { "message": "Logarithme nul", "severity": "low"},
+        "304": { "message": "Tangente nulle", "severity": "low"},
+        "305": { "message": "Sinus Cardinal nul", "severity": "low"},
+        "311": { "message": "Division par Zéro", "severity": "low"},
+        "312": { "message": "Zéro puissance Zéro", "severity": "low"},
+        "313": { "message": "Zéro puissance négative", "severity": "low"}
+
     },
     "en": {
         "1": { "message": "File not found.", "severity": "high" },
