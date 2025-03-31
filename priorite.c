@@ -51,17 +51,17 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     .jeton = tab[indoputile]
                 }; 
                 if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
-                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 break;
             case PAR_OUV:
                 if (tab[fin].lexem != PAR_FERM){
-                    *erreur = PARENTHESE_PAS_FERMEE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
-                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 else{
