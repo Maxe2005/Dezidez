@@ -1,43 +1,8 @@
 # include "evaluateur.h"
 
 
-
-float evaluateur(Node *racine,float valeur_x, float valeur_y, int *code_erreur){
-    remplacer_variable(racine,valeur_x,valeur_y, code_erreur);
-    return decodage_arbre(racine, code_erreur);
-}
-
-void remplacer_variable(Node *racine,float valeur_x, float valeur_y ,int *code_erreur){
-    if(racine->jeton.lexem==VARIABLE){
-        switch (racine->jeton.valeur.variable)
-        {
-        case 'x':
-            racine->jeton.lexem=REEL;
-            racine->jeton.valeur.reel=valeur_x;
-            break;
-        
-        case 'y':
-            racine->jeton.lexem=REEL;
-            racine->jeton.valeur.reel=valeur_y;
-            break;
-        
-        default:
-
-            break;
-        }   
-    } 
-
-    if(racine->pjeton_preced!=NULL){
-        remplacer_variable(racine->pjeton_preced, valeur_x,valeur_y, code_erreur);
-    }
-
-    if(racine->pjeton_suiv!=NULL){
-        remplacer_variable(racine->pjeton_suiv,valeur_x,valeur_y, code_erreur);   
-    }
-}
-
 /* décodage des arbre */
-float decodage_arbre(Node *racine, int *code_erreur){
+float evaluateur(Node *racine,float valeur_x, float valeur_y ,int *code_erreur){
     
     if (*code_erreur == 0){ //vérification si il y a une erreur
         switch (racine->jeton.lexem)
@@ -45,19 +10,31 @@ float decodage_arbre(Node *racine, int *code_erreur){
         case REEL: //décodage réels
             return racine->jeton.valeur.reel;
             break;
+        case VARIABLE:
+            if (racine->jeton.valeur.variable=='x'){
+                return valeur_x;
+        
+
+            }
+            if (racine->jeton.valeur.variable=='y'){
+                return valeur_y;
+        
+
+            }
+            break;
         case OPERATEUR: //décodage opérateur
             if (racine->jeton.valeur.operateur==PLUS){ // appel récursif pour calculer la somme
-                return decodage_arbre(racine->pjeton_preced, code_erreur)+decodage_arbre(racine->pjeton_suiv, code_erreur);
+                return evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur)+evaluateur(racine->pjeton_suiv, valeur_x,  valeur_y,  code_erreur);
                 
             }
             if (racine->jeton.valeur.operateur==MOINS){ // appel récursif pour calculer la soustraction
-                return decodage_arbre(racine->pjeton_preced, code_erreur)-decodage_arbre(racine->pjeton_suiv,code_erreur);
+                return evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur)-evaluateur(racine->pjeton_suiv, valeur_x,  valeur_y,  code_erreur);
                 
             }
             if (racine->jeton.valeur.operateur==DIV){ // appel récursif pour calculer la division
                 
-                float nominateur=decodage_arbre(racine->pjeton_preced,code_erreur); 
-                float denominateur=decodage_arbre(racine->pjeton_suiv,code_erreur);
+                float nominateur=evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur); 
+                float denominateur=evaluateur(racine->pjeton_suiv, valeur_x,  valeur_y,  code_erreur);
                 
                 if(denominateur == 0){ 
                     *code_erreur=DIVISION_PAR_ZERO; //Potentielle erreur 311 
@@ -70,12 +47,12 @@ float decodage_arbre(Node *racine, int *code_erreur){
                 
             }
             if (racine->jeton.valeur.operateur==FOIS){ // appel récursif pour calculer la multiplication
-                return decodage_arbre(racine->pjeton_preced,code_erreur)*decodage_arbre(racine->pjeton_suiv,code_erreur);
+                return evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur)*evaluateur(racine->pjeton_suiv, valeur_x,  valeur_y,  code_erreur);
                 
             }
             if (racine->jeton.valeur.operateur==PUIS){ // appel récursif pour calculer la multiplication
-                float valeur=decodage_arbre(racine->pjeton_preced,code_erreur);
-                float exposant=decodage_arbre(racine->pjeton_suiv,code_erreur);
+                float valeur=evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur);
+                float exposant=evaluateur(racine->pjeton_suiv, valeur_x,  valeur_y,  code_erreur);
                 
                 if (valeur == 0 && exposant == 0){ //Potentielle erreur 312
                     *code_erreur=ERREUR_ZERO_PUIS_ZERO;
@@ -92,7 +69,7 @@ float decodage_arbre(Node *racine, int *code_erreur){
 
             break;
         case FONCTION: //décodage fonction
-            return calculer_fonction(racine->jeton.valeur.fonction,decodage_arbre(racine->pjeton_preced,code_erreur),code_erreur);
+            return calculer_fonction(racine->jeton.valeur.fonction,evaluateur(racine->pjeton_preced, valeur_x,  valeur_y,  code_erreur),code_erreur);
             break;
         
         
@@ -185,4 +162,3 @@ float calculer_fonction(typefonction fonction, float variable,int *code_erreur){
         break;
     }
 }
-

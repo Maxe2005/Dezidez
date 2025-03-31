@@ -79,7 +79,7 @@ six.valeur.reel = 6.0;
 
 typejeton zero1;
 zero1.lexem = REEL;
-zero1.valeur.reel = 0.0;
+zero1.valeur.reel = 1.0;
 
 // Opérateurs
 typejeton plus1;
@@ -270,7 +270,7 @@ Node SQRT1_ARBRE = creation_arbre(sqrt1, &PLUS4_ARBRE, NULL);
 
 
 printf("%s","\n");
-printf("%f",evaluateur(&PUISSANCE2_ARBRE ,0,0,&ERREUR_CODE));
+printf("%f",evaluateur(&COSINUS_ARBRE ,2,4,&ERREUR_CODE));
 printf("%s","\n");
 printf("%d", ERREUR_CODE);
 }
