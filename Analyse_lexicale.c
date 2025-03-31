@@ -188,22 +188,33 @@ typejeton TokenOperateur (char *Element){
 }
 
 
-typejeton TokenVariable (char *Element, int *erreur){
-    char *var[] = {"x","y"};
+typejeton TokenVariable (char *Element, int *erreur, int dimension){
+    char *var2[] = {"x","y"};
+    char *var1[] = {"x"};
     typejeton fonct;
-    if (IsInTab2(var,2,Element)){
-        fonct.lexem = VARIABLE;
-        if (ComparaisonString(Element,"y")){
-            fonct.valeur.variable = 'y';
+    if (dimension){
+        if (IsInTab2(var2,2,Element)){
+            fonct.lexem = VARIABLE;
+            if (ComparaisonString(Element,"y")){
+                fonct.valeur.variable = 'y';
+            }
+            else if (ComparaisonString(Element,"x")){
+                fonct.valeur.variable = 'x';
+            }
+        }  
+        else{
+            *erreur = VARIABLE_INCONNUE; 
         }
-        else if (ComparaisonString(Element,"x")){
+    }else {
+        if (IsInTab2(var1,2,Element)){
+            fonct.lexem = VARIABLE;
             fonct.valeur.variable = 'x';
+        } 
+        else{
+            *erreur = VARIABLE_INCONNUE; 
         }
-        
-    }  
-    else{
-        *erreur = VARIABLE_INCONNUE; 
     }
+    
     return fonct;     
 }
 
@@ -242,7 +253,7 @@ typejeton TokenReelNegatif (char *Element){
 
 
 
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur) {
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int dimension) {
     char buffer[TailleMax];
     char bufferneg[TailleMax];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
@@ -349,7 +360,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
                 indiceinjection++;
                 i = i + longueurident -1 ; 
             } else { //cas d'une variable
-                TabToken[indiceinjection]=TokenVariable(residentificateur, erreur);
+                TabToken[indiceinjection]=TokenVariable(residentificateur, erreur,dimension);
                 indiceinjection++;
                 i = i + longueurident -1; 
             }
@@ -364,12 +375,12 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
     TabToken[indiceinjection].lexem = FIN;
 }
 
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur){
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension){
     int tailleExpression = strlen(Expression);
     char buffert[TailleMax];
     ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
     MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
     tailleExpression = strlen(Expression);
-    CutStr(Expression,tailleExpression,TabToken,erreur);//transforme l'expression en un tableau de Token 
+    CutStr(Expression,tailleExpression,TabToken,erreur,Dimension);//transforme l'expression en un tableau de Token 
 }
 

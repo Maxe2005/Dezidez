@@ -65,11 +65,12 @@ typejeton TokenOperateur (char *Element);
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas de variable
  * @param Element : chaine de caractère 
  */
-typejeton TokenVariable (char *Element, int* erreur);
+typejeton TokenVariable (char *Element, int* erreur,int  Dimension);
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel POSITIF'
  * @param Element : chaine de caractère 
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
+ * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */
 typejeton TokenReelPositif (char *Element , int* erreur);
 
@@ -79,8 +80,9 @@ typejeton TokenReelPositif (char *Element , int* erreur);
  * @param SizeExpression : la taille de l'expression 
  * @param Strdecoupee : tableau de sortie qui sera rempli de Token 
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
+ * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */ 
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur);
+void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int  Dimension);
 
 /**
  * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
@@ -99,7 +101,8 @@ int PlusieursVirgules (char *nombre);
  * @param TabToken : Tableau de typejeton qui sera le tableau de sorti
  * @param Expression : chaine de caractère qui est une expression mathématique (supporte les espace et des multiplication implicite entre réel et variable)
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
+ * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax], int* erreur);
+void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension);
 
 //*erreur = 101;
