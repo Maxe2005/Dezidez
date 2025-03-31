@@ -50,7 +50,7 @@ void test_erreur_operateurs_a_la_suite1() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur opérateurs à la suite 1 : %s\n", erreur == OPERATEURS_A_LA_SUITE ? "OK" : "ÉCHEC");
+    printf("Test erreur operateurs a la suite 1 : %s : erreur %d\n", erreur == MEMBRE_VIDE ? "OK" : "ECHEC", erreur);
 }
 
 void test_erreur_operateurs_a_la_suite2() {
@@ -64,7 +64,7 @@ void test_erreur_operateurs_a_la_suite2() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur opérateurs à la suite 2 : %s\n", erreur == OPERATEURS_A_LA_SUITE ? "OK" : "ÉCHEC");
+    printf("Test erreur opérateurs à la suite 2 : %s\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC");
 }
 
 void test_erreur_manque_operateur() {
@@ -76,7 +76,20 @@ void test_erreur_manque_operateur() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur manque opérateur : %s\n", erreur == MANQUE_OPERATEUR ? "OK" : "ÉCHEC");
+    printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur );
+}
+
+void test_erreur_manque_parenthese() {
+    // (5 +
+    typejeton tab[] = {
+        {PAR_OUV, {0}},
+        {REEL, {.reel = 5.0}},
+        {OPERATEUR, {.operateur = PLUS}},
+        {FIN, {0}}
+    };
+    typeerreur erreur = 0;
+    Syntaxique(tab, &erreur);
+    printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == PROBLEMES_NOMBRE_PARENTHESES ? "OK" : "ÉCHEC", erreur );
 }
 
 // Fonction principale qui exécute tous les tests
@@ -87,4 +100,5 @@ void tester_syntaxe() {
     test_erreur_operateurs_a_la_suite1();
     test_erreur_operateurs_a_la_suite2();
     test_erreur_manque_operateur();
+    test_erreur_manque_parenthese();
 }

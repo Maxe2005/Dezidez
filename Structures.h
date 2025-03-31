@@ -50,7 +50,7 @@ typedef enum {
     PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
     
     // ERREUR OPERATEUR 21X
-    OPERATEURS_A_LA_SUITE = 211, // ++,**,/*
+    MEMBRE_VIDE = 211, // ++,**,/*
     MANQUE_OPERATEUR = 212, // 3+
 
     // ERREUR PARENTHESES 22X
