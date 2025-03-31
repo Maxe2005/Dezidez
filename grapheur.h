@@ -11,7 +11,7 @@
 #define TAILLE_GRADUATION_MIN 40
 #define TAILLE_GRADUATION_MAX 100
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
-#define NB_EVALUATEUR_MAX 10
+#define NB_EVALUATEUR_MAX 100
 
 extern Message message;
 
