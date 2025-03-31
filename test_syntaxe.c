@@ -1,3 +1,5 @@
+#include "test_syntaxe.h"
+
 // Fonctions de test
 void test_valide1() {
     typejeton tab[] = {

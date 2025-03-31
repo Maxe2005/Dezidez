@@ -1,7 +1,7 @@
 #ifndef TEST_SYNTAXE_H
 #define TEST_SYNTAXE_H
 
-#include "structure.h"
+#include "Structures.h"
 
 // Prototype de la fonction à tester
 void syntaxe(typejeton *tabjetons, typeerreur *erreur);
