@@ -410,39 +410,43 @@ void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x
     Evaluateur affichage_evaluateur;
     int valeur_pixel_x = x_souris_px;
     float valeur_en_x = ((valeur_pixel_x - graph->centre_x) * graph->axe_x->echelle_grad / graph->axe_x->taille_grad);//+ graph->axe_x->min;
-    float valeur_en_y = bande_haute->expressions[0]->fonction.f(valeur_en_x);
-    int valeur_pixel_y = graph->centre_y - (valeur_en_y * graph->axe_y->taille_grad / graph->axe_y->echelle_grad);
-    affichage_evaluateur.x_px = valeur_pixel_x;
-    affichage_evaluateur.y_px = valeur_pixel_y;
-    char* formatted_string = malloc(50 * sizeof(char));
-    sprintf(formatted_string, "f(%.2f) = %.2f  ", valeur_en_x, valeur_en_y);
-    affichage_evaluateur.bouton_evaluateur.label = formatted_string;
-    affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
-    int width, height;
-    TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
-    affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x, valeur_pixel_y, width + 20, height + 15};
-    affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
-    affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){150, 150, 150, 255};
-    affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
-    affichage_evaluateur.bouton_evaluateur.radius = affichage_evaluateur.bouton_evaluateur.rect.h / 4;
-    affichage_evaluateur.bouton_evaluateur.hovered = 0;
+    
+    if (valeur_en_x >= bande_haute->expressions[0]->fonction.borne_inf && valeur_en_x <= bande_haute->expressions[0]->fonction.borne_sup) {
+        int code_erreur = 0;
+        float valeur_en_y = evaluateur(bande_haute->expressions[0]->fonction.fonction_arbre, valeur_en_x, 0, &code_erreur);
+        int valeur_pixel_y = graph->centre_y - (valeur_en_y * graph->axe_y->taille_grad / graph->axe_y->echelle_grad);
+        affichage_evaluateur.x_px = valeur_pixel_x;
+        affichage_evaluateur.y_px = valeur_pixel_y;
+        char* formatted_string = malloc(50 * sizeof(char));
+        sprintf(formatted_string, "f(%.2f) = %.2f  ", valeur_en_x, valeur_en_y);
+        affichage_evaluateur.bouton_evaluateur.label = formatted_string;
+        affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
+        int width, height;
+        TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
+        affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x, valeur_pixel_y, width + 20, height + 15};
+        affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
+        affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){150, 150, 150, 255};
+        affichage_evaluateur.bouton_evaluateur.is_survolable = 0;
+        affichage_evaluateur.bouton_evaluateur.radius = affichage_evaluateur.bouton_evaluateur.rect.h / 4;
+        affichage_evaluateur.bouton_evaluateur.hovered = 0;
 
-    affichage_evaluateur.boutton_quitter.image = load_image(ren, "Icons/croix.png");
-    affichage_evaluateur.boutton_quitter.rect.h = affichage_evaluateur.bouton_evaluateur.rect.h/2;
-    affichage_evaluateur.boutton_quitter.rect.w = affichage_evaluateur.boutton_quitter.rect.h;
-    affichage_evaluateur.boutton_quitter.rect.x = affichage_evaluateur.bouton_evaluateur.rect.x + affichage_evaluateur.bouton_evaluateur.rect.w - affichage_evaluateur.boutton_quitter.rect.w;
-    affichage_evaluateur.boutton_quitter.rect.y = affichage_evaluateur.bouton_evaluateur.rect.y;
-    affichage_evaluateur.boutton_quitter.is_survolable = 1;
-    affichage_evaluateur.boutton_quitter.color_base = affichage_evaluateur.bouton_evaluateur.color_base;
-    affichage_evaluateur.boutton_quitter.color_hover = (SDL_Color){255, 0, 0, 255};
-    affichage_evaluateur.boutton_quitter.hovered = 0;
-    affichage_evaluateur.boutton_quitter.radius = affichage_evaluateur.boutton_quitter.rect.w / 3;
-    affichage_evaluateur.boutton_quitter.pourcentage_place = 50;
-    affichage_evaluateur.boutton_quitter.taille_bonus_hover_x = 0;
-    affichage_evaluateur.boutton_quitter.taille_bonus_hover_y = 0;
+        affichage_evaluateur.boutton_quitter.image = load_image(ren, "Icons/croix.png");
+        affichage_evaluateur.boutton_quitter.rect.h = affichage_evaluateur.bouton_evaluateur.rect.h/2;
+        affichage_evaluateur.boutton_quitter.rect.w = affichage_evaluateur.boutton_quitter.rect.h;
+        affichage_evaluateur.boutton_quitter.rect.x = affichage_evaluateur.bouton_evaluateur.rect.x + affichage_evaluateur.bouton_evaluateur.rect.w - affichage_evaluateur.boutton_quitter.rect.w;
+        affichage_evaluateur.boutton_quitter.rect.y = affichage_evaluateur.bouton_evaluateur.rect.y;
+        affichage_evaluateur.boutton_quitter.is_survolable = 1;
+        affichage_evaluateur.boutton_quitter.color_base = affichage_evaluateur.bouton_evaluateur.color_base;
+        affichage_evaluateur.boutton_quitter.color_hover = (SDL_Color){255, 0, 0, 255};
+        affichage_evaluateur.boutton_quitter.hovered = 0;
+        affichage_evaluateur.boutton_quitter.radius = affichage_evaluateur.boutton_quitter.rect.w / 3;
+        affichage_evaluateur.boutton_quitter.pourcentage_place = 50;
+        affichage_evaluateur.boutton_quitter.taille_bonus_hover_x = 0;
+        affichage_evaluateur.boutton_quitter.taille_bonus_hover_y = 0;
 
-    graph-> liste_evaluateurs[graph-> nombre_evaluateur] = affichage_evaluateur;
-    graph-> nombre_evaluateur = graph-> nombre_evaluateur + 1;
+        graph-> liste_evaluateurs[graph-> nombre_evaluateur] = affichage_evaluateur;
+        graph-> nombre_evaluateur = graph-> nombre_evaluateur + 1;
+    }
 }
 
 void suppr_evaluateur_x (Graph* graph, int index){

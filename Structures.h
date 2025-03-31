@@ -1,3 +1,6 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
 //énumération des différents types de lexems existants
 typedef enum
 {
@@ -62,5 +65,6 @@ DIVISION_PAR_ZERO=311, // 0/0
 ERREUR_ZERO_PUIS_ZERO=312, // 0^0
 ERREUR_ZERRO_PUIS_NEGATIVE=313, //0^(-x) 
 
-
 } typeerreur;
+
+#endif
