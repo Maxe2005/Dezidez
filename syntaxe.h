@@ -1,5 +1,5 @@
-#ifndef LEXICALE_H
-#define LEXICALE_H
+#ifndef SYNTAXE_H
+#define SYNTAXE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,7 +8,6 @@
 #include <float.h>
 #include "Structures.h"
 
-Node syntaxe( typejeton *tabjetons, int taille, int debut, int fin);
 
 
 #endif

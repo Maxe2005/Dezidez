@@ -9,14 +9,18 @@ Node arbrevide(){
     return arbre;
 }
 
-Node operateur( typejeton *tab, int debut, int fin){
-    int  indoputile = minIndice(tab, debut, fin); 
+Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
+    int  indoputile = minIndice(tab, debut, fin, erreur); 
+    if (parenthese(fin, tab)!= true){
+        *erreur = PROBLEMES_NOMBRE_PARENTHESES;
+        return arbrevide(); 
+    }
     if (debut==fin){
         return arbrevide();
     }
     if (indoputile != -1){
-        Node Fg= operateur(tab, debut, indoputile -1);
-        Node Fd = operateur(tab,indoputile + 1, fin);
+        Node Fg= operateur(tab, debut, indoputile -1, erreur);
+        Node Fd = operateur(tab,indoputile + 1, fin, erreur);
         Node arbre = (Node){
             .pjeton_preced = &Fg,
             .pjeton_suiv = &Fd,
@@ -27,22 +31,30 @@ Node operateur( typejeton *tab, int debut, int fin){
         switch (tab[debut].lexem){
             case FONCTION:
                 if (tab[debut + 1].lexem != PAR_OUV){
-                        //ERREUR
-                        return;
+                        *erreur = PROBLEME_PARENTHESES_FONCTIONS;
+                        return arbrevide();
                 }    
-                Node Fg = operateur(tab, debut + 2, fin - 1);
+                Node Fg = operateur(tab, debut + 2, fin - 1, erreur);
                 Node arbre = (Node){
                     .pjeton_preced = &Fg,
                     .jeton = tab[indoputile]
                 }; 
+                if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
+                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    return arbrevide();
+                }
                 break;
             case PAR_OUV:
                 if (tab[fin].lexem != PAR_FERM){
-                    //ERREUR
-                    return;
+                    *erreur = PARENTHESE_PAS_FERMEE;
+                    return arbrevide();
+                }
+                if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
+                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    return arbrevide();
                 }
                 else{
-                    Fg = operateur(tab, debut + 1, fin - 1);
+                    Fg = operateur(tab, debut + 1, fin - 1, erreur);
                     Node arbre = (Node){
                         .pjeton_preced = &Fg,
                         .jeton = tab[indoputile]
@@ -50,24 +62,25 @@ Node operateur( typejeton *tab, int debut, int fin){
                 }
                 break;
             case PAR_FERM:
-                //ERREUR
-                return;
+                *erreur = PARENTHESE_FERMEE_1_ER_JETON;
+                return arbrevide(); 
             case REEL:
-            if (tab[debut+1].lexem != FIN){
+                if (tab[debut+1].lexem != FIN){
                 Fg = arbrevide();
                 Node arbre = (Node){
                     .pjeton_preced = &Fg,
                     .jeton = tab[indoputile]
-                };
-            }
-            else{
-                //ERREUR
-            }
+                    };
+                }
+                else{
+                *erreur = REELS_DAFFILE;
+                return arbrevide();
+                }
         } 
     }
 }
 
-int minIndice(typejeton *tab,  int debut, int fin){
+int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur){
     int prof = 0;
     int operateurutile = 0;
     int profoperutile =0;
@@ -101,15 +114,21 @@ int minIndice(typejeton *tab,  int debut, int fin){
         continuer = false;
     }
     if (prof!= 0){
-        //ERREUR #TODO
-        return;
+        *erreur = PROBLEMES_NOMBRE_PARENTHESES;
+        return indoputile;
     }
     return (indoputile);
 }
 
 
-
-
+int calculTaille(typejeton *tab){
+    for (int i = 0; i<TAILLE_MAX; i++){
+        if (tab[i].lexem == FIN){
+            return i;
+        }
+    }
+    return -1;
+}
 
 bool parenthese(int tailletab, typejeton *tab){
     int nbouv = 0;
@@ -125,5 +144,8 @@ bool parenthese(int tailletab, typejeton *tab){
     return nbouv == nbfer;
 }
 
-
-
+Node Syntaxique(typejeton *tab, typeerreur *erreur){
+    int fin = calculTaille(tab);
+    Node arbrePlein = operateur( tab, 0, fin, erreur);
+    return arbrePlein;
+}

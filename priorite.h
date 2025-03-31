@@ -1,5 +1,5 @@
-#ifndef LEXICALE_H
-#define LEXICALE_H
+#ifndef PRIORITE_H
+#define PRIORITE_H
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -8,9 +8,13 @@
 #include <float.h>
 #include "Structures.h"
 
-Node operateur(typejeton *tab, int debut, int fin);
+#define TAILLE_MAX 100
+
+Node arbrevide();
+Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur);
 bool parenthese(int tailletab, typejeton *tab);
-
-
+int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur);
+int calculTaille(typejeton *tab);
+Node Syntaxique(typejeton *tab, typeerreur *erreur);
 
 #endif

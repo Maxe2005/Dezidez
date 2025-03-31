@@ -6,8 +6,11 @@
 #include <ctype.h>
 #include "syntaxe.h"
 #include "priorite.h"
+#include "test_syntaxe.h"
+#include "Structures.h"
 
 int main(int argc, char *argv[]){
-    printf("Coucou on est dans la branche syntaxique ! :) \n");
+    tester_syntaxe();
+    printf("fin");
     return 0;
 }

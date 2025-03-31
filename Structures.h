@@ -1,3 +1,6 @@
+#ifndef STRUCTURES_H
+#define STRUCTURES_H
+
 //énumération des différents types de lexems existants
 typedef enum
 {
@@ -44,20 +47,20 @@ typedef Node *Arbre;
 
 typedef enum {
     //ERREUR FONCTION 20X
-    PROBLEME_PARENTHESES_FONCTIONS, // cos(.... , cos.....
+    PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
     
     // ERREUR OPERATEUR 21X
-    OPERATEURS_A_LA_SUITE, // ++,**,/*
-    MANQUE_OPERATEUR, // 3+
+    OPERATEURS_A_LA_SUITE = 211, // ++,**,/*
+    MANQUE_OPERATEUR = 212, // 3+
 
     // ERREUR PARENTHESES 22X
-    PARENTHESE_FERMEE_1_ER_JETON = 221 ,// )......
-    PARENTHESE_VIDE = 222, // ()
-    PROBLEMES_NOMBRE_PARENTHESES, // ((.....), ((()))))))))))
+    PARENTHESE_FERMEE_1_ER_JETON = 221 ,// ......
+    PROBLEME_INTERIEUR_PARENTHESE = 222, // ()
+    PROBLEMES_NOMBRE_PARENTHESES = 223, // ((.....), ((()))))))))))
+    PARENTHESE_PAS_FERMEE = 224, // (......., .......)
 
     // ERREUR REEL 23X
-    REELS_DAFFILE = 231 // 2,3,4
-
-    
-    
+    REELS_DAFFILE = 231, // 2,3,4
     } typeerreur;
+
+#endif 
