@@ -337,6 +337,9 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
+        typejeton TabToken;
+        int erreur = 0;
+        Analyse_Lexicale(&TabToken, expression->expression->text, &erreur);
         expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }

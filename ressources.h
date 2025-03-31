@@ -11,6 +11,7 @@
 #include "gestionGraphique.h"
 #include "cJSON/cJSON.h"
 #include "evaluateur.h"
+#include "Analyse_lexicale.h"
 
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
