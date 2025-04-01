@@ -10,16 +10,25 @@ Node arbrevide(){
 }
 
 Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
-    int  indoputile = minIndice(tab, debut, fin, erreur); 
-    if (parenthese(debut, fin, tab)!= true){
-        *erreur = PROBLEMES_NOMBRE_PARENTHESES;
-        return arbrevide(); 
+    printf("debut =%d fin %d\n", debut,fin);
+    affiche_liste_jeton(tab, debut, fin);
+    int  indoputile = minIndice(tab, debut, fin, erreur);
+    printf("voir indoputile %d \n", indoputile);
+    if (*erreur != 0){
+        printf("erreur != 0 = %d\n", *erreur);
+        return arbrevide();
     }
-    if (debut>=fin){
-        //*erreur = ABSENCE_FIN; #TODO
+    // if (parenthese(debut, fin, tab)!= true){
+    //     *erreur = PROBLEMES_NOMBRE_PARENTHESES;
+    //     return arbrevide(); 
+    // }
+    if (debut>fin){
+        printf("debut>fin\n");
+        *erreur = MEMBRE_VIDE;
         return arbrevide();
     }
     if (indoputile != -1){
+        printf("indoputile != -1\n");
         Node Fg= operateur(tab, debut, indoputile -1, erreur);
         Node Fd = operateur(tab,indoputile + 1, fin, erreur);
         Node arbre = (Node){
@@ -27,6 +36,7 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
             .pjeton_suiv = &Fd,
             .jeton = tab[indoputile]
         };
+        return arbre;
     }
     else{
         switch (tab[debut].lexem){
@@ -41,17 +51,17 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     .jeton = tab[indoputile]
                 }; 
                 if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
-                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 break;
             case PAR_OUV:
                 if (tab[fin].lexem != PAR_FERM){
-                    *erreur = PARENTHESE_PAS_FERMEE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 if (tab[debut + 2].lexem !=(FONCTION||REEL||VARIABLE)){
-                    *erreur = PROBLEME_INTERIEUR_PARENTHESE;
+                    *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
                 else{
@@ -66,7 +76,7 @@ Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 *erreur = PARENTHESE_FERMEE_1_ER_JETON;
                 return arbrevide(); 
             case REEL:
-                if (fin - debut == 1){
+                if (fin - debut == 0){
                     // Node Fg = arbrevide();
                     Node arbre = (Node){
                         .pjeton_preced = NULL,
@@ -88,36 +98,37 @@ int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur){
     int profoperutile =0;
     int indoputile = -1;
     bool continuer = true;
-    for (int i = 0; i< fin; i++){
+    for (int i = debut; i< fin+1; i++){
         switch (tab[i].lexem){
-        case OPERATEUR:
-            if (prof == 0){
-                if (operateurutile < tab[i].lexem){
-                    profoperutile = prof;
-                    operateurutile = tab[i].lexem;
-                    indoputile = i;
+            case OPERATEUR:
+                if (prof == 0){
+                    if (operateurutile < tab[i].lexem){
+                        profoperutile = prof;
+                        operateurutile = tab[i].lexem;
+                        indoputile = i;
+                    }
                 }
+                break;
+                
+            case PAR_OUV:
+                prof = prof + 1;
+                break;
+
+            case PAR_FERM:
+                prof = prof - 1;
+                break;   
+
+            default:
+                break;
             }
-            break;
-            
-        case PAR_OUV:
-            prof = prof + 1;
-            break;
-
-        case PAR_FERM:
-            prof = prof - 1;
-            break;   
-
-        default:
-            break;
         }
-    }
     if (&tab[0]){
         continuer = false;
     }
     if (prof!= 0){
         *erreur = PROBLEMES_NOMBRE_PARENTHESES;
-        return indoputile;
+        printf("test mindice. prof=%d\n", prof);
+        return -1;
     }
     return (indoputile);
 }
@@ -155,10 +166,16 @@ Node Syntaxique(typejeton *tab, typeerreur *erreur){
     return arbrePlein;
 }
 
-void afficher_arbre(Node *arbre) {
-    if (arbre == NULL) {
-        return;
+void affiche_liste_jeton(typejeton *tab, int debut, int fin){
+    for(int i=debut;i<fin+1;i++){
+        printf(", %d", tab[i].lexem);
     }
+    printf("\n");
+}
+void afficher_arbre(Node *arbre) {
+    // if (arbre == NULL) {
+    //     return;
+    // }
 
     // Afficher le jeton courant
     printf("Lexem : %s\n", lexem_string[arbre->jeton.lexem]);
@@ -179,6 +196,6 @@ void afficher_arbre(Node *arbre) {
     }
 
     // Afficher les sous-arbres récursivement
-    afficher_arbre(arbre->pjeton_preced);
-    afficher_arbre(arbre->pjeton_suiv);
+    if(arbre->pjeton_preced != NULL) afficher_arbre(arbre->pjeton_preced);
+    if(arbre->pjeton_suiv != NULL) afficher_arbre(arbre->pjeton_suiv);
 }

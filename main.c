@@ -11,6 +11,8 @@
 
 int main(int argc, char *argv[]){
     tester_syntaxe();
-    printf("fin");
+    printf("fin\n");
     return 0;
 }
+
+// PENSER A ALLOC + FREE 

@@ -25,8 +25,8 @@ typedef union
     float reel;
     typefonction fonction;
     typeoperateur operateur;
-    //typeerreur erreur;
     char variable;
+    //typeerreur erreur;
 } typevaleur;
 
 //énumération des diff types de jetons existants
@@ -51,14 +51,12 @@ typedef enum {
     PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
     
     // ERREUR OPERATEUR 21X
-    OPERATEURS_A_LA_SUITE = 211, // ++,**,/*
-    MANQUE_OPERATEUR = 212, // 3+
+    MEMBRE_VIDE = 211, // ++,**,/*
+    //MANQUE_OPERATEUR = 212, // 3+
 
     // ERREUR PARENTHESES 22X
     PARENTHESE_FERMEE_1_ER_JETON = 221 ,// ......
-    PROBLEME_INTERIEUR_PARENTHESE = 222, // ()
     PROBLEMES_NOMBRE_PARENTHESES = 223, // ((.....), ((()))))))))))
-    PARENTHESE_PAS_FERMEE = 224, // (......., .......)
 
     // ERREUR REEL 23X
     PROBLEME_APRES_REEL = 231, // 2,3,4
