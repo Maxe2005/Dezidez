@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define TailleMax 100
+#define TailleMax 20
 
 /**
  * Retire tout les espaces de l'expression

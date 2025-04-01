@@ -2,6 +2,7 @@
 #define GESTIONGRAPHIQUE_H_
 
 #include <stdio.h>
+#include <string.h>
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_ttf.h>
@@ -14,9 +15,10 @@
 // Paramètres pour l'affichage du Markdown (MD)
 #define MARGE_MD 150
 #define FONT_TEXT_SIZE_MD 20
-#define FONT_TITRE_1_SIZE_MD 34
-#define FONT_TITRE_2_SIZE_MD 28
-#define NB_FONTS_MD 3
+#define FONT_TITRE_1_SIZE_MD 50
+#define FONT_TITRE_2_SIZE_MD 34
+#define FONT_TITRE_3_SIZE_MD 28
+#define NB_FONTS_MD 4
 
 extern int FEN_X;
 extern int FEN_Y;

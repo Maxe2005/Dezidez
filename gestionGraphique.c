@@ -435,7 +435,7 @@ void render_markdown(SDL_Renderer *renderer, MarkdownText* md_txt, int scroll_of
         if (current_line->y_position - scroll_offset > FEN_Y) break;
         SDL_Rect rect = {marge, current_line->y_position - scroll_offset, FEN_X - 2*marge, FEN_Y};
         TextAlignX align_x = current_line->is_list ? ALIGN_LEFT : ALIGN_CENTER_X;
-        render_text_wrapped(renderer, current_line->wrapped_text, rect, white, align_x, ALIGN_TOP);
+        render_text_wrapped(renderer, current_line->wrapped_text, rect, white, ALIGN_LEFT, ALIGN_TOP);
         current_line = current_line->ligne_suivante;
     }
 }

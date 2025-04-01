@@ -1,22 +1,6 @@
-#include "entrees_expressions.h"
+#include "bande_haute.h"
 
 Message message;
-
-float f (float x) {
-    return sin(x);
-}
-float g (float x) {
-    return cos(x);
-}
-float h (float x) {
-    return exp(x);
-}
-float k (float x) {
-    return x;
-}
-float l (float x) {
-    return 2 - x;
-}
 
 void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
@@ -138,6 +122,7 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
         but[j]->champs_texte->radius = but[j]->position_initiale.h / 3;
         but[j]->cursorVisible = 0;
         strcpy(but[j]->text, "");
+        strcpy(but[j]->text_backup, "");
         but[j]->position_cursor = 0;//strlen(but[j]->text);
         but[j]->lastCursorToggle = SDL_GetTicks();
         expression->champs_entrees[j] = but[j];
@@ -303,13 +288,16 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
         char *end;
         float test = strtof(expression->borne_inf->text, &end);
         if (*end != '\0') {
+            strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
             set_message("PROBLEME DE CONVERSION", expression->borne_inf->champs_texte->rect);
         
         } else if(test > expression->fonction.borne_sup){
+            strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
             set_message("BORNE INF SUPERIEUR A BORNE SUP", expression->borne_inf->champs_texte->rect);
         }
         else {
+            strcpy(expression->borne_inf->text_backup, expression->borne_inf->text);
             expression->fonction.borne_inf = test;
         }
         expression->borne_inf->position_cursor = strlen(expression->borne_inf->text);
@@ -321,13 +309,16 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
         char *end;
         float test = strtof(expression->borne_sup->text, &end);
         if (*end != '\0') {
+            strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
             printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
             set_message("PROBLEME DE CONVERSION", expression->borne_sup->champs_texte->rect);
         } 
         else if(expression->fonction.borne_inf > test){
+            strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
             set_message("BORNE SUP INFERIEUR A BORNE INF", expression->borne_sup->champs_texte->rect);
         }
         else {
+            strcpy(expression->borne_sup->text_backup, expression->borne_sup->text);
             expression->fonction.borne_sup = test;
         }
         expression->borne_sup->position_cursor = strlen(expression->borne_sup->text);
@@ -337,9 +328,9 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
-        typejeton TabToken;
+        typejeton TabToken[TailleMax] = {};
         int erreur = 0;
-        Analyse_Lexicale(&TabToken, expression->expression->text, &erreur);
+        Analyse_Lexicale(TabToken, expression->expression->text, &erreur);
         expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }
@@ -494,7 +485,7 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
+    const char* nom_f[] = {"sin(x)", "sqrt(x)", "exp(x)", "x", "2-x"};
     typejeton x;
     x.lexem=VARIABLE;
     x.valeur.variable='x';
@@ -502,6 +493,18 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     typejeton Soustraction;
     Soustraction.lexem=OPERATEUR;
     Soustraction.valeur.operateur=MOINS;
+    // Racine
+    typejeton Racine;
+    Racine.lexem=FONCTION;
+    Racine.valeur.fonction=SQRT;
+    // Logarithme
+    typejeton Logarithme;
+    Logarithme.lexem=FONCTION;
+    Logarithme.valeur.fonction=LOG;
+    // Tangente
+    typejeton Tangente;
+    Tangente.lexem=FONCTION;
+    Tangente.valeur.fonction=TAN;
     // Sinus
     typejeton Sinus;
     Sinus.lexem=FONCTION;
@@ -530,14 +533,25 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
     Node* SIN_ARBRE = malloc(sizeof(Node));
     *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
-    Node* arbres[] = {SIN_ARBRE, COSINUS_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
+    Node* RACINE_ARBRE = malloc(sizeof(Node));
+    *RACINE_ARBRE = creation_arbre(Racine,X_ARBRE,NULL);
+    Node* LOGARITHME_ARBRE = malloc(sizeof(Node));
+    *LOGARITHME_ARBRE = creation_arbre(Logarithme,X_ARBRE,NULL);
+    Node* TANGENTE_ARBRE = malloc(sizeof(Node));
+    *TANGENTE_ARBRE = creation_arbre(Tangente,X_ARBRE,NULL);
+    Node* arbres[] = {SIN_ARBRE, RACINE_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
+    const char* interval[][2] = {{"1", "4"}, {"5", "10"}, {"1", "3"}, {"1", "3.5"}, {"1e1", "2e2"}};
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
     int a = nb_alea(0,4);
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, interval[a][0]);
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, interval[a][1]);
+    char *end;
+    float test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, &end);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_inf = test - 2;
+    test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, &end);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_sup = test + 2;
     charge_valeur_borne_inf(bande_haute->expressions[bande_haute->nb_expressions]);
     charge_valeur_borne_sup(bande_haute->expressions[bande_haute->nb_expressions]);
     bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text);
@@ -547,3 +561,5 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->nb_expressions++;
     action_apres_modif_offset(bande_haute);
 }
+
+

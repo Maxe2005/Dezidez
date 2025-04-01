@@ -195,7 +195,8 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     TTF_Font *font_text_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TEXT_SIZE_MD);
     TTF_Font *font_title_1_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_1_SIZE_MD);
     TTF_Font *font_title_2_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_2_SIZE_MD);
-    TTF_Font *fonts_md [NB_FONTS_MD] = {font_text_md, font_title_1_md, font_title_2_md};
+    TTF_Font *font_title_3_md = createFont("Ressources/Fonts/DejaVuSans-Bold.ttf", FONT_TITRE_3_SIZE_MD);
+    TTF_Font *fonts_md [NB_FONTS_MD] = {font_text_md, font_title_1_md, font_title_2_md,font_title_3_md};
 
     int marge = FEN_X / 7;
     MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);

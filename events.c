@@ -17,14 +17,56 @@ void handle_event_graph_MOUSEMOTION (SDL_Event event, Graph* graph, int x_souris
             graph->axe_y->min += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
             graph->axe_y->max += event.motion.yrel * graph->axe_y->echelle_grad / graph->axe_y->taille_grad;
             resize_navigation(graph);
+            for (int i=0; i<graph->nombre_evaluateur; i++) {
+                graph->liste_evaluateurs[i].x_px += event.motion.xrel;
+                graph->liste_evaluateurs[i].y_px += event.motion.yrel;
+                graph->liste_evaluateurs[i].bouton_evaluateur.rect.x += event.motion.xrel;
+                graph->liste_evaluateurs[i].bouton_evaluateur.rect.y += event.motion.yrel;
+                graph->liste_evaluateurs[i].boutton_quitter.rect.x += event.motion.xrel;
+                graph->liste_evaluateurs[i].boutton_quitter.rect.y += event.motion.yrel;
+            }
         } else {
             graph->souris_pressee = false;
         }
     }
+    for (int i=0; i<graph->nombre_evaluateur; i++){
+        if (is_souris_sur_rectangle(graph->liste_evaluateurs[i].boutton_quitter.rect, x_souris_px, y_souris_px)){
+            graph->liste_evaluateurs[i].boutton_quitter.hovered = 1;
+        } else {
+            graph->liste_evaluateurs[i].boutton_quitter.hovered = 0;
+        }
+    }
 }
 
-void handle_event_graph_MOUSEBUTTONUP (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
+void handle_event_graph_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    if (x_souris_px > graph->origine_x && x_souris_px < graph->origine_x + graph->x &&
+        y_souris_px > graph->origine_y_apres_bande_haut && y_souris_px < graph->origine_y + graph->y){
+            if (event.button.button == SDL_BUTTON_RIGHT){
+                handle_event_graph_MOUSEBUTTONUP_RIGHT(event, graph, x_souris_px, y_souris_px);
+            }
+            if (event.button.button == SDL_BUTTON_LEFT){
+                handle_event_graph_MOUSEBUTTONUP_LEFT(ren, event, graph, x_souris_px, y_souris_px, bande_haute);
+            }
+    }
+}
+
+void handle_event_graph_MOUSEBUTTONUP_RIGHT (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
     graph->souris_pressee = false;
+}
+
+void handle_event_graph_MOUSEBUTTONUP_LEFT (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    bool clic_utile = false;
+    for (int i=0; i<graph->nombre_evaluateur; i++){
+        if (is_souris_sur_rectangle(graph->liste_evaluateurs[i].boutton_quitter.rect, x_souris_px, y_souris_px)){
+            suppr_evaluateur_x(graph, i);
+            clic_utile = true;
+            break;
+        }
+    }
+    if (!clic_utile){
+        ajout_evaluateur_x (ren, event,  graph,  x_souris_px,  y_souris_px,  bande_haute);
+    }
+    // TODO ajouter un mode au graph pour changer l'evaluateur x y et les autres modes
 }
 
 void handle_event_graph_MOUSEBUTTONDOWN (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px) {
@@ -86,7 +128,7 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
     return is_MOUSEMOTION_used;
 }
 
-void handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
+bool handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     bool clic_utile = false;
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
         if (!clic_utile && bande_haute->expressions[i]->visible) {
@@ -99,7 +141,9 @@ void handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, 
     }
     if (!clic_utile && is_souris_sur_rectangle(bande_haute->surface, x_souris_px, y_souris_px)) {
         bande_haute->expanding = !bande_haute->expanding;
+        clic_utile = true;
     }
+    return clic_utile;
 }
 
 bool handle_event_bande_haut_MOUSEBUTTONDOWN (SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
@@ -257,7 +301,35 @@ void handle_event_entrees_expressions_KEYUP (SDL_Event event, Expression_fonctio
 }
 
 
-void resize_fen_2D (Bande_haute* bande_haute, Graph* graph){
+
+void handle_event_bande_droite_MOUSEMOTION (SDL_Event event, Bande_droite* bande_droite, int x_souris_px, int y_souris_px){
+    if (is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
+        bande_droite->bouton_retour.hovered = 1;
+        bande_droite->bouton_retour.pourcentage_place = 50;
+    } else {
+        bande_droite->bouton_retour.hovered = 0;
+        bande_droite->bouton_retour.pourcentage_place = 80;
+    }
+
+    if (is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
+        bande_droite->bouton_centrer.hovered = 1;
+    } else bande_droite->bouton_centrer.hovered = 0;
+}
+
+int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_droite* bande_droite, Bande_haute* bande_haute, Graph* graph, int x_souris_px, int y_souris_px){
+    int clic_utile = 0;
+    if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
+        return -1; // Retourner à l'accueil
+    }
+    if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
+        resize_recentrer(graph, &bande_haute->expressions[0]->fonction);
+        clic_utile = 1;
+    }
+    return clic_utile;
+}
+
+
+void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph){
     bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
     int x = graph->x;
     int y = graph->y;
@@ -266,9 +338,10 @@ void resize_fen_2D (Bande_haute* bande_haute, Graph* graph){
     graph->axe_y->taille_grad *= graph->y / y;
     resize_navigation(graph);
     resize_bande_haut(bande_haute);
+    resize_bande_droite(bande_droite);
 }
 
-int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
+int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) return 1; // On quitte le grapheur
@@ -276,7 +349,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = event.window.data1;
             FEN_Y = event.window.data2;
-            resize_fen_2D(bande_haute, graph);
+            resize_fen_2D(bande_haute, bande_droite, graph);
         }
 
         if (event.type == SDL_MOUSEMOTION) {
@@ -285,6 +358,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
             bool is_MOUSEMOTION_used = false;
             is_MOUSEMOTION_used = handle_event_bande_haut_MOUSEMOTION (event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEMOTION_used) {
+                handle_event_bande_droite_MOUSEMOTION(event, bande_droite, *x_souris_px, *y_souris_px);
                 handle_event_graph_MOUSEMOTION (event, graph, *x_souris_px, *y_souris_px);
             }
         }
@@ -295,14 +369,21 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Graph* graph
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
-            handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
-            handle_event_graph_MOUSEBUTTONUP (event, graph, *x_souris_px, *y_souris_px);
+            int is_MOUSEBUTTONUP_used = 0;
+            is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
+            if (!is_MOUSEBUTTONUP_used){
+                is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, graph, *x_souris_px, *y_souris_px);
+                if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                else if (!is_MOUSEBUTTONUP_used){
+                    handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+                }
+            }
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             bool is_MOUSEBUTTONDOWN_used = false;
             is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONDOWN_used){
+            if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
                 handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
             }
         }

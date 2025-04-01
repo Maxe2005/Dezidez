@@ -2,8 +2,8 @@
 #define ENTREES_EXPRESSIONS_H
 
 #include "ressources.h"
+#include "bande_droite.h"
 
-#define TAILLE_BANDE_DROITE 100
 #define TAILLE_BANDE_DESCRIPTIONS 40 
 #define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
 #define TAILLE_BANDE_EXPRESSIONS_MIN (TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS)
@@ -40,6 +40,7 @@ typedef struct {
 
 typedef struct {
     char text[MAX_LEN_STR + 1]; // +1 pour le /0 comme fin de chaine
+    char text_backup[MAX_LEN_STR + 1]; // La dernière chaine exécutée fonctionnelle
     char display[MAX_LEN_STR + 2]; // +2 pour le /0 et le curseur
     Button* champs_texte;
     SDL_Rect position_initiale; // Position de l'entrée sans offset. L'offset est appliqué directement dans le bouton <champs_texte>
@@ -50,7 +51,6 @@ typedef struct {
 } Entree_texte;
 
 typedef struct {
-    char fonction_str [MAX_LEN_STR]; // L'expression en chaine de caractère de la fonction
     Node * fonction_arbre; // L'arbre de la fonction
     float borne_inf; // Le minimum de l'intervale de définition choisi
     float borne_sup; // Le maximum de l'intervale de définition choisi
@@ -60,6 +60,7 @@ typedef struct {
     SDL_Color color;
 } Fonction;
 
+// Un bouton en mouvement
 typedef struct {
     ImageButton bt;
     SDL_Rect rect_base;
@@ -112,12 +113,6 @@ typedef struct {
     Button_mvt button_new_expression; // Le bouton pour ajouter une nouvelle expression à tracer sur le graphique
 } Bande_haute;
 
-
-float f (float x);
-float g (float x);
-float h (float x);
-float k (float x);
-float l (float x);
 
 /**
  * Affiche la bande haute de l'interface
