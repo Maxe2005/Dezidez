@@ -154,3 +154,31 @@ Node Syntaxique(typejeton *tab, typeerreur *erreur){
     Node arbrePlein = operateur( tab, 0, fin, erreur);
     return arbrePlein;
 }
+
+void afficher_arbre(Node *arbre) {
+    if (arbre == NULL) {
+        return;
+    }
+
+    // Afficher le jeton courant
+    printf("Lexem : %s\n", lexem_string[arbre->jeton.lexem]);
+    switch (arbre->jeton.lexem) {
+        case REEL:
+            printf("Valeur : %f\n", arbre->jeton.valeur.reel);
+            break;
+        case OPERATEUR:
+            printf("Operateur : %s\n", operateur_string[arbre->jeton.valeur.operateur]);
+            break;
+        case FONCTION:
+            printf("Fonction : %s\n", fonction_string[arbre->jeton.valeur.fonction]);
+            break;
+        case VARIABLE:
+            printf("Variable\n");
+            break;
+        // Ajouter les autres cas si nécessaire
+    }
+
+    // Afficher les sous-arbres récursivement
+    afficher_arbre(arbre->pjeton_preced);
+    afficher_arbre(arbre->pjeton_suiv);
+}

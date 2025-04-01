@@ -16,5 +16,6 @@ bool parenthese(int debut, int fin, typejeton *tab);
 int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur);
 int calculTaille(typejeton *tab);
 Node Syntaxique(typejeton *tab, typeerreur *erreur);
+void afficher_arbre(Node *arbre);
 
 #endif

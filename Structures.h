@@ -26,6 +26,7 @@ typedef union
     typefonction fonction;
     typeoperateur operateur;
     //typeerreur erreur;
+    char variable;
 } typevaleur;
 
 //énumération des diff types de jetons existants
@@ -43,7 +44,7 @@ typedef struct Node
     struct Node *pjeton_suiv;
 } Node;
 
-typedef Node *Arbre;
+//typedef Node *Arbre;
 
 typedef enum {
     //ERREUR FONCTION 20X
@@ -65,5 +66,9 @@ typedef enum {
     //ERREUR TAILLE 24X
     ABSENCE_FIN = 241, //debut>fin, absence token END
     } typeerreur;
+
+static const char* lexem_string[] = {"REEL", "OPERATEUR", "FONCTION", "ERREUR", "FIN", "PAR_OUV", "PAR_FERM", "VARIABLE", "BAR_OUV", "BAR_FERM", "ABSOLU"};
+static const char* operateur_string[] = {"PLUS", "MOINS", "FOIS", "DIV", "PUIS"};
+static const char* fonction_string[] = {"ABS", "SIN", "SQRT", "LOG", "COS", "TAN", "EXP", "ENTIER", "VAL_NEG", "SINC"};
 
 #endif 
