@@ -11,7 +11,7 @@ void test_valide1() {
     typeerreur erreur = 0;
     Node a = Syntaxique(tab, &erreur);
     printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
-    afficher_arbre(&a);
+    //afficher_arbre(&a);
 }
 
 void test_valide2() {
@@ -26,8 +26,8 @@ void test_valide2() {
     typeerreur erreur = 0;
     Node a = Syntaxique(tab, &erreur);
     printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ÉCHEC", erreur);
-    printf("fg a = %d\n", a.pjeton_preced->jeton.lexem);
-    afficher_arbre(&a);
+    //printf("fg a = %d\n", a.pjeton_preced->jeton.lexem);
+    //afficher_arbre(&a);
 }
 
 void test_valide3() {
@@ -97,19 +97,19 @@ void test_erreur_manque_parenthese() {
 
 // Fonction principale qui exécute tous les tests
 void tester_syntaxe() {
-    // test_valide1();
+    test_valide1();
     test_valide2();
-    // test_valide3();
-    // test_erreur_operateurs_a_la_suite1();
-    // test_erreur_operateurs_a_la_suite2();
-    // test_erreur_manque_operateur();
-    // test_erreur_manque_parenthese();
-    // test_probleme_parentheses_fonctions1();
-    // test_probleme_parentheses_fonctions2();
-    // test_probleme_apres_reel();
-    // test_membre_vide();
-    // test_parenthese_fermee_1er_jeton();
-    // test_expression_valide();
+    test_valide3();
+    test_erreur_operateurs_a_la_suite1();
+    test_erreur_operateurs_a_la_suite2();
+    test_erreur_manque_operateur();
+    test_erreur_manque_parenthese();
+    test_probleme_parentheses_fonctions1();
+    test_probleme_parentheses_fonctions2();
+    test_probleme_apres_reel();
+    test_membre_vide();
+    test_parenthese_fermee_1er_jeton();
+    test_expression_valide();
 }
 
 
@@ -139,7 +139,7 @@ void test_expression_valide() {
     typeerreur erreur = 0;
     Node a = Syntaxique(tab, &erreur);
     printf("Test expression valide : %s. Erreur=%d\n", erreur == 0 ? "OK" : "ÉCHEC", erreur);
-    afficher_arbre(&a);
+    //afficher_arbre(&a);
 
 }
 
