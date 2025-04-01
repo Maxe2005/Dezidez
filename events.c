@@ -410,3 +410,70 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite
     }
     return 0; // On ne quitte pas le grapheur
 }
+
+
+int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) return 1; // On quitte le grapheur
+
+        if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+            FEN_X = event.window.data1;
+            FEN_Y = event.window.data2;
+        }
+
+        if (event.type == SDL_MOUSEMOTION) {
+            *x_souris_px = event.motion.x;
+            *y_souris_px = event.motion.y;
+            bool is_MOUSEMOTION_used = false;
+            is_MOUSEMOTION_used = handle_event_bande_haut_MOUSEMOTION (event, bande_haute, *x_souris_px, *y_souris_px);
+            if (!is_MOUSEMOTION_used) {
+                handle_event_bande_droite_MOUSEMOTION(event, bande_droite, *x_souris_px, *y_souris_px);
+                //handle_event_graph_MOUSEMOTION (event, graph, *x_souris_px, *y_souris_px);
+            }
+        }
+
+        if (event.type == SDL_MOUSEWHEEL) {
+            handle_event_bande_haut_MOUSEWHEEL (event, bande_haute, *x_souris_px, *y_souris_px);
+            //handle_event_graph_MOUSEWHEEL (event, graph, *x_souris_px, *y_souris_px);
+        }
+
+        if (event.type == SDL_MOUSEBUTTONUP) {
+            int is_MOUSEBUTTONUP_used = 0;
+            is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
+            if (!is_MOUSEBUTTONUP_used){
+                is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, NULL, *x_souris_px, *y_souris_px);
+                if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                else if (!is_MOUSEBUTTONUP_used){
+                    //handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+                }
+            }
+        }
+
+        if (event.type == SDL_MOUSEBUTTONDOWN) {
+            bool is_MOUSEBUTTONDOWN_used = false;
+            is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
+            if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
+                //handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
+            }
+        }
+
+        if (event.type == SDL_TEXTINPUT) {
+            handle_event_bande_haut_TEXTINPUT (event, bande_haute);
+        }
+
+        if (event.type == SDL_KEYDOWN) {
+            *is_event_backspace_used = handle_event_bande_haut_KEYDOWN (event, bande_haute);
+        }
+
+        if (event.type == SDL_KEYUP) {
+            handle_event_bande_haut_KEYUP (event, bande_haute);
+
+            if (!*is_event_backspace_used && event.key.keysym.sym == SDLK_BACKSPACE){
+                return 2; // On revient à l'écran d'accueil
+            }
+        }
+    }
+    return 0; // On ne quitte pas le grapheur
+}
+

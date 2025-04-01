@@ -26,7 +26,6 @@ extern TTF_Font* fonts[NB_FONTS];
 extern int FEN_X;
 extern int FEN_Y;
 
-
 typedef struct {
     SDL_Color bg;
     SDL_Color axes;
@@ -59,11 +58,18 @@ typedef struct {
 } Tous_les_JSON;
 extern Tous_les_JSON tous_les_JSON;
 
+
 /**
  * Initialise les différentes polices de caractère avec les tailles correspondantes
  * @param font Le tableau de police vide à remplire
  */
 void init_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Change le mode de couleur
+ * @param color_mode Le mode de couleur à appliquer
+ */
+void change_color_mode (int color_mode);
 
 /**
  * Génère un nombre aléatoire compris entre les valeurs min et max (incluses).

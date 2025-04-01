@@ -219,4 +219,15 @@ void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph*
  */
 int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
 
+/**
+ * Gère tous les évènement par type
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
+ * @param x_souris_px La position en abssices actuelle de la souris 
+ * @param y_souris_px La position en ordonnées actuelle de la souris 
+ * @param is_event_backspace_used Permet de séparer (ou hiérarchiser) l'utilisation de la touche backspace pour plusieurs utilisation
+ */
+int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
+
 #endif

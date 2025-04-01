@@ -1,10 +1,10 @@
 #include "menus.h"
 
-void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele){
+void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D){
     // Initialisation des boutons
-    Button button_mode_emploi, button_remerciements, button_grapheur;
+    Button button_mode_emploi, button_remerciements, button_grapheur, button_grapheur_3D;
     Button* buttons[NB_BOUTONS_ACCUEIL];
-    init_buttons_accueil(buttons, &button_mode_emploi, &button_remerciements, &button_grapheur);
+    init_buttons_accueil(buttons, &button_mode_emploi, &button_remerciements, &button_grapheur, &button_grapheur_3D);
 
     // Chargement du fond d'ecran
     Background* bg = malloc(sizeof(Background));
@@ -20,7 +20,7 @@ void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele){
         affiche_boutons_accueil(ren, buttons);
         updateDisplay(ren);
 
-        handle_events_accueil(buttons, ren, bg, &running, gr_ele);
+        handle_events_accueil(buttons, ren, bg, &running, gr_ele, grapheur_ele_3D);
     }
     free_background(bg);
 }
@@ -46,7 +46,7 @@ void affiche_titre (SDL_Renderer* ren){
     SDL_DestroyTexture(texture);
 }
 
-void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur) {
+void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur, Button* button_grapheur_3D) {
     int button_height = 60;
     int button_width = 300;
     int button_margin_x = 20;
@@ -54,8 +54,8 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
     SDL_Color color_base = {20, 30, 60, 200};
     SDL_Color color_touch = {0, 120, 255, 200};
     
-    Button* but[] = {button_mode_emploi, button_remerciements, button_grapheur};
-    char* noms[] = {"Mode d'emploi", "Remerciements", "Grapheur"};
+    Button* but[] = {button_mode_emploi, button_remerciements, button_grapheur, button_grapheur_3D};
+    char* noms[] = {"Mode d'emploi", "Remerciements", "Grapheur", "Grapheur 3D"};
     int origine_x = FEN_X/2 - (NB_BOUTONS_ACCUEIL * button_width + (NB_BOUTONS_ACCUEIL - 1) * button_margin_x)/2;
     for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
         but[j]->rect.x = origine_x + j * (button_width + button_margin_x);
@@ -94,7 +94,7 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
     }
 }
 
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele) {
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *running = 0;
@@ -134,6 +134,9 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                         case 2:
                             mode_quitter = Grapheur(ren, gr_ele);
                             break;
+                        case 3:
+                            mode_quitter = Grapheur_3D(ren, grapheur_ele_3D);
+                            break;
                     }
                     if (!mode_quitter) *running = 0;
                     buttons[i]->hovered = 0;
@@ -150,6 +153,9 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
             switch (lancement) {
                 case SDLK_SPACE:case SDLK_g:
                     mode_quitter = Grapheur(ren, gr_ele);
+                    break;
+                case SDLK_b:
+                    mode_quitter = Grapheur_3D(ren, grapheur_ele_3D);
                     break;
                 case SDLK_r:
                     mode_quitter = ecran_remerciements(ren);

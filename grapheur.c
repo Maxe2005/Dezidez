@@ -183,28 +183,6 @@ Graph init_graph (Fonction* fonction_defaut){
     return graph;
 }
 
-void change_color_mode (int color_mode){
-    if (color_mode == 0){
-        colors->bg = (SDL_Color){255, 255, 255, 255};
-        colors->axes = (SDL_Color){0, 0, 0, 255};
-        colors->texte_axes = (SDL_Color){0, 0, 0, 255};
-    } else {
-        colors->bg = (SDL_Color){0, 0, 0, 255};
-        colors->axes = (SDL_Color){255, 255, 255, 255};
-        colors->texte_axes = (SDL_Color){255, 255, 255, 255};
-    }
-    colors->bande_droite = (SDL_Color){100, 100, 100, 255};
-    colors->bande_haute_expressions = (SDL_Color){200, 200, 200, 255};
-    colors->bande_haute_description = (SDL_Color){150, 150, 150, 255};
-    colors->texte_champ_entree = (SDL_Color){0, 0, 0, 255};
-    colors->texte_descriptifs_bande_haut = (SDL_Color){255, 255, 255, 255};
-    colors->bg_bandes_expression_1 = colors->bande_haute_expressions;
-    colors->bg_bandes_expression_2 = (SDL_Color){150, 150, 150, 255};
-    colors->bande_bas_de_bande_haut = (SDL_Color){200, 200, 200, 255};
-    colors->button_new_expression = (SDL_Color){125, 125, 125, 255};
-    colors->button_new_expression_hover = (SDL_Color){150, 150, 150, 255};
-}
-
 float arrondir_ordre_grandeur(float x) {
     if (x == 0.0f) return 0.0f; // Éviter log10(0)
 
@@ -474,9 +452,6 @@ void suppr_evaluateur_x (Graph* graph, int index){
 }
 
 void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
-    colors = malloc(sizeof(Colors));
-    change_color_mode(1);
-
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 

@@ -1,28 +1,10 @@
-#include <SDL2/SDL.h>
-#include <math.h>
-#include <stdbool.h>
-
-#define WIDTH 800
-#define HEIGHT 600
-#define GRID_SIZE 20
-#define RENDER_DISTANCE 5.0f
-
-typedef struct {
-    float x, y, z;
-} Point3D;
-
-typedef struct {
-    Point3D position;
-    Point3D rotation;
-    Point3D renderCenter; // Center of our rendering area
-} Camera;
+#include "grapheur_3D.h"
 
 Camera camera = {
-    .position = {0, 0, 10},
+    .position = {0, 0, -10},
     .rotation = {0, 0, 0},
     .renderCenter = {0, 0, 0}
 };
-
 // Function to project 3D point to 2D screen coordinates
 void projectPoint(Point3D point, int* screenX, int* screenY) {
     // Apply camera position
@@ -47,8 +29,8 @@ void projectPoint(Point3D point, int* screenX, int* screenY) {
     
     // Perspective projection
     float scale = 200.0f / (point.z + 5.0f);
-    *screenX = WIDTH / 2 + (int)(point.x * scale);
-    *screenY = HEIGHT / 2 + (int)(point.y * scale);
+    *screenX = FEN_X - TAILLE_BANDE_DROITE / 2 + (int)(point.x * scale);
+    *screenY = FEN_Y - TAILLE_BANDE_HAUT / 2 + (int)(point.y * scale);
 }
 
 bool shouldRenderPoint(Point3D point) {
@@ -193,23 +175,52 @@ void render(SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-int main(int argc, char* argv[]) {
-    SDL_Init(SDL_INIT_VIDEO);
-    SDL_Window* window = SDL_CreateWindow("3D Infinite Graph", SDL_WINDOWPOS_CENTERED,
-                                        SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
-    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+
+
+void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite){
+    SDL_SetRenderDrawColor(ren, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
+    SDL_RenderClear(ren);
+
+    affiche_bande_haut(ren, bande_haute);
+    // Rectangle pour cacher les bande d'expression qui ne sont qu'a moitié sur la bande haute. 
+    boxRGBA(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - RAYON_BAS_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h + bande_haute->params.height_bande_expression, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
+
     
-    bool running = true;
-    SDL_Event event;
-    
-    while (running) {
-        handleInput(event, &running);
-        render(renderer);
-        SDL_Delay(16); // ~60 FPS
+    // Dessiner le bas arrondi de la bande haute
+    affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
+    renderImageButton(ren, &bande_haute->button_new_expression.bt);
+    // Affichage de la bande droite
+    affiche_bande_droite(ren, bande_droite);
+
+    for (int j = 0; j < bande_haute->nb_expressions; j++) {
+        affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
     }
-    
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
-    return 0;
+}
+
+
+void init_totale_interface_grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
+    init_bande_droite(ren, gr_ele->bande_droite);
+    init_bande_haute(ren, gr_ele->bande_haute);
+}
+
+int Grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
+    Bande_haute* bande_haute = gr_ele->bande_haute;
+    Bande_droite* bande_droite = gr_ele->bande_droite;
+
+    SDL_StartTextInput();
+    bool is_event_backspace_used = false;
+    int x_souris_px, y_souris_px;
+    int mode_quitter = 0; // Les différentes façons de quitter le grapheur : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
+    bool running = true;
+
+    while (running) {
+        affiche_interface_graph_3D(ren, bande_haute, bande_droite);
+
+        mode_quitter = handle_all_events_3D(ren, bande_haute, bande_droite, &x_souris_px, &y_souris_px, &is_event_backspace_used);
+        if (mode_quitter) break;
+
+        updateDisplay(ren);
+    }
+    SDL_StopTextInput();
+    return mode_quitter - 1;
 }
