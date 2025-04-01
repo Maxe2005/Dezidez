@@ -72,8 +72,8 @@ void init_tous_les_json () {
 
 ErrorInfo get_error_message(int code) {
     ErrorInfo error_info;
-    strcpy(error_info.message, "Erreur inconnue");
-    strcpy(error_info.severity, "unknown");
+    error_info.message = "Erreur inconnue";
+    error_info.severity = "unknown";
 
     char code_str[10];
     sprintf(code_str, "%d", code);  // Convertit l'entier en chaîne
@@ -88,11 +88,9 @@ ErrorInfo get_error_message(int code) {
     cJSON *severity_json = cJSON_GetObjectItem(error_json, "severity");
 
     if (message_json) {
-        free(error_info.message); // Libérer l'ancienne valeur
         error_info.message = strdup(message_json->valuestring);
     }
     if (severity_json) {
-        free(error_info.severity);
         error_info.severity = strdup(severity_json->valuestring);
     }
     return error_info;

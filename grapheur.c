@@ -245,7 +245,7 @@ float recherche_meilleur_echelle_grad (float max, float min){
             nb_grad = fabsf(max - min) / echelle_grad_arrondi;
             if (nb_grad >= nb_grad_min && nb_grad <= nb_grad_max) return echelle_grad_arrondi;
             else {
-                printf("nb graduations : %d\n", nb_grad);
+                //printf("nb graduations : %d\n", nb_grad);
                 return echelle_grad;
             }
         } else {
@@ -344,12 +344,13 @@ void find_min_max(Fonction* fonction, int steps) {
     }
 
     float step_size = (fonction->borne_sup - fonction->borne_inf) / steps;
-    int code_erreur;
+    int code_erreur = 0;
     fonction->fx_min = fonction->fx_max = evaluateur(fonction->fonction_arbre, fonction->borne_inf, 0, &code_erreur); // Initialisation
 
+    float x,y;
     for (int i = 1; i <= steps; i++) {
-        float x = fonction->borne_inf + i * step_size;
-        float y = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
+        x = fonction->borne_inf + i * step_size;
+        y = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
 
         if (y < fonction->fx_min) fonction->fx_min = y;
         if (y > fonction->fx_max) fonction->fx_max = y;

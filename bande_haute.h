@@ -40,6 +40,7 @@ typedef struct {
 
 typedef struct {
     char text[MAX_LEN_STR + 1]; // +1 pour le /0 comme fin de chaine
+    char text_backup[MAX_LEN_STR + 1]; // La dernière chaine exécutée fonctionnelle
     char display[MAX_LEN_STR + 2]; // +2 pour le /0 et le curseur
     Button* champs_texte;
     SDL_Rect position_initiale; // Position de l'entrée sans offset. L'offset est appliqué directement dans le bouton <champs_texte>
@@ -50,7 +51,6 @@ typedef struct {
 } Entree_texte;
 
 typedef struct {
-    char fonction_str [MAX_LEN_STR]; // L'expression en chaine de caractère de la fonction
     Node * fonction_arbre; // L'arbre de la fonction
     float borne_inf; // Le minimum de l'intervale de définition choisi
     float borne_sup; // Le maximum de l'intervale de définition choisi
