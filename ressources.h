@@ -43,6 +43,11 @@ typedef struct {
 } Colors;
 extern Colors* colors;
 
+typedef enum {
+    _2D, _3D
+} Dimention;
+extern Dimention dimention;
+
 typedef struct {
     char *message;
     char *severity;

@@ -6,7 +6,10 @@
     "sdl2_gfxprimitives.h": "c",
     "cmath": "c",
     "sdl.h": "c",
-    "string.h": "c"
+    "string.h": "c",
+    "gestion_3d_1.h": "c",
+    "gestion_3d_2.h": "c",
+    "grapheur_3d.h": "c"
   },
 
   "github.copilot.chat.commitMessageGeneration.instructions": [

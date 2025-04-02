@@ -2,6 +2,7 @@
 
 TTF_Font* fonts[NB_FONTS] = {NULL};
 Colors* colors = NULL;
+Dimention dimention = _2D;
 Langue langue = FR;
 Tous_les_JSON tous_les_JSON;
 int FEN_X = 1100;

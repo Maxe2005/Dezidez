@@ -1,7 +1,7 @@
 #include "ressources.h"
 #include "menus.h"
 #include "grapheur.h"
-#include "grapheur_3D.h"
+#include "Gestion_3D/grapheur_3D.h"
 
 int main (int argc, char *argv[]){
     srand(time(NULL));

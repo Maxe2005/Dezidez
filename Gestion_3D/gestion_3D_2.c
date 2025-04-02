@@ -1,12 +1,13 @@
-#include "grapheur_3D.h"
+#include "gestion_3D_2.h"
 
 Camera camera = {
-    .position = {0, 0, -10},
+    .position = {0, 0, 10},
     .rotation = {0, 0, 0},
     .renderCenter = {0, 0, 0}
 };
+
 // Function to project 3D point to 2D screen coordinates
-void projectPoint(Point3D point, int* screenX, int* screenY) {
+void projectPoint(Point3D_ point, int* screenX, int* screenY) {
     // Apply camera position
     point.x -= camera.position.x;
     point.y -= camera.position.y;
@@ -29,11 +30,11 @@ void projectPoint(Point3D point, int* screenX, int* screenY) {
     
     // Perspective projection
     float scale = 200.0f / (point.z + 5.0f);
-    *screenX = FEN_X - TAILLE_BANDE_DROITE / 2 + (int)(point.x * scale);
-    *screenY = FEN_Y - TAILLE_BANDE_HAUT / 2 + (int)(point.y * scale);
+    *screenX = WIDTH / 2 + (int)(point.x * scale);
+    *screenY = HEIGHT / 2 + (int)(point.y * scale);
 }
 
-bool shouldRenderPoint(Point3D point) {
+bool shouldRenderPoint(Point3D_ point) {
     // Check if point is within our render distance square
     return (point.x >= camera.renderCenter.x - RENDER_DISTANCE &&
             point.x <= camera.renderCenter.x + RENDER_DISTANCE &&
@@ -53,8 +54,8 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw grid lines in X direction
     for (float y = floor(minY); y <= ceil(maxY); y += 1.0f) {
-        Point3D start = {minX, y, 0};
-        Point3D end = {maxX, y, 0};
+        Point3D_ start = {minX, y, 0};
+        Point3D_ end = {maxX, y, 0};
         
         int sx, sy, ex, ey;
         projectPoint(start, &sx, &sy);
@@ -64,8 +65,8 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw grid lines in Y direction
     for (float x = floor(minX); x <= ceil(maxX); x += 1.0f) {
-        Point3D start = {x, minY, 0};
-        Point3D end = {x, maxY, 0};
+        Point3D_ start = {x, minY, 0};
+        Point3D_ end = {x, maxY, 0};
         
         int sx, sy, ex, ey;
         projectPoint(start, &sx, &sy);
@@ -75,16 +76,16 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw main axes (X and Y)
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red X axis
-    Point3D xStart = {minX, 0, 0};
-    Point3D xEnd = {maxX, 0, 0};
+    Point3D_ xStart = {minX, 0, 0};
+    Point3D_ xEnd = {maxX, 0, 0};
     int xs, ys, xe, ye;
     projectPoint(xStart, &xs, &ys);
     projectPoint(xEnd, &xe, &ye);
     SDL_RenderDrawLine(renderer, xs, ys, xe, ye);
     
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green Y axis
-    Point3D yStart = {0, minY, 0};
-    Point3D yEnd = {0, maxY, 0};
+    Point3D_ yStart = {0, minY, 0};
+    Point3D_ yEnd = {0, maxY, 0};
     projectPoint(yStart, &xs, &ys);
     projectPoint(yEnd, &xe, &ye);
     SDL_RenderDrawLine(renderer, xs, ys, xe, ye);
@@ -102,7 +103,7 @@ void renderGraph(SDL_Renderer* renderer) {
     float step = 0.2f;
     for (float x = minX; x <= maxX; x += step) {
         for (float y = minY; y <= maxY; y += step) {
-            Point3D point = {x, y, sin(x) * cos(y)};
+            Point3D_ point = {x, y, sin(x) * cos(y)};
             if (shouldRenderPoint(point)) {
                 int screenX, screenY;
                 projectPoint(point, &screenX, &screenY);
@@ -155,7 +156,7 @@ void render(SDL_Renderer* renderer) {
     
     // Draw render area boundary (for visualization)
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 100);
-    Point3D corners[4] = {
+    Point3D_ corners[4] = {
         {camera.renderCenter.x - RENDER_DISTANCE, camera.renderCenter.y - RENDER_DISTANCE, 0},
         {camera.renderCenter.x + RENDER_DISTANCE, camera.renderCenter.y - RENDER_DISTANCE, 0},
         {camera.renderCenter.x + RENDER_DISTANCE, camera.renderCenter.y + RENDER_DISTANCE, 0},
@@ -175,52 +176,24 @@ void render(SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-
-
-void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite){
-    SDL_SetRenderDrawColor(ren, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
-    SDL_RenderClear(ren);
-
-    affiche_bande_haut(ren, bande_haute);
-    // Rectangle pour cacher les bande d'expression qui ne sont qu'a moitié sur la bande haute. 
-    boxRGBA(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - RAYON_BAS_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h + bande_haute->params.height_bande_expression, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
-
+/* int main(int argc, char* argv[]) {
+    SDL_Init(SDL_INIT_VIDEO);
+    SDL_Window* window = SDL_CreateWindow("3D Infinite Graph", SDL_WINDOWPOS_CENTERED,
+                                        SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
+    SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
     
-    // Dessiner le bas arrondi de la bande haute
-    affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
-    renderImageButton(ren, &bande_haute->button_new_expression.bt);
-    // Affichage de la bande droite
-    affiche_bande_droite(ren, bande_droite);
-
-    for (int j = 0; j < bande_haute->nb_expressions; j++) {
-        affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
-    }
-}
-
-
-void init_totale_interface_grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
-    init_bande_droite(ren, gr_ele->bande_droite);
-    init_bande_haute(ren, gr_ele->bande_haute);
-}
-
-int Grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
-    Bande_haute* bande_haute = gr_ele->bande_haute;
-    Bande_droite* bande_droite = gr_ele->bande_droite;
-
-    SDL_StartTextInput();
-    bool is_event_backspace_used = false;
-    int x_souris_px, y_souris_px;
-    int mode_quitter = 0; // Les différentes façons de quitter le grapheur : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
     bool running = true;
-
+    SDL_Event event;
+    
     while (running) {
-        affiche_interface_graph_3D(ren, bande_haute, bande_droite);
-
-        mode_quitter = handle_all_events_3D(ren, bande_haute, bande_droite, &x_souris_px, &y_souris_px, &is_event_backspace_used);
-        if (mode_quitter) break;
-
-        updateDisplay(ren);
+        handleInput(event, &running);
+        render(renderer);
+        SDL_Delay(16); // ~60 FPS
     }
-    SDL_StopTextInput();
-    return mode_quitter - 1;
-}
+    
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    SDL_Quit();
+    return 0;
+} */
+

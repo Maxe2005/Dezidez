@@ -321,9 +321,11 @@ int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event,
     if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
         return -1; // Retourner à l'accueil
     }
-    if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
-        resize_recentrer(graph, &bande_haute->expressions[0]->fonction);
-        clic_utile = 1;
+    if (dimention == _2D){
+        if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_centrer.rect, x_souris_px, y_souris_px)) {
+            resize_recentrer(graph, &bande_haute->expressions[0]->fonction);
+            clic_utile = 1;
+        }
     }
     return clic_utile;
 }
@@ -337,6 +339,12 @@ void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph*
     graph->axe_x->taille_grad *= graph->x / x;
     graph->axe_y->taille_grad *= graph->y / y;
     resize_navigation(graph);
+    resize_bande_haut(bande_haute);
+    resize_bande_droite(bande_droite);
+}
+
+void resize_fen_3D (Bande_haute* bande_haute, Bande_droite* bande_droite){
+    bande_haute->surface.w = FEN_X - TAILLE_BANDE_DROITE;
     resize_bande_haut(bande_haute);
     resize_bande_droite(bande_droite);
 }
@@ -429,13 +437,11 @@ int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_dro
             is_MOUSEMOTION_used = handle_event_bande_haut_MOUSEMOTION (event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEMOTION_used) {
                 handle_event_bande_droite_MOUSEMOTION(event, bande_droite, *x_souris_px, *y_souris_px);
-                //handle_event_graph_MOUSEMOTION (event, graph, *x_souris_px, *y_souris_px);
             }
         }
 
         if (event.type == SDL_MOUSEWHEEL) {
             handle_event_bande_haut_MOUSEWHEEL (event, bande_haute, *x_souris_px, *y_souris_px);
-            //handle_event_graph_MOUSEWHEEL (event, graph, *x_souris_px, *y_souris_px);
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
@@ -444,9 +450,6 @@ int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_dro
             if (!is_MOUSEBUTTONUP_used){
                 is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, NULL, *x_souris_px, *y_souris_px);
                 if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
-                else if (!is_MOUSEBUTTONUP_used){
-                    //handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
-                }
             }
         }
 
@@ -454,7 +457,6 @@ int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_dro
             bool is_MOUSEBUTTONDOWN_used = false;
             is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
-                //handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
             }
         }
 

@@ -287,4 +287,10 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
  */
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute);
 
+/**
+ * Actions à effectuer après avoir changé la taille de la bande des entrées
+ * @param bande_haute La bande d'entrées à afficher
+ */
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute);
+
 #endif

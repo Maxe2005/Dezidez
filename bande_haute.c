@@ -562,4 +562,9 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     action_apres_modif_offset(bande_haute);
 }
 
-
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute){
+    for (int i = 0; i < bande_haute->nb_expressions; i++) {
+        cacher_expression_si_nessessaire(bande_haute, bande_haute->expressions[i]);
+    }
+    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.15*bande_haute->button_new_expression.bt.rect.h;
+}

@@ -3,7 +3,7 @@
 
 #include "ressources.h"
 #include "grapheur.h"
-#include "grapheur_3D.h"
+#include "Gestion_3D/grapheur_3D.h"
 
 #define NB_BOUTONS_ACCUEIL 4
 

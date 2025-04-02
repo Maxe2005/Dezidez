@@ -208,6 +208,13 @@ int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event,
 void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph);
 
 /**
+ * Redimentionne tous les éléments de la fenêtre
+ * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
+ */
+void resize_fen_3D (Bande_haute* bande_haute, Bande_droite* bande_droite);
+
+/**
  * Gère tous les évènement par type
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_haute La bande d'entrées affiché

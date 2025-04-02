@@ -182,13 +182,6 @@ void resize_precision_grad (Graph* graph);
 void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
 
 /**
- * Actions à effectuer après avoir chager la taille de la bande des entrées
- * @param graph Le graphique à afficher
- * @param bande_haute La bande d'entrées à afficher
- */
-void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
-
-/**
  * Initialisation des constantes pour la structure message
  */
 void init_const_message();

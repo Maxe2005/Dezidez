@@ -1,23 +1,11 @@
 #ifndef GRAPHIQUE_3D_H
 #define GRAPHIQUE_3D_H
 
-#include "ressources.h"
-#include "bande_haute.h"
-#include "events.h"
-
-#define GRID_SIZE 20
-#define RENDER_DISTANCE 5.0f
-
-typedef struct {
-    float x, y, z;
-} Point3D;
-
-typedef struct {
-    Point3D position;
-    Point3D rotation;
-    Point3D renderCenter; // Center of our rendering area
-} Camera;
-
+#include "../ressources.h"
+#include "../bande_haute.h"
+#include "../events.h"
+#include "gestion_3D_1.h"
+#include "gestion_3D_2.h"
 
 
 typedef struct {

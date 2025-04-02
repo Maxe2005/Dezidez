@@ -2,7 +2,9 @@
 
 void init_bande_droite (SDL_Renderer* ren, Bande_droite* bande_droite){
     init_boutton_home(ren, bande_droite);
-    init_boutton_centrer(ren ,bande_droite);
+    if (dimention == _2D){
+        init_boutton_centrer(ren ,bande_droite);
+    }
 }
 
 void init_boutton_home (SDL_Renderer* ren, Bande_droite* bande_droite){
@@ -43,12 +45,16 @@ void init_boutton_centrer (SDL_Renderer* ren, Bande_droite* bande_droite){
 
 void resize_bande_droite (Bande_droite* bande_droite){
     bande_droite->bouton_retour.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_retour.rect.w)/2 ;
-    bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
+    if (dimention == _2D){
+        bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
+    }
 }
 
 void affiche_bande_droite (SDL_Renderer* ren, Bande_droite* bande_droite){
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
     renderImageButton(ren, &bande_droite->bouton_retour);
-    renderButton(ren, &bande_droite->bouton_centrer);
+    if (dimention == _2D){
+        renderButton(ren, &bande_droite->bouton_centrer);
+    }
 }
 
