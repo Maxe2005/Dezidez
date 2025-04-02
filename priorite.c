@@ -69,7 +69,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 *arbre = (Node){
                     .pjeton_preced = Fg,
                     .pjeton_suiv = NULL,
-                    .jeton = tab[indoputile]   
+                    .jeton = tab[debut]   
                 }; 
                 printf("aff arbre func\n");
                 afficher_arbre(arbre);
