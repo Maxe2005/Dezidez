@@ -44,11 +44,6 @@ Point2D project(Point3D p, Graph_3D_1* graph) {
     return projected;
 }
 
-// Fonction mathématique à afficher
-float function3D(float x, float y) {
-    return sin(sqrt(x*x + y*y));
-}
-
 // Dessiner un axe avec des graduations
 void drawAxis(SDL_Renderer* renderer, Point3D start, Point3D end, int steps, Graph_3D_1* graph) {
     Point2D start2D = project(start, graph);
@@ -78,42 +73,60 @@ void drawAxis(SDL_Renderer* renderer, Point3D start, Point3D end, int steps, Gra
 
 
 void handle_event_3D_1 (SDL_Event e, Graph_3D_1* graph, int x_souris_px, int y_souris_px){
-    if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
-        graph->dragging = 1;
+    if (is_souris_sur_rectangle((SDL_Rect){0, graph->origine_y_apres_bande_haut, FEN_X - TAILLE_BANDE_DROITE, FEN_Y - graph->origine_y_apres_bande_haut}, x_souris_px, y_souris_px)){
+        if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
+            graph->dragging = 1;
 
-    } else if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
-        graph->dragging = 0;
+        } else if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
+            graph->dragging = 0;
 
-    } else if (e.type == SDL_MOUSEMOTION && graph->dragging) {
-        float deltaX = e.motion.xrel * 0.01f;
-        float deltaY = e.motion.yrel * 0.01f;
-        Quaternion yaw = quaternionFromAxisAngle(0, 1, 0, deltaX);
-        Quaternion pitch = quaternionFromAxisAngle(1, 0, 0, deltaY);
-        graph->rotation = multiplyQuaternions(yaw, multiplyQuaternions(pitch, graph->rotation));
-        normalizeQuaternion(&graph->rotation);
+        } else if (e.type == SDL_MOUSEMOTION) {
+            if (e.motion.state & SDL_BUTTON_LMASK) {
+                float deltaX = e.motion.xrel * 0.01f;
+                float deltaY = e.motion.yrel * 0.01f;
+                Quaternion yaw = quaternionFromAxisAngle(0, 1, 0, deltaX);
+                Quaternion pitch = quaternionFromAxisAngle(1, 0, 0, deltaY);
+                graph->rotation = multiplyQuaternions(yaw, multiplyQuaternions(pitch, graph->rotation));
+                normalizeQuaternion(&graph->rotation);
+            }
 
-    } else if (e.type == SDL_MOUSEWHEEL) {
-        graph->zoom += e.wheel.y * 1.0f;
-        if (graph->zoom < 0.1f) graph->zoom = 0.1f;
+        } else if (e.type == SDL_MOUSEWHEEL) {
+            graph->zoom += e.wheel.y * 1.0f;
+            if (graph->zoom < 15) graph->zoom = 15;
+        }
     }
 }
 
-void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph) {
+void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph, Bande_haute* bande_haute) {
         // Dessiner les axes avec graduations
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         drawAxis(renderer, (Point3D){-5, 0, 0}, (Point3D){5, 0, 0}, 10, graph); // Axes X
         drawAxis(renderer, (Point3D){0, -5, 0}, (Point3D){0, 5, 0}, 10, graph); // Axes Y
         drawAxis(renderer, (Point3D){0, 0, -5}, (Point3D){0, 0, 5}, 10, graph); // Axes Z
 
-        // Dessiner la fonction
-        SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255);
-        for (float x = -5; x <= 5; x += 0.1) {
-            for (float y = -5; y <= 5; y += 0.1) {
-                Point3D p = {x, y, function3D(x, y)};
-                Point2D projected = project(p, graph);
-                if (projected.y > graph->origine_y_apres_bande_haut){
-                    SDL_RenderDrawPoint(renderer, projected.x, projected.y);
+        for (int i = 0; i < bande_haute->nb_expressions; i++) {
+            Fonction f = bande_haute->expressions[i]->fonction;
+            if (f.visible){
+                // Dessiner la fonction
+                SDL_SetRenderDrawColor(renderer, f.color.r, f.color.g, f.color.b, f.color.a);
+                for (float x = f.borne_inf; x <= f.borne_sup; x += graph->zoom/470) {
+                    for (float y = f.borne_inf; y <= f.borne_sup; y += graph->zoom/470) {
+                        int code_erreur = 0;
+                        float z = evaluateur(f.fonction_arbre, x, y, &code_erreur);
+                        if (code_erreur){
+                            ErrorInfo info_erreur = get_error_message(code_erreur);
+                            SDL_Rect rectangle = {3*FEN_X/8,3*FEN_Y/8,FEN_X/8,FEN_Y/16};
+                            set_message(info_erreur.message,rectangle);
+                            return;
+                        }
+                        Point3D p = {x, y, z};
+                        Point2D projected = project(p, graph);
+                        if (projected.y > graph->origine_y_apres_bande_haut){
+                            SDL_RenderDrawPoint(renderer, projected.x, projected.y);
+                        }
+                    }
                 }
             }
         }
+        
     }

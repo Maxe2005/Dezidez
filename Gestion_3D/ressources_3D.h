@@ -6,6 +6,7 @@
 #include <stdbool.h>
 #include "../ressources.h"
 #include "../evaluateur.h"
+#include "../bande_haute.h"
 
 // Structure pour représenter un point 3D
 typedef struct {

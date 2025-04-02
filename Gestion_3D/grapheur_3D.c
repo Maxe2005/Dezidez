@@ -9,7 +9,7 @@ void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Ba
     // Rectangle pour cacher les bande d'expression qui ne sont qu'a moitié sur la bande haute. 
     boxRGBA(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - RAYON_BAS_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h + bande_haute->params.height_bande_expression, colors->bg.r, colors->bg.g, colors->bg.b, colors->bg.a);
 
-    renderGraph3D_1(ren, graph_3D_1);
+    renderGraph3D_1(ren, graph_3D_1, bande_haute);
 
     // Dessiner le bas arrondi de la bande haute
     affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
@@ -20,10 +20,19 @@ void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Ba
     for (int j = 0; j < bande_haute->nb_expressions; j++) {
         affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
     }
+
+    if (message.is_visible){
+        if (time(NULL) - message.start_time > message.temps_affichage){
+            message.is_visible = 0;
+        } else {
+            renderButton(ren, &message.button_base);
+        }
+    }
 }
 
 
 void init_totale_interface_grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
+    dimention = _3D;
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 }
@@ -37,6 +46,7 @@ int Grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
     graph_3D_1->rotation = (Quaternion){1, 0, 0, 0};
     graph_3D_1->zoom = 0.7f * (FEN_X - TAILLE_BANDE_DROITE < FEN_Y - TAILLE_BANDE_HAUT ? FEN_X - TAILLE_BANDE_DROITE : FEN_Y - TAILLE_BANDE_HAUT) / 10.0f;
     graph_3D_1->dragging = false;
+    graph_3D_1->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
 
     resize_fen_3D(bande_haute, bande_droite);
     SDL_StartTextInput();

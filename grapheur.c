@@ -440,6 +440,7 @@ void suppr_evaluateur_x (Graph* graph, int index){
 }
 
 void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
+    dimention = _2D;
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 

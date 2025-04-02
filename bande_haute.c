@@ -116,7 +116,7 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
         but[j]->champs_texte->color_hover = but[j]->champs_texte->color_base;
         but[j]->champs_texte->color_hover.a = 150;
         but[j]->champs_texte->font_text = fonts[1];
-        but[j]->champs_texte->font_text_hover = fonts[2];
+        but[j]->champs_texte->font_text_hover = fonts[1];
         but[j]->champs_texte->taille_bonus_hover_x = 0;
         but[j]->champs_texte->taille_bonus_hover_y = 0;
         but[j]->champs_texte->radius = but[j]->position_initiale.h / 3;
@@ -504,7 +504,7 @@ Exemples exemples_fonctions_2D (){
 
 Exemples exemples_fonctions_3D (){
     Exemples ex;
-    ex.nb_exemples = 1;
+    ex.nb_exemples = 2;
     ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
     ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
     ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
@@ -512,16 +512,55 @@ Exemples exemples_fonctions_3D (){
         ex.interval[i] = malloc(sizeof(const char*) * 2);
     }
 
-    int i = -1;
-    ex.nom_f[++i] = "x";
+    // x
     typejeton x;
     x.lexem=VARIABLE;
     x.valeur.variable='x';
+    // y
+    typejeton y;
+    y.lexem=VARIABLE;
+    y.valeur.variable='y';
+    // Racine
+    typejeton Racine;
+    Racine.lexem=FONCTION;
+    Racine.valeur.fonction=SQRT;
+    // Sinus
+    typejeton Sinus;
+    Sinus.lexem=FONCTION;
+    Sinus.valeur.fonction=SIN;
+    // Addition
+    typejeton Addition;
+    Addition.lexem=OPERATEUR;
+    Addition.valeur.operateur=PLUS;
+    // Multiplication
+    typejeton Multiplication;
+    Multiplication.lexem=OPERATEUR;
+    Multiplication.valeur.operateur=FOIS;
     Node* X_ARBRE = malloc(sizeof(Node));
     *X_ARBRE = creation_arbre(x,NULL,NULL);
-    ex.arbres[i] = X_ARBRE;
+    Node* Y_ARBRE = malloc(sizeof(Node));
+    *Y_ARBRE = creation_arbre(y,NULL,NULL);
+    Node* Y_carre_ARBRE = malloc(sizeof(Node));
+    *Y_carre_ARBRE = creation_arbre(Multiplication,Y_ARBRE,Y_ARBRE);
+    Node* X_carre_ARBRE = malloc(sizeof(Node));
+    *X_carre_ARBRE = creation_arbre(Multiplication,X_ARBRE,X_ARBRE);
+    Node* SOMME_ARBRE = malloc(sizeof(Node));
+    *SOMME_ARBRE = creation_arbre(Addition,X_carre_ARBRE,Y_carre_ARBRE);
+    Node* Racine_ARBRE = malloc(sizeof(Node));
+    *Racine_ARBRE = creation_arbre(Racine,SOMME_ARBRE,NULL);
+    Node* SINUS_ARBRE = malloc(sizeof(Node));
+    *SINUS_ARBRE = creation_arbre(Sinus,Racine_ARBRE,NULL);
+
+    int i = -1;
+    ex.nom_f[++i] = "sin(sqrt(x*x + y*y))";
+    ex.arbres[i] = SINUS_ARBRE;
     ex.interval[i][0] = "-5";
     ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "x*x + y*y";
+    ex.arbres[i] = SOMME_ARBRE;
+    ex.interval[i][0] = "-2";
+    ex.interval[i][1] = "2";
 
     return ex;
 }
@@ -536,7 +575,7 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     Exemples exemples;
     if (dimention == _2D){
         exemples = exemples_fonctions_2D();
-    }else if (dimention == _3D){
+    } else if (dimention == _3D){
         exemples = exemples_fonctions_3D();
     }
 

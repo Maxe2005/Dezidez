@@ -75,7 +75,8 @@ void handle_event_3D_1 (SDL_Event e, Graph_3D_1* graph, int x_souris_px, int y_s
  * Affiche le graphique 3D
  * @param renderer Un pointeur sur une structure contenant l'état du rendu
  * @param graph Le graphique 3D à afficher
+ * @param bande_haute La bande haute avec toutes les expressions des fonctions
  */
-void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph);
+void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph, Bande_haute* bande_haute);
 
 #endif

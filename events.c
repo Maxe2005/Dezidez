@@ -441,11 +441,13 @@ int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute
             is_MOUSEMOTION_used = handle_event_bande_haut_MOUSEMOTION (event, bande_haute, *x_souris_px, *y_souris_px);
             if (!is_MOUSEMOTION_used) {
                 handle_event_bande_droite_MOUSEMOTION(event, bande_droite, *x_souris_px, *y_souris_px);
+                handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
             }
         }
 
         if (event.type == SDL_MOUSEWHEEL) {
             handle_event_bande_haut_MOUSEWHEEL (event, bande_haute, *x_souris_px, *y_souris_px);
+            handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
@@ -454,14 +456,14 @@ int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute
             if (!is_MOUSEBUTTONUP_used){
                 is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, NULL, *x_souris_px, *y_souris_px);
                 if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                if (!is_MOUSEBUTTONUP_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
             }
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {
             bool is_MOUSEBUTTONDOWN_used = false;
             is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
-            }
+            if (!is_MOUSEBUTTONDOWN_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
         }
 
         if (event.type == SDL_TEXTINPUT) {
@@ -479,7 +481,7 @@ int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute
                 return 2; // On revient à l'écran d'accueil
             }
         }
-        handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
+        
     }
     return 0; // On ne quitte pas le grapheur
 }
