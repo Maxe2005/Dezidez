@@ -9,18 +9,27 @@
 #include "Structures.h"
 
 #define TAILLE_MAX 100
+#define MAX_DEPTH TAILLE_MAX
 
-Node arbrevide();
-Node operateur( typejeton *tab, int debut, int fin, typeerreur *erreur);
+void afficher_liste_jetons(typejeton *liste, int debut, int fin);
+Node* arbrevide();
+Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur);
 bool parenthese(int debut, int fin, typejeton *tab);
 int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur);
 int calculTaille(typejeton *tab);
-Node Syntaxique(typejeton *tab, typeerreur *erreur);
+Node* Syntaxique(typejeton *tab, typeerreur *erreur);
 
 // Affichage
-void affiche_liste_jeton(typejeton *tab, int debut, int fin);
 void jeton_to_string(typejeton jeton, char* buffer, size_t size);
 void afficher_arbre_rec(Node* racine, char* prefixe, int est_dernier);
 void afficher_arbre(Node* racine);
+void afficher_arbre2(Node* racine, int niveau);
+const char* choisir_couleur(typelexem lexem);
+void afficher_rec_couleur(Node* noeud, char* prefixe, int est_dernier);
+void afficher_arbre_couleur(Node* racine);
+bool comparer_arbres(Node* arbre1, Node* arbre2);
+void liberer_arbre(Node* racine);
+
+
 
 #endif

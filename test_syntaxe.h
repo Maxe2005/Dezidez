@@ -23,5 +23,6 @@ void test_parenthese_fermee_1er_jeton();
 void test_expression_valide();
 
 void tester_syntaxe();
+void test_cos_plus_sin();
 
 #endif // TEST_SYNTAXE_H
