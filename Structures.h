@@ -7,19 +7,19 @@
 //énumération des différents types de lexems existants
 typedef enum
 {
-    REEL, OPERATEUR, FONCTION, ERREUR, FIN, PAR_OUV, PAR_FERM, VARIABLE, BAR_OUV, BAR_FERM, ABSOLU
+    REEL=0, OPERATEUR, FONCTION, ERREUR, FIN, PAR_OUV, PAR_FERM, VARIABLE, BAR_OUV, BAR_FERM, ABSOLU
 } typelexem;
 
 //énumération des diff types d'opérateurs existants
 typedef enum
 {
-    PLUS = 0, MOINS = 1, FOIS = 10, DIV = 11, PUIS = 20
+    PLUS=0, MOINS, FOIS, DIV, PUIS
 } typeoperateur;
 
 //énumération des diff types de fonctions existantes
 typedef enum
 {
-    ABS, SIN, SQRT, LOG, COS, TAN, EXP, ENTIER, VAL_NEG, SINC
+    ABS=0, SIN, SQRT, LOG, COS, TAN, EXP, ENTIER, VAL_NEG, SINC
 } typefonction;
 
 //énumération des diff types de valeurs existantes

@@ -1,7 +1,5 @@
 #include "affiche_syntaxe.h"
 
-
-
 void afficher_liste_jetons(typejeton* liste, int debut, int fin) {
     if (liste == NULL) {
         printf("Liste de jetons vide\n");

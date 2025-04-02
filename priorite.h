@@ -8,7 +8,13 @@
 #include <float.h>
 #include "Structures.h"
 
-
+static const char opPriorite[] = {
+    [PLUS] = 0, 
+    [MOINS] = 0, 
+    [FOIS] = 1, 
+    [DIV] = 1, 
+    [PUIS] = 2
+};
 
 Node* arbrevide();
 Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur);

@@ -12,7 +12,7 @@ void test_valide1() {
     Node* a = Syntaxique(tab, &erreur);
     //printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
     //afficher_arbre(a);
-    afficher_arbre2(a, 0);
+    //afficher_arbre2(a, 0);
     afficher_arbre_couleur(a);
 }
 
@@ -27,16 +27,16 @@ void test_valide2() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ÉCHEC", erreur);
+    printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ECHEC", erreur);
     //printf("fg a = %d\n", a.pjeton_preced->jeton.lexem);
     //afficher_arbre(&a);
-    afficher_arbre2(a, 0);
+    //afficher_arbre2(a, 0);
     afficher_arbre_couleur(a);
 }
 
 void test_valide3() {
     typejeton tab[] = {
-        {VARIABLE, {.reel = 0}},
+        {VARIABLE, {.variable = 'x'}},
         {OPERATEUR, {.operateur = PUIS}},
         {REEL, {.reel = 2.0}},
         {FIN, {0}}
@@ -44,7 +44,7 @@ void test_valide3() {
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
     printf("Test valide 3 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
-    afficher_arbre2(a, 0);
+    //afficher_arbre2(a, 0);
     afficher_arbre_couleur(a);
 }
 
@@ -103,9 +103,9 @@ void test_erreur_manque_parenthese() {
 
 // Fonction principale qui exécute tous les tests
 void tester_syntaxe() {
-    //test_valide1();
-    //test_valide2();
-    //test_valide3();
+    test_valide1();
+    test_valide2();
+    test_valide3();
     /*test_erreur_operateurs_a_la_suite1();
     test_erreur_operateurs_a_la_suite2();
     test_erreur_manque_operateur();
@@ -116,7 +116,7 @@ void tester_syntaxe() {
     test_membre_vide();
     test_parenthese_fermee_1er_jeton();*/
     //test_expression_valide();
-    test_cos_plus_sin();
+    //test_cos_plus_sin();
 }
 
 
@@ -127,7 +127,7 @@ void test_expression_valide() {
         {REEL, {.reel = 3.0}},
         {OPERATEUR, {.operateur = PLUS}},
         {REEL, {.reel = 6.0}},
-        {OPERATEUR, {.operateur = PUIS}},
+        {OPERATEUR, {.operateur = FOIS}},
         {VARIABLE, {.variable = 'X'}},
         {PAR_FERM, {0}},
         {OPERATEUR, {.operateur = PLUS}},
@@ -240,7 +240,7 @@ void test_cos_plus_sin() {
     // Niveau 1: Opérateur + principal
     Node* racine = (Node*)malloc(sizeof(Node));
     racine->jeton.lexem = OPERATEUR;
-    racine->jeton.valeur.operateur = PLUS;
+    racine->jeton.valeur.operateur = FOIS;
 
     // Branche gauche: cos(3)
     Node* cos = (Node*)malloc(sizeof(Node));
@@ -282,7 +282,7 @@ void test_cos_plus_sin() {
 
     // Afficher arbre
     //afficher_arbre2(arbre_syntaxique,0);
-    afficher_arbre_couleur(arbre_syntaxique);
+    afficher_arbre_couleur(racine);
 
     // Libération de la mémoire
     liberer_arbre(arbre_syntaxique);

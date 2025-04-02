@@ -5,15 +5,16 @@ Node* arbrevide(){
     *arbre = (Node){
         .pjeton_preced = NULL,
         .pjeton_suiv = NULL,
-        .jeton = FIN
+        .jeton = {.lexem = FIN, .valeur = {0}}
     };
     return arbre;
 }
 
 Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
 
-    //afficher_liste_jetons(tab, debut, fin);
+    afficher_liste_jetons(tab, debut, fin);
     int  indoputile = minIndice(tab, debut, fin, erreur);
+    printf("indoputile=%d\n", indoputile);
     if (*erreur != 0){
         return arbrevide();
     }
@@ -46,8 +47,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     return arbrevide();
                 }
 
-                Node* Fg = (Node*)malloc(sizeof(Node));
-                Fg = operateur(tab, debut + 2, fin - 1, erreur);
+                Node* Fg = operateur(tab, debut + 2, fin - 1, erreur);
                 Node* arbre = (Node*)malloc(sizeof(Node));
                 *arbre = (Node){
                     .pjeton_preced = Fg,
@@ -66,13 +66,12 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     return arbrevide();
                 }
                 else{
-                    Node* FG = (Node*)malloc(sizeof(Node));
-                    FG = operateur(tab, debut + 1, fin - 1, erreur);
+                    Node* FG = operateur(tab, debut + 1, fin - 1, erreur);
                     Node* arbre = (Node*)malloc(sizeof(Node));
                     *arbre = (Node){
                         .pjeton_preced = FG,
                         .pjeton_suiv = NULL,
-                        .jeton = tab[indoputile]
+                        .jeton = tab[debut]
                     };
                     return arbre;
                 }
@@ -100,40 +99,39 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 break;
         } 
     }
+    return arbrevide();
 }
 
 int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur){
-    int prof = 0;
-    int operateurutile = 0;
-    int indoputile = -1;
-    for (int i = debut; i< fin+1; i++){
-        switch (tab[i].lexem){
+    int depth = 0;
+    int minOperatorIndex = -1;
+    int minOperatorPriority = TAILLE_MAX;
+
+    for (int i = debut; i <= fin; i++) {
+        switch (tab[i].lexem) {
             case OPERATEUR:
-                if (prof == 0){
-                    if (operateurutile < tab[i].lexem){
-                        operateurutile = tab[i].lexem;
-                        indoputile = i;
-                    }
+                if (depth == 0 && opPriorite[tab[i].valeur.operateur] < minOperatorPriority) {
+                    minOperatorIndex = i;
+                    minOperatorPriority = opPriorite[tab[i].valeur.operateur];
                 }
                 break;
-                
             case PAR_OUV:
-                prof = prof + 1;
+                depth++;
                 break;
-
             case PAR_FERM:
-                prof = prof - 1;
-                break;   
-
+                depth--;
+                break;
             default:
                 break;
         }
     }
-    if (prof!= 0){
+
+    if (depth != 0) {
         *erreur = PROBLEMES_NOMBRE_PARENTHESES;
         return -1;
     }
-    return (indoputile);
+
+    return minOperatorIndex;
 }
 
 
@@ -149,7 +147,7 @@ int calculTaille(typejeton *tab){
 bool parenthese(int debut, int fin, typejeton *tab){
     int nbouv = 0;
     int nbfer = 0;
-    for (int i = debut; i < fin - debut + 1; i++){
+    for (int i = debut; i <= fin; i++){
         if (tab[i].lexem == PAR_OUV){
             nbouv = nbouv + 1;
         }
