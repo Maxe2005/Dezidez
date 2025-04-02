@@ -1,12 +1,13 @@
 #ifndef TEST_SYNTAXE_H
 #define TEST_SYNTAXE_H
 
-#include "priorite.h"
-
 //#include <stdio.h>
 //#include <stdlib.h>
 
 #include "Structures.h"
+#include "affiche_syntaxe.h"
+#include "priorite.h"
+
 // Prototypes des fonctions de test
 void test_valide1();
 void test_valide2();

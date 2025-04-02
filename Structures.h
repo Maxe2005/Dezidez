@@ -1,6 +1,9 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#define TAILLE_MAX 100
+#define MAX_DEPTH TAILLE_MAX
+
 //énumération des différents types de lexems existants
 typedef enum
 {

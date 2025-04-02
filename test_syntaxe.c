@@ -10,8 +10,10 @@ void test_valide1() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
+    //printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
     //afficher_arbre(a);
+    afficher_arbre2(a, 0);
+    afficher_arbre_couleur(a);
 }
 
 void test_valide2() {
@@ -28,6 +30,8 @@ void test_valide2() {
     printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ÉCHEC", erreur);
     //printf("fg a = %d\n", a.pjeton_preced->jeton.lexem);
     //afficher_arbre(&a);
+    afficher_arbre2(a, 0);
+    afficher_arbre_couleur(a);
 }
 
 void test_valide3() {
@@ -38,8 +42,10 @@ void test_valide3() {
         {FIN, {0}}
     };
     typeerreur erreur = 0;
-    Syntaxique(tab, &erreur);
+    Node* a = Syntaxique(tab, &erreur);
     printf("Test valide 3 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
+    afficher_arbre2(a, 0);
+    afficher_arbre_couleur(a);
 }
 
 void test_erreur_operateurs_a_la_suite1() {
@@ -97,10 +103,10 @@ void test_erreur_manque_parenthese() {
 
 // Fonction principale qui exécute tous les tests
 void tester_syntaxe() {
-    /*test_valide1();
-    test_valide2();
-    test_valide3();
-    test_erreur_operateurs_a_la_suite1();
+    //test_valide1();
+    //test_valide2();
+    //test_valide3();
+    /*test_erreur_operateurs_a_la_suite1();
     test_erreur_operateurs_a_la_suite2();
     test_erreur_manque_operateur();
     test_erreur_manque_parenthese();
@@ -121,7 +127,7 @@ void test_expression_valide() {
         {REEL, {.reel = 3.0}},
         {OPERATEUR, {.operateur = PLUS}},
         {REEL, {.reel = 6.0}},
-        {OPERATEUR, {.operateur = FOIS}},
+        {OPERATEUR, {.operateur = PUIS}},
         {VARIABLE, {.variable = 'X'}},
         {PAR_FERM, {0}},
         {OPERATEUR, {.operateur = PLUS}},
@@ -140,7 +146,8 @@ void test_expression_valide() {
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
     printf("Test expression valide : %s. Erreur=%d\n", erreur == 0 ? "OK" : "ÉCHEC", erreur);
-    afficher_arbre(a);
+    //afficher_arbre2(a, 0);
+    afficher_arbre_couleur(a);
 
 }
 
@@ -212,7 +219,7 @@ void test_cos_plus_sin() {
         {PAR_OUV, {0}},
         {REEL, {.reel = 3.0}},
         {PAR_FERM, {0}},
-        {OPERATEUR, {.operateur = PLUS}},
+        {OPERATEUR, {.operateur = FOIS}},
         {FONCTION, {.fonction = COS}},
         {PAR_OUV, {0}},
         {REEL, {.reel = 2.0}},
@@ -274,8 +281,8 @@ void test_cos_plus_sin() {
            (erreur == 0 && arbres_identiques) ? "OK" : "ÉCHEC", erreur);
 
     // Afficher arbre
-    afficher_arbre2(arbre_syntaxique,0);
-    //afficher_arbre_couleur(arbre_syntaxique);
+    //afficher_arbre2(arbre_syntaxique,0);
+    afficher_arbre_couleur(arbre_syntaxique);
 
     // Libération de la mémoire
     liberer_arbre(arbre_syntaxique);
