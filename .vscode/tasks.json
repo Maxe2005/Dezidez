@@ -28,6 +28,7 @@
         "args": [
           "*.c",
           "cJSON/cJSON.c",
+          "Gestion_3D/*.c",
           "-o",
           "prog",
           "-g",

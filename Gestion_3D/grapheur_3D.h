@@ -31,7 +31,7 @@ void init_totale_interface_grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements 
  * @param bande_haute La bande d'entrées à afficher
  * @param bande_droite La bande droite affichée
  */
-void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite);
+void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph_3D_1* graph_3D_1);
 
 /**
  * Fonction principale du grapheur 3D

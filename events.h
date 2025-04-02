@@ -5,6 +5,8 @@
 #include "bande_haute.h"
 #include "bande_droite.h"
 #include "grapheur.h"
+#include "Gestion_3D/gestion_3D_1.h"
+#include "Gestion_3D/gestion_3D_2.h"
 
 
 
@@ -235,6 +237,6 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite
  * @param y_souris_px La position en ordonnées actuelle de la souris 
  * @param is_event_backspace_used Permet de séparer (ou hiérarchiser) l'utilisation de la touche backspace pour plusieurs utilisation
  */
-int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
+int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
 
 #endif

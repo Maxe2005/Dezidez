@@ -13,6 +13,10 @@
 #include "evaluateur.h"
 #include "Analyse_lexicale.h"
 
+#define TAILLE_BANDE_DESCRIPTIONS 40 
+#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
+#define TAILLE_BANDE_DROITE 150
+
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 50

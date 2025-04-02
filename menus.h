@@ -28,8 +28,9 @@ void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_el
 /**
  * Affiche le titre de la page d'accueil
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param titre Le titre wrappé
  */
-void affiche_titre (SDL_Renderer* ren);
+void affiche_titre (SDL_Renderer* ren, WrappedText *titre);
 
 /**
  * Initialise les boutons de l'écran d'accueil
@@ -53,11 +54,12 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]);
  * @param buttons Le tableau de boutons
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bg L'image de fond
+ * @param titre Le titre wrappé
  * @param running Un pointeur sur un entier qui permet de quitter la boucle de jeu
  * @param gr_ele Les éléments du grapheur
  * @param grapheur_ele_3D Les éléments du grapheur 3D
  */
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, WrappedText *titre, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
 
 /**
  * Affiche une page de texte scrollable
@@ -114,5 +116,13 @@ void free_background (Background* bg);
  * @param boutons Un tableau avec tous les boutons à redimentionner
  */
 void resize_boutons_acceuil (Button* boutons[]);
+
+/**
+ * Redimentionne tout l'ecran d'accueil
+ * @param boutons Un tableau avec tous les boutons à redimentionner
+ * @param bg La structure nessessaire pour l'image de fond
+ * @param titre Le titre wrappé
+ */
+void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre);
 
 #endif

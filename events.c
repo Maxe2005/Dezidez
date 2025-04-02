@@ -319,6 +319,8 @@ void handle_event_bande_droite_MOUSEMOTION (SDL_Event event, Bande_droite* bande
 int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_droite* bande_droite, Bande_haute* bande_haute, Graph* graph, int x_souris_px, int y_souris_px){
     int clic_utile = 0;
     if (!clic_utile && is_souris_sur_rectangle(bande_droite->bouton_retour.rect, x_souris_px, y_souris_px)) {
+        bande_droite->bouton_retour.hovered = 0;
+        bande_droite->bouton_retour.pourcentage_place = 80;
         return -1; // Retourner à l'accueil
     }
     if (dimention == _2D){
@@ -348,6 +350,8 @@ void resize_fen_3D (Bande_haute* bande_haute, Bande_droite* bande_droite){
     resize_bande_haut(bande_haute);
     resize_bande_droite(bande_droite);
 }
+
+
 
 int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
     SDL_Event event;
@@ -419,8 +423,7 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite
     return 0; // On ne quitte pas le grapheur
 }
 
-
-int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
+int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used){
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) return 1; // On quitte le grapheur
@@ -428,6 +431,7 @@ int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_dro
         if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = event.window.data1;
             FEN_Y = event.window.data2;
+            resize_fen_3D(bande_haute, bande_droite);
         }
 
         if (event.type == SDL_MOUSEMOTION) {
@@ -475,6 +479,7 @@ int handle_all_events_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_dro
                 return 2; // On revient à l'écran d'accueil
             }
         }
+        handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
     }
     return 0; // On ne quitte pas le grapheur
 }

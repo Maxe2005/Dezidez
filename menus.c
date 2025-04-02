@@ -9,57 +9,67 @@ void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_el
     // Chargement du fond d'ecran
     Background* bg = malloc(sizeof(Background));
     init_background(ren, "bg2.jpg", bg);
-    resize_background(bg);
 
+    WrappedText *titre = malloc(sizeof(WrappedText));
+
+    resize_ecran_acceuil(buttons, bg, titre);
     int running = 1;
     while (running) {
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
         affiche_background(ren, bg);
-        affiche_titre(ren);
+        affiche_titre(ren, titre);
         affiche_boutons_accueil(ren, buttons);
         updateDisplay(ren);
 
-        handle_events_accueil(buttons, ren, bg, &running, gr_ele, grapheur_ele_3D);
+        handle_events_accueil(buttons, ren, bg, titre, &running, gr_ele, grapheur_ele_3D);
     }
     free_background(bg);
+    free(titre);
 }
 
-void affiche_titre (SDL_Renderer* ren){
+void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre){
+    resize_background(bg);
+    resize_boutons_acceuil(buttons);
+    *titre = text_wrapper(fonts[0], "Grapheur d'expressions fonctionnelles", FEN_X - 20);
+}
+
+void affiche_titre (SDL_Renderer* ren, WrappedText *titre){
     SDL_SetRenderDrawBlendMode(ren, SDL_BLENDMODE_BLEND);
     int marge_x_fond = 20;
     int marge_y_fond = 10;
-    int pos_y = FEN_Y/3;
+    int pos_y = FEN_Y/6;
 
-    SDL_Surface *surface = TTF_RenderUTF8_Solid(fonts[0], "Grapheur d'expressions fonctionnelles", (SDL_Color){255, 255, 255, 255});
-    SDL_Texture *texture = SDL_CreateTextureFromSurface(ren, surface);
-    SDL_Rect textRect = {FEN_X / 2 - surface->w / 2, pos_y / 2 - surface->h / 2, surface->w, surface->h};
-    
+    int titre_width = 0;
+    int w;
+    Ligne_texte* current_line = &titre->fist_ligne;
+    for (int i = 0; i < titre->nb_lines; i++) {
+        TTF_SizeText(fonts[0], current_line->text, &w, NULL);
+        if (w > titre_width) titre_width = w;
+        current_line = current_line->ligne_suivante;
+    }
+
     // Fond de l'en-tête
     SDL_SetRenderDrawColor(ren, 50, 50, 50, 200);
-    SDL_Rect header = {textRect.x - marge_x_fond, textRect.y - marge_y_fond, textRect.w + 2*marge_x_fond, textRect.h + 2*marge_y_fond};
+    SDL_Rect header = {(FEN_X - titre_width)/2 - marge_x_fond, pos_y - titre->total_height/2 - marge_y_fond, titre_width + 2*marge_x_fond, titre->total_height + 2*marge_y_fond};
     SDL_RenderFillRect(ren, &header);
 
-    SDL_RenderCopy(ren, texture, NULL, &textRect);
-
-    SDL_FreeSurface(surface);
-    SDL_DestroyTexture(texture);
+    render_text_wrapped(ren, *titre, (SDL_Rect){0, 0, FEN_X, 2*pos_y}, (SDL_Color){255, 255, 255, 255}, ALIGN_CENTER_X, ALIGN_MIDDLE_Y);
 }
 
 void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur, Button* button_grapheur_3D) {
     int button_height = 60;
     int button_width = 300;
     int button_margin_x = 20;
+    int button_margin_y = 20;
+    int marge_fen = 20;
     SDL_Color color_texte = {255, 255, 255, 255};
     SDL_Color color_base = {20, 30, 60, 200};
     SDL_Color color_touch = {0, 120, 255, 200};
     
     Button* but[] = {button_mode_emploi, button_remerciements, button_grapheur, button_grapheur_3D};
     char* noms[] = {"Mode d'emploi", "Remerciements", "Grapheur", "Grapheur 3D"};
-    int origine_x = FEN_X/2 - (NB_BOUTONS_ACCUEIL * button_width + (NB_BOUTONS_ACCUEIL - 1) * button_margin_x)/2;
     for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
-        but[j]->rect.x = origine_x + j * (button_width + button_margin_x);
-        but[j]->rect.y = (FEN_Y - button_height)/2;
         but[j]->rect.w = button_width;
         but[j]->rect.h = button_height;
         but[j]->is_survolable = 1;
@@ -81,10 +91,28 @@ void resize_boutons_acceuil (Button* boutons[]){
     int button_height = 60;
     int button_width = 300;
     int button_margin_x = 20;
-    int origine_x = FEN_X/2 - (NB_BOUTONS_ACCUEIL * button_width + (NB_BOUTONS_ACCUEIL - 1) * button_margin_x)/2;
-    for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
-        boutons[i]->rect.x = origine_x + i * (button_width + button_margin_x);
-        boutons[i]->rect.y = (FEN_Y - button_height)/2;
+    int button_margin_y = 20;
+    int marge_fen = 20;
+
+    int origines_x[NB_BOUTONS_ACCUEIL];
+    int nb_bts_par_ligne[NB_BOUTONS_ACCUEIL];
+    nb_bts_par_ligne[0] = NB_BOUTONS_ACCUEIL;
+    int k = 0;
+    while (nb_bts_par_ligne[k] > 0){
+        origines_x[k] = FEN_X/2 - (nb_bts_par_ligne[k] * button_width + (nb_bts_par_ligne[k] - 1) * button_margin_x)/2;
+        while (origines_x[k] <= marge_fen && nb_bts_par_ligne[k] > 1){
+            nb_bts_par_ligne[k]--;
+            origines_x[k] = FEN_X/2 - (nb_bts_par_ligne[k] * button_width + (nb_bts_par_ligne[k] - 1) * button_margin_x)/2;
+        }
+        k++;
+        nb_bts_par_ligne[k] = NB_BOUTONS_ACCUEIL;
+        for (int i = 0; i < k; i++) {
+            nb_bts_par_ligne[k] -= nb_bts_par_ligne[i];
+        }
+    }
+    for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
+        boutons[j]->rect.x = origines_x[(j / nb_bts_par_ligne[0])] + (j % nb_bts_par_ligne[0]) * (button_width + button_margin_x);
+        boutons[j]->rect.y = (FEN_Y - button_height)/2 + (j / nb_bts_par_ligne[0]) * (button_height + button_margin_y);
     }
 }
 
@@ -94,7 +122,7 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
     }
 }
 
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D) {
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, WrappedText *titre, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *running = 0;
@@ -102,8 +130,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = e.window.data1;
             FEN_Y = e.window.data2;
-            resize_background(bg);
-            resize_boutons_acceuil(buttons);
+            resize_ecran_acceuil(buttons, bg, titre);
         }
 
         if (e.type == SDL_MOUSEMOTION) {
@@ -140,8 +167,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     }
                     if (!mode_quitter) *running = 0;
                     buttons[i]->hovered = 0;
-                    resize_background(bg);
-                    resize_boutons_acceuil(buttons);
+                    resize_ecran_acceuil(buttons, bg, titre);
                     return;
                 }
             }
@@ -167,8 +193,7 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     break;
             }
             if (!mode_quitter) *running = 0;
-            resize_background(bg);
-            resize_boutons_acceuil(buttons);
+            resize_ecran_acceuil(buttons, bg, titre);
         }
     }
 }

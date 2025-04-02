@@ -7,7 +7,7 @@ Camera camera = {
 };
 
 // Function to project 3D point to 2D screen coordinates
-void projectPoint(Point3D_ point, int* screenX, int* screenY) {
+void projectPoint(Point3D point, int* screenX, int* screenY) {
     // Apply camera position
     point.x -= camera.position.x;
     point.y -= camera.position.y;
@@ -30,11 +30,11 @@ void projectPoint(Point3D_ point, int* screenX, int* screenY) {
     
     // Perspective projection
     float scale = 200.0f / (point.z + 5.0f);
-    *screenX = WIDTH / 2 + (int)(point.x * scale);
-    *screenY = HEIGHT / 2 + (int)(point.y * scale);
+    //*screenX = WIDTH / 2 + (int)(point.x * scale);
+    //*screenY = HEIGHT / 2 + (int)(point.y * scale);
 }
 
-bool shouldRenderPoint(Point3D_ point) {
+bool shouldRenderPoint(Point3D point) {
     // Check if point is within our render distance square
     return (point.x >= camera.renderCenter.x - RENDER_DISTANCE &&
             point.x <= camera.renderCenter.x + RENDER_DISTANCE &&
@@ -54,8 +54,8 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw grid lines in X direction
     for (float y = floor(minY); y <= ceil(maxY); y += 1.0f) {
-        Point3D_ start = {minX, y, 0};
-        Point3D_ end = {maxX, y, 0};
+        Point3D start = {minX, y, 0};
+        Point3D end = {maxX, y, 0};
         
         int sx, sy, ex, ey;
         projectPoint(start, &sx, &sy);
@@ -65,8 +65,8 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw grid lines in Y direction
     for (float x = floor(minX); x <= ceil(maxX); x += 1.0f) {
-        Point3D_ start = {x, minY, 0};
-        Point3D_ end = {x, maxY, 0};
+        Point3D start = {x, minY, 0};
+        Point3D end = {x, maxY, 0};
         
         int sx, sy, ex, ey;
         projectPoint(start, &sx, &sy);
@@ -76,16 +76,16 @@ void drawInfiniteAxis(SDL_Renderer* renderer) {
     
     // Draw main axes (X and Y)
     SDL_SetRenderDrawColor(renderer, 255, 0, 0, 255); // Red X axis
-    Point3D_ xStart = {minX, 0, 0};
-    Point3D_ xEnd = {maxX, 0, 0};
+    Point3D xStart = {minX, 0, 0};
+    Point3D xEnd = {maxX, 0, 0};
     int xs, ys, xe, ye;
     projectPoint(xStart, &xs, &ys);
     projectPoint(xEnd, &xe, &ye);
     SDL_RenderDrawLine(renderer, xs, ys, xe, ye);
     
     SDL_SetRenderDrawColor(renderer, 0, 255, 0, 255); // Green Y axis
-    Point3D_ yStart = {0, minY, 0};
-    Point3D_ yEnd = {0, maxY, 0};
+    Point3D yStart = {0, minY, 0};
+    Point3D yEnd = {0, maxY, 0};
     projectPoint(yStart, &xs, &ys);
     projectPoint(yEnd, &xe, &ye);
     SDL_RenderDrawLine(renderer, xs, ys, xe, ye);
@@ -103,7 +103,7 @@ void renderGraph(SDL_Renderer* renderer) {
     float step = 0.2f;
     for (float x = minX; x <= maxX; x += step) {
         for (float y = minY; y <= maxY; y += step) {
-            Point3D_ point = {x, y, sin(x) * cos(y)};
+            Point3D point = {x, y, sin(x) * cos(y)};
             if (shouldRenderPoint(point)) {
                 int screenX, screenY;
                 projectPoint(point, &screenX, &screenY);
@@ -156,7 +156,7 @@ void render(SDL_Renderer* renderer) {
     
     // Draw render area boundary (for visualization)
     SDL_SetRenderDrawColor(renderer, 255, 255, 0, 100);
-    Point3D_ corners[4] = {
+    Point3D corners[4] = {
         {camera.renderCenter.x - RENDER_DISTANCE, camera.renderCenter.y - RENDER_DISTANCE, 0},
         {camera.renderCenter.x + RENDER_DISTANCE, camera.renderCenter.y - RENDER_DISTANCE, 0},
         {camera.renderCenter.x + RENDER_DISTANCE, camera.renderCenter.y + RENDER_DISTANCE, 0},

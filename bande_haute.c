@@ -478,6 +478,54 @@ void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
     action_apres_modif_offset(bande_haute);
 }
 
+Exemples exemples_fonctions_2D (){
+    Exemples ex;
+    ex.nb_exemples = 1;
+    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+
+    int i = -1;
+    ex.nom_f[++i] = "x";
+    typejeton x;
+    x.lexem=VARIABLE;
+    x.valeur.variable='x';
+    Node* X_ARBRE = malloc(sizeof(Node));
+    *X_ARBRE = creation_arbre(x,NULL,NULL);
+    ex.arbres[i] = X_ARBRE;
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    return ex;
+}
+
+Exemples exemples_fonctions_3D (){
+    Exemples ex;
+    ex.nb_exemples = 1;
+    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+
+    int i = -1;
+    ex.nom_f[++i] = "x";
+    typejeton x;
+    x.lexem=VARIABLE;
+    x.valeur.variable='x';
+    Node* X_ARBRE = malloc(sizeof(Node));
+    *X_ARBRE = creation_arbre(x,NULL,NULL);
+    ex.arbres[i] = X_ARBRE;
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    return ex;
+}
+
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     if (bande_haute->nb_expressions >= NB_EXPRESSIONS_MAX) return; // TODO : message d'erreur
     bande_haute->expressions[bande_haute->nb_expressions] = malloc(sizeof(Expression_fonction));
@@ -485,68 +533,19 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    const char* nom_f[] = {"sin(x)", "sqrt(x)", "exp(x)", "x", "2-x"};
-    typejeton x;
-    x.lexem=VARIABLE;
-    x.valeur.variable='x';
-    //Soustraction
-    typejeton Soustraction;
-    Soustraction.lexem=OPERATEUR;
-    Soustraction.valeur.operateur=MOINS;
-    // Racine
-    typejeton Racine;
-    Racine.lexem=FONCTION;
-    Racine.valeur.fonction=SQRT;
-    // Logarithme
-    typejeton Logarithme;
-    Logarithme.lexem=FONCTION;
-    Logarithme.valeur.fonction=LOG;
-    // Tangente
-    typejeton Tangente;
-    Tangente.lexem=FONCTION;
-    Tangente.valeur.fonction=TAN;
-    // Sinus
-    typejeton Sinus;
-    Sinus.lexem=FONCTION;
-    Sinus.valeur.fonction=SIN;
-    // Cosinus
-    typejeton Cosinus;
-    Cosinus.lexem=FONCTION;
-    Cosinus.valeur.fonction=COS;
-    // Exp
-    typejeton Exp;
-    Exp.lexem=FONCTION;
-    Exp.valeur.fonction=EXP;
-    //Deux
-    typejeton Deux;
-    Deux.lexem=REEL;
-    Deux.valeur.reel=2;
-    Node* DEUX_ARBRE = malloc(sizeof(Node));
-    *DEUX_ARBRE = creation_arbre(Deux,NULL,NULL);
-    Node* X_ARBRE = malloc(sizeof(Node));
-    *X_ARBRE = creation_arbre(x,NULL,NULL);
-    Node* COSINUS_ARBRE = malloc(sizeof(Node));
-    *COSINUS_ARBRE = creation_arbre(Cosinus,X_ARBRE,NULL);
-    Node* SOMME_ARBRE = malloc(sizeof(Node));
-    *SOMME_ARBRE = creation_arbre(Soustraction,DEUX_ARBRE,X_ARBRE);
-    Node* EXP_ARBRE = malloc(sizeof(Node));
-    *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
-    Node* SIN_ARBRE = malloc(sizeof(Node));
-    *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
-    Node* RACINE_ARBRE = malloc(sizeof(Node));
-    *RACINE_ARBRE = creation_arbre(Racine,X_ARBRE,NULL);
-    Node* LOGARITHME_ARBRE = malloc(sizeof(Node));
-    *LOGARITHME_ARBRE = creation_arbre(Logarithme,X_ARBRE,NULL);
-    Node* TANGENTE_ARBRE = malloc(sizeof(Node));
-    *TANGENTE_ARBRE = creation_arbre(Tangente,X_ARBRE,NULL);
-    Node* arbres[] = {SIN_ARBRE, RACINE_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
-    const char* interval[][2] = {{"1", "4"}, {"5", "10"}, {"1", "3"}, {"1", "3.5"}, {"1e1", "2e2"}};
+    Exemples exemples;
+    if (dimention == _2D){
+        exemples = exemples_fonctions_2D();
+    }else if (dimention == _3D){
+        exemples = exemples_fonctions_3D();
+    }
+
+
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
-    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
-    int a = nb_alea(0,4);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, interval[a][0]);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, interval[a][1]);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = exemples.arbres[bande_haute->nb_expressions % exemples.nb_exemples];
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, exemples.nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][0]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][1]);
     char *end;
     float test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, &end);
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_inf = test - 2;
