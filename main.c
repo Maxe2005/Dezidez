@@ -1,6 +1,7 @@
 #include "ressources.h"
 #include "menus.h"
 #include "grapheur.h"
+#include "Gestion_3D/grapheur_3D.h"
 
 int main (int argc, char *argv[]){
     srand(time(NULL));
@@ -15,6 +16,8 @@ int main (int argc, char *argv[]){
     
     init_font(fonts);
     init_tous_les_json();
+    colors = malloc(sizeof(Colors));
+    change_color_mode(1);
 
     Grapheur_elements grapheur_ele;
     grapheur_ele.bande_haute = malloc(sizeof(Bande_haute));
@@ -22,7 +25,12 @@ int main (int argc, char *argv[]){
     grapheur_ele.graph = malloc(sizeof(Graph));
     init_totale_interface_grapheur(ren, &grapheur_ele);
 
-    ecran_acceuil(ren, &grapheur_ele);
+    Grapheur_3D_elements grapheur_ele_3D;
+    grapheur_ele_3D.bande_haute = malloc(sizeof(Bande_haute));
+    grapheur_ele_3D.bande_droite = malloc(sizeof(Bande_droite));
+    init_totale_interface_grapheur_3D(ren, &grapheur_ele_3D);
+
+    ecran_acceuil(ren, &grapheur_ele, &grapheur_ele_3D);
 
     QuitSDL(window,ren);
     return 0;

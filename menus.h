@@ -3,8 +3,9 @@
 
 #include "ressources.h"
 #include "grapheur.h"
+#include "Gestion_3D/grapheur_3D.h"
 
-#define NB_BOUTONS_ACCUEIL 3
+#define NB_BOUTONS_ACCUEIL 4
 
 typedef struct {
     SDL_Rect dstRect;
@@ -20,24 +21,26 @@ typedef struct {
  * Début du lancement du jeu
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param gr_ele Les éléments du grapheur
+ * @param grapheur_ele_3D Les éléments du grapheur 3D
  */
-void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele);
+void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
 
 /**
  * Affiche le titre de la page d'accueil
  * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param titre Le titre wrappé
  */
-void affiche_titre (SDL_Renderer* ren);
+void affiche_titre (SDL_Renderer* ren, WrappedText *titre);
 
 /**
  * Initialise les boutons de l'écran d'accueil
  * @param buttons Le tableau de boutons à initialiser
- * @param button_musique Le bouton musique
- * @param button_niveaux Le bouton niveaux
- * @param button_remerciements Le bouton remerciements
- * @param button_createur_map Le bouton createur de map
+ * @param button_mode_emploi Le bouton "Mode d'emploi"
+ * @param button_remerciements Le bouton "Remerciements"
+ * @param button_grapheur Le bouton "Grapheur"
+ * @param button_grapheur_3D Le bouton "Grapheur 3D"
  */
-void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur);
+void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur, Button* button_grapheur_3D);
 
 /**
  * Affiche les boutons de l'écran d'accueil
@@ -51,10 +54,12 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]);
  * @param buttons Le tableau de boutons
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bg L'image de fond
+ * @param titre Le titre wrappé
  * @param running Un pointeur sur un entier qui permet de quitter la boucle de jeu
  * @param gr_ele Les éléments du grapheur
+ * @param grapheur_ele_3D Les éléments du grapheur 3D
  */
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, int *running, Grapheur_elements *gr_ele);
+void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, WrappedText *titre, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
 
 /**
  * Affiche une page de texte scrollable
@@ -111,5 +116,13 @@ void free_background (Background* bg);
  * @param boutons Un tableau avec tous les boutons à redimentionner
  */
 void resize_boutons_acceuil (Button* boutons[]);
+
+/**
+ * Redimentionne tout l'ecran d'accueil
+ * @param boutons Un tableau avec tous les boutons à redimentionner
+ * @param bg La structure nessessaire pour l'image de fond
+ * @param titre Le titre wrappé
+ */
+void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre);
 
 #endif

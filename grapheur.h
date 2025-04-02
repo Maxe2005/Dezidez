@@ -114,12 +114,6 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
 void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute, Bande_droite* bande_droite);
 
 /**
- * Change le mode de couleur
- * @param color_mode Le mode de couleur à appliquer
- */
-void change_color_mode (int color_mode);
-
-/**
  * @param renderer Un pointeur sur une structure contenant l'état du rendu
  * @param x La position en x du point
  * @param y La position en y du point
@@ -186,13 +180,6 @@ void resize_precision_grad (Graph* graph);
  * @param y_souris_px La position en pixel de la souris
  */
 void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
-
-/**
- * Actions à effectuer après avoir chager la taille de la bande des entrées
- * @param graph Le graphique à afficher
- * @param bande_haute La bande d'entrées à afficher
- */
-void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
 
 /**
  * Initialisation des constantes pour la structure message

@@ -4,8 +4,6 @@
 #include "ressources.h"
 #include "bande_droite.h"
 
-#define TAILLE_BANDE_DESCRIPTIONS 40 
-#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
 #define TAILLE_BANDE_EXPRESSIONS_MIN (TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS)
 #define TAILLE_BANDE_EXPRESSIONS_MAX (TAILLE_BANDE_EXPRESSIONS_MIN + 200)
 #define BANDE_EXPRESSIONS_ON_SCROLL_STEP 20
@@ -112,6 +110,14 @@ typedef struct {
     Parametres_bandes_entrees params;
     Button_mvt button_new_expression; // Le bouton pour ajouter une nouvelle expression à tracer sur le graphique
 } Bande_haute;
+
+
+typedef struct {
+    const char* **interval;
+    Node* *arbres;
+    const char* *nom_f;
+    int nb_exemples;
+} Exemples;
 
 
 /**
@@ -286,5 +292,24 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
  * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande d'expression
  */
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
+ * Actions à effectuer après avoir changé la taille de la bande des entrées
+ * @param bande_haute La bande d'entrées à afficher
+ */
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute);
+
+/**
+ * Génère des exemples de fonctions 2D pour l'utilisateur
+ * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
+ */
+Exemples exemples_fonctions_2D ();
+
+/**
+ * Génère des exemples de fonctions 3D pour l'utilisateur
+ * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
+ */
+Exemples exemples_fonctions_3D ();
+
 
 #endif

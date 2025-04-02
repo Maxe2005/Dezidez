@@ -13,6 +13,10 @@
 #include "evaluateur.h"
 #include "Analyse_lexicale.h"
 
+#define TAILLE_BANDE_DESCRIPTIONS 40 
+#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
+#define TAILLE_BANDE_DROITE 150
+
 #define HEADER_HEIGHT 100
 #define BUTTON_WIDTH 200
 #define BUTTON_HEIGHT 50
@@ -25,7 +29,6 @@ extern TTF_Font* fonts[NB_FONTS];
 
 extern int FEN_X;
 extern int FEN_Y;
-
 
 typedef struct {
     SDL_Color bg;
@@ -44,6 +47,11 @@ typedef struct {
 } Colors;
 extern Colors* colors;
 
+typedef enum {
+    _2D, _3D
+} Dimention;
+extern Dimention dimention;
+
 typedef struct {
     char *message;
     char *severity;
@@ -59,11 +67,18 @@ typedef struct {
 } Tous_les_JSON;
 extern Tous_les_JSON tous_les_JSON;
 
+
 /**
  * Initialise les différentes polices de caractère avec les tailles correspondantes
  * @param font Le tableau de police vide à remplire
  */
 void init_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Change le mode de couleur
+ * @param color_mode Le mode de couleur à appliquer
+ */
+void change_color_mode (int color_mode);
 
 /**
  * Génère un nombre aléatoire compris entre les valeurs min et max (incluses).

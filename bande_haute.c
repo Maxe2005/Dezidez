@@ -116,7 +116,7 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
         but[j]->champs_texte->color_hover = but[j]->champs_texte->color_base;
         but[j]->champs_texte->color_hover.a = 150;
         but[j]->champs_texte->font_text = fonts[1];
-        but[j]->champs_texte->font_text_hover = fonts[2];
+        but[j]->champs_texte->font_text_hover = fonts[1];
         but[j]->champs_texte->taille_bonus_hover_x = 0;
         but[j]->champs_texte->taille_bonus_hover_y = 0;
         but[j]->champs_texte->radius = but[j]->position_initiale.h / 3;
@@ -478,6 +478,93 @@ void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
     action_apres_modif_offset(bande_haute);
 }
 
+Exemples exemples_fonctions_2D (){
+    Exemples ex;
+    ex.nb_exemples = 1;
+    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+
+    int i = -1;
+    ex.nom_f[++i] = "x";
+    typejeton x;
+    x.lexem=VARIABLE;
+    x.valeur.variable='x';
+    Node* X_ARBRE = malloc(sizeof(Node));
+    *X_ARBRE = creation_arbre(x,NULL,NULL);
+    ex.arbres[i] = X_ARBRE;
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    return ex;
+}
+
+Exemples exemples_fonctions_3D (){
+    Exemples ex;
+    ex.nb_exemples = 2;
+    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+
+    // x
+    typejeton x;
+    x.lexem=VARIABLE;
+    x.valeur.variable='x';
+    // y
+    typejeton y;
+    y.lexem=VARIABLE;
+    y.valeur.variable='y';
+    // Racine
+    typejeton Racine;
+    Racine.lexem=FONCTION;
+    Racine.valeur.fonction=SQRT;
+    // Sinus
+    typejeton Sinus;
+    Sinus.lexem=FONCTION;
+    Sinus.valeur.fonction=SIN;
+    // Addition
+    typejeton Addition;
+    Addition.lexem=OPERATEUR;
+    Addition.valeur.operateur=PLUS;
+    // Multiplication
+    typejeton Multiplication;
+    Multiplication.lexem=OPERATEUR;
+    Multiplication.valeur.operateur=FOIS;
+    Node* X_ARBRE = malloc(sizeof(Node));
+    *X_ARBRE = creation_arbre(x,NULL,NULL);
+    Node* Y_ARBRE = malloc(sizeof(Node));
+    *Y_ARBRE = creation_arbre(y,NULL,NULL);
+    Node* Y_carre_ARBRE = malloc(sizeof(Node));
+    *Y_carre_ARBRE = creation_arbre(Multiplication,Y_ARBRE,Y_ARBRE);
+    Node* X_carre_ARBRE = malloc(sizeof(Node));
+    *X_carre_ARBRE = creation_arbre(Multiplication,X_ARBRE,X_ARBRE);
+    Node* SOMME_ARBRE = malloc(sizeof(Node));
+    *SOMME_ARBRE = creation_arbre(Addition,X_carre_ARBRE,Y_carre_ARBRE);
+    Node* Racine_ARBRE = malloc(sizeof(Node));
+    *Racine_ARBRE = creation_arbre(Racine,SOMME_ARBRE,NULL);
+    Node* SINUS_ARBRE = malloc(sizeof(Node));
+    *SINUS_ARBRE = creation_arbre(Sinus,Racine_ARBRE,NULL);
+
+    int i = -1;
+    ex.nom_f[++i] = "sin(sqrt(x*x + y*y))";
+    ex.arbres[i] = SINUS_ARBRE;
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "x*x + y*y";
+    ex.arbres[i] = SOMME_ARBRE;
+    ex.interval[i][0] = "-2";
+    ex.interval[i][1] = "2";
+
+    return ex;
+}
+
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     if (bande_haute->nb_expressions >= NB_EXPRESSIONS_MAX) return; // TODO : message d'erreur
     bande_haute->expressions[bande_haute->nb_expressions] = malloc(sizeof(Expression_fonction));
@@ -485,68 +572,19 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    const char* nom_f[] = {"sin(x)", "sqrt(x)", "exp(x)", "x", "2-x"};
-    typejeton x;
-    x.lexem=VARIABLE;
-    x.valeur.variable='x';
-    //Soustraction
-    typejeton Soustraction;
-    Soustraction.lexem=OPERATEUR;
-    Soustraction.valeur.operateur=MOINS;
-    // Racine
-    typejeton Racine;
-    Racine.lexem=FONCTION;
-    Racine.valeur.fonction=SQRT;
-    // Logarithme
-    typejeton Logarithme;
-    Logarithme.lexem=FONCTION;
-    Logarithme.valeur.fonction=LOG;
-    // Tangente
-    typejeton Tangente;
-    Tangente.lexem=FONCTION;
-    Tangente.valeur.fonction=TAN;
-    // Sinus
-    typejeton Sinus;
-    Sinus.lexem=FONCTION;
-    Sinus.valeur.fonction=SIN;
-    // Cosinus
-    typejeton Cosinus;
-    Cosinus.lexem=FONCTION;
-    Cosinus.valeur.fonction=COS;
-    // Exp
-    typejeton Exp;
-    Exp.lexem=FONCTION;
-    Exp.valeur.fonction=EXP;
-    //Deux
-    typejeton Deux;
-    Deux.lexem=REEL;
-    Deux.valeur.reel=2;
-    Node* DEUX_ARBRE = malloc(sizeof(Node));
-    *DEUX_ARBRE = creation_arbre(Deux,NULL,NULL);
-    Node* X_ARBRE = malloc(sizeof(Node));
-    *X_ARBRE = creation_arbre(x,NULL,NULL);
-    Node* COSINUS_ARBRE = malloc(sizeof(Node));
-    *COSINUS_ARBRE = creation_arbre(Cosinus,X_ARBRE,NULL);
-    Node* SOMME_ARBRE = malloc(sizeof(Node));
-    *SOMME_ARBRE = creation_arbre(Soustraction,DEUX_ARBRE,X_ARBRE);
-    Node* EXP_ARBRE = malloc(sizeof(Node));
-    *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
-    Node* SIN_ARBRE = malloc(sizeof(Node));
-    *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
-    Node* RACINE_ARBRE = malloc(sizeof(Node));
-    *RACINE_ARBRE = creation_arbre(Racine,X_ARBRE,NULL);
-    Node* LOGARITHME_ARBRE = malloc(sizeof(Node));
-    *LOGARITHME_ARBRE = creation_arbre(Logarithme,X_ARBRE,NULL);
-    Node* TANGENTE_ARBRE = malloc(sizeof(Node));
-    *TANGENTE_ARBRE = creation_arbre(Tangente,X_ARBRE,NULL);
-    Node* arbres[] = {SIN_ARBRE, RACINE_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
-    const char* interval[][2] = {{"1", "4"}, {"5", "10"}, {"1", "3"}, {"1", "3.5"}, {"1e1", "2e2"}};
+    Exemples exemples;
+    if (dimention == _2D){
+        exemples = exemples_fonctions_2D();
+    } else if (dimention == _3D){
+        exemples = exemples_fonctions_3D();
+    }
+
+
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
-    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
-    int a = nb_alea(0,4);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, interval[a][0]);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, interval[a][1]);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = exemples.arbres[bande_haute->nb_expressions % exemples.nb_exemples];
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, exemples.nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][0]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][1]);
     char *end;
     float test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, &end);
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_inf = test - 2;
@@ -562,4 +600,9 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     action_apres_modif_offset(bande_haute);
 }
 
-
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute){
+    for (int i = 0; i < bande_haute->nb_expressions; i++) {
+        cacher_expression_si_nessessaire(bande_haute, bande_haute->expressions[i]);
+    }
+    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.15*bande_haute->button_new_expression.bt.rect.h;
+}

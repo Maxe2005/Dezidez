@@ -1,21 +1,4 @@
-#include <SDL2/SDL.h>
-#include <math.h>
-#include <stdbool.h>
-
-#define WIDTH 800
-#define HEIGHT 600
-#define GRID_SIZE 20
-#define RENDER_DISTANCE 5.0f
-
-typedef struct {
-    float x, y, z;
-} Point3D;
-
-typedef struct {
-    Point3D position;
-    Point3D rotation;
-    Point3D renderCenter; // Center of our rendering area
-} Camera;
+#include "gestion_3D_2.h"
 
 Camera camera = {
     .position = {0, 0, 10},
@@ -47,8 +30,8 @@ void projectPoint(Point3D point, int* screenX, int* screenY) {
     
     // Perspective projection
     float scale = 200.0f / (point.z + 5.0f);
-    *screenX = WIDTH / 2 + (int)(point.x * scale);
-    *screenY = HEIGHT / 2 + (int)(point.y * scale);
+    //*screenX = WIDTH / 2 + (int)(point.x * scale);
+    //*screenY = HEIGHT / 2 + (int)(point.y * scale);
 }
 
 bool shouldRenderPoint(Point3D point) {
@@ -193,7 +176,7 @@ void render(SDL_Renderer* renderer) {
     SDL_RenderPresent(renderer);
 }
 
-int main(int argc, char* argv[]) {
+/* int main(int argc, char* argv[]) {
     SDL_Init(SDL_INIT_VIDEO);
     SDL_Window* window = SDL_CreateWindow("3D Infinite Graph", SDL_WINDOWPOS_CENTERED,
                                         SDL_WINDOWPOS_CENTERED, WIDTH, HEIGHT, 0);
@@ -212,4 +195,5 @@ int main(int argc, char* argv[]) {
     SDL_DestroyWindow(window);
     SDL_Quit();
     return 0;
-}
+} */
+

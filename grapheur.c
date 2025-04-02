@@ -120,10 +120,6 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     }
 }
 
-
-
-
-
 void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
     if (fonction.borne_sup > graph->axe_x->min && fonction.borne_inf < graph->axe_x->max){
         SDL_SetRenderDrawColor(ren, fonction.color.r, fonction.color.g, fonction.color.b, fonction.color.a);
@@ -181,28 +177,6 @@ Graph init_graph (Fonction* fonction_defaut){
     }
     graph.nombre_evaluateur = 0;
     return graph;
-}
-
-void change_color_mode (int color_mode){
-    if (color_mode == 0){
-        colors->bg = (SDL_Color){255, 255, 255, 255};
-        colors->axes = (SDL_Color){0, 0, 0, 255};
-        colors->texte_axes = (SDL_Color){0, 0, 0, 255};
-    } else {
-        colors->bg = (SDL_Color){0, 0, 0, 255};
-        colors->axes = (SDL_Color){255, 255, 255, 255};
-        colors->texte_axes = (SDL_Color){255, 255, 255, 255};
-    }
-    colors->bande_droite = (SDL_Color){100, 100, 100, 255};
-    colors->bande_haute_expressions = (SDL_Color){200, 200, 200, 255};
-    colors->bande_haute_description = (SDL_Color){150, 150, 150, 255};
-    colors->texte_champ_entree = (SDL_Color){0, 0, 0, 255};
-    colors->texte_descriptifs_bande_haut = (SDL_Color){255, 255, 255, 255};
-    colors->bg_bandes_expression_1 = colors->bande_haute_expressions;
-    colors->bg_bandes_expression_2 = (SDL_Color){150, 150, 150, 255};
-    colors->bande_bas_de_bande_haut = (SDL_Color){200, 200, 200, 255};
-    colors->button_new_expression = (SDL_Color){125, 125, 125, 255};
-    colors->button_new_expression_hover = (SDL_Color){150, 150, 150, 255};
 }
 
 float arrondir_ordre_grandeur(float x) {
@@ -399,14 +373,6 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
         graph->liste_evaluateurs[i].boutton_quitter.rect.y -= mvt_y;
     }
 }
-    
-void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute){
-    graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
-    for (int i = 0; i < bande_haute->nb_expressions; i++) {
-        cacher_expression_si_nessessaire(bande_haute, bande_haute->expressions[i]);
-    }
-    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.15*bande_haute->button_new_expression.bt.rect.h;
-}
 
 void init_const_message(){
     message.temps_affichage = 3;
@@ -474,21 +440,21 @@ void suppr_evaluateur_x (Graph* graph, int index){
 }
 
 void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
-    colors = malloc(sizeof(Colors));
-    change_color_mode(1);
-
+    dimention = _2D;
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 
     *gr_ele->graph = init_graph(&gr_ele->bande_haute->expressions[0]->fonction);
     gr_ele->graph->souris_pressee = false;
-    actions_apres_resize_bande_haute(gr_ele->graph, gr_ele->bande_haute);
+    gr_ele->graph->origine_y_apres_bande_haut = gr_ele->bande_haute->surface.y + gr_ele->bande_haute->surface.h;
+    actions_apres_resize_bande_haute(gr_ele->bande_haute);
 
     init_const_message();
     message.is_visible = 0;
 }
 
 int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
+    dimention = _2D;
     Graph* graph = gr_ele->graph;
     Bande_haute* bande_haute = gr_ele->bande_haute;
     Bande_droite* bande_droite = gr_ele->bande_droite;
@@ -509,10 +475,12 @@ int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
         // Animation de l'agrandissement
         if (bande_haute->expanding && bande_haute->surface.h < TAILLE_BANDE_EXPRESSIONS_MAX) {
             bande_haute->surface.h += (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
-            actions_apres_resize_bande_haute(graph, bande_haute);
+            graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
+            actions_apres_resize_bande_haute(bande_haute);
         } else if (!bande_haute->expanding && bande_haute->surface.h > TAILLE_BANDE_EXPRESSIONS_MIN) {
             bande_haute->surface.h -= (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
-            actions_apres_resize_bande_haute(graph, bande_haute);
+            graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
+            actions_apres_resize_bande_haute(bande_haute);
         }
 
         updateDisplay(ren);

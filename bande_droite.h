@@ -3,8 +3,6 @@
 
 #include "ressources.h"
 
-#define TAILLE_BANDE_DROITE 150
-
 typedef struct {
     ImageButton bouton_retour;
     Button bouton_centrer;
