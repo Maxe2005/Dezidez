@@ -31,7 +31,7 @@ void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_el
 void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre){
     resize_background(bg);
     resize_boutons_acceuil(buttons);
-    *titre = text_wrapper(fonts[0], "Grapheur d'expressions fonctionnelles", FEN_X - 20);
+    *titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
 }
 
 void affiche_titre (SDL_Renderer* ren, WrappedText *titre){
@@ -68,13 +68,13 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
     SDL_Color color_touch = {0, 120, 255, 200};
     
     Button* but[] = {button_mode_emploi, button_remerciements, button_grapheur, button_grapheur_3D};
-    char* noms[] = {"Mode d'emploi", "Remerciements", "Grapheur", "Grapheur 3D"};
+    char* id[] = {"Mode_emploi", "Remerciements", "Grapheur_2D", "Grapheur_3D"};
     for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
         but[j]->rect.w = button_width;
         but[j]->rect.h = button_height;
         but[j]->is_survolable = 1;
         but[j]->hovered = 0;
-        but[j]->label = noms[j];
+        but[j]->label = get_texte("Acceuil", id[j]);
         but[j]->color_text = color_texte;
         but[j]->color_base = color_base;
         but[j]->color_hover = color_touch;
@@ -201,6 +201,8 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
 
 
 int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
+    int taille_header = 100;
+
     Background* bg = malloc(sizeof(Background));
     init_background(ren, "bg2.jpg", bg);
     bg->is_filtre = true;
@@ -210,9 +212,9 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     ImageButton bouton_retour;
     int pourcentage_du_header = 70;
     bouton_retour.image = load_image(ren, "Icons/maison.png");
-    bouton_retour.rect.y = HEADER_HEIGHT * (100 - pourcentage_du_header) / 200;
+    bouton_retour.rect.y = taille_header * (100 - pourcentage_du_header) / 200;
     bouton_retour.rect.x = 2*bouton_retour.rect.y;
-    bouton_retour.rect.w = HEADER_HEIGHT * pourcentage_du_header/100;
+    bouton_retour.rect.w = taille_header * pourcentage_du_header/100;
     bouton_retour.rect.h = bouton_retour.rect.w;
     bouton_retour.is_survolable = 1;
     bouton_retour.color_base = (SDL_Color){50, 50, 50, 255};
@@ -232,9 +234,10 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     int marge = FEN_X / 7;
     MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);
 
-    int taille_header = 100;
+    
     int scroll_offset_min = -40; // Décalage vertical minimum du scrolling
     int scroll_offset = scroll_offset_min/2; // Décalage vertical du scrolling
+    int SCROLL_SPEED = 30; // Vitesse de défilement
     int mode_quitter = 0; // Les différentes façons de quitter l'ecrant texte : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
     int running = 1;
     SDL_Event event;
@@ -309,12 +312,16 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
 }
 
 int ecran_remerciements (SDL_Renderer* ren){
-    int a = ecran_text(ren, "Ressources/Md_files/Remerciements.md", "Remerciements");
+    char filename[60];
+    sprintf(filename, "Ressources/Md_files/Remerciements_%s.md", get_lang_str());
+    int a = ecran_text(ren, filename, get_texte("Acceuil", "Titre_page_remerciement"));
     return a;
 }
 
 int ecran_mode_emploi (SDL_Renderer* ren){
-    int a = ecran_text(ren, "Ressources/Md_files/Mode_emploi.md", "Mode d'emploi");
+    char filename[60];
+    sprintf(filename, "Ressources/Md_files/Mode_emploi_%s.md", get_lang_str());
+    int a = ecran_text(ren, filename, get_texte("Acceuil", "Titre_page_mode_emploi"));
     return a;
 }
 
@@ -370,3 +377,27 @@ void free_background (Background* bg){
     free(bg);
 }
 
+
+void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Button* buttons[], WrappedText *titre) {
+    // Page d'accueil
+    char* id[] = {"Mode_emploi", "Remerciements", "Grapheur_2D", "Grapheur_3D"};
+    for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
+        buttons[j]->label = get_texte("Acceuil", id[j]);
+    }
+    *titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
+
+    // Grapheur 2D
+    // bande droite
+    gr_ele->bande_droite->bouton_centrer.label = get_texte("Bande_droite", "centrer");
+    // bande haute
+    gr_ele->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
+    gr_ele->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
+    gr_ele->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
+
+    // Grapheur 3D
+    // bande haute
+    grapheur_ele_3D->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
+    grapheur_ele_3D->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
+    grapheur_ele_3D->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
+
+}

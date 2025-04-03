@@ -17,7 +17,6 @@ typedef struct {
 typedef struct {
     Quaternion rotation;
     float zoom;
-    float dragging;
     int origine_y_apres_bande_haut;
 } Graph_3D_1;
 

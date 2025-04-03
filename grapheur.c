@@ -102,9 +102,19 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
         if (abs(x_axis_pos - x) > 3 && x > graph->origine_x && x < graph->origine_x + graph->x) {
             SDL_RenderDrawLine(ren, x, y_axis_pos - 5, x, y_axis_pos + 5);
             // Afficher les valeurs des graduations en x
-            char label[10];
-            snprintf(label, 10, "%.*f", graph->axe_x->precision, graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
-            renderText(ren, (const char*)label, x, y_axis_pos + 2*graph->axe_x->grad_text_size, color_axes, graph->axe_x->font_texte_grad);
+            char label[15];
+            snprintf(label, 15, "%.*f", graph->axe_x->precision, graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
+            int w, h;
+            TTF_SizeText(graph->axe_x->font_texte_grad, label, &w, &h);
+            if (w > TAILLE_MAX_TEXT_GRAD_X){
+                snprintf(label, 15, "%.2g", graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
+                TTF_SizeText(graph->axe_x->font_texte_grad, label, &w, &h);
+            }
+            if (FEN_Y - y_axis_pos < 4*h){
+                renderText(ren, (const char*)label, x, y_axis_pos - 2*h, color_axes, graph->axe_x->font_texte_grad);
+            } else {
+                renderText(ren, (const char*)label, x, y_axis_pos + 2*h, color_axes, graph->axe_x->font_texte_grad);
+            }
         }
     }
 
@@ -113,9 +123,19 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
         if (abs(y_axis_pos - y) > 3 && y > graph->origine_y_apres_bande_haut && y < graph->origine_y + graph->y) {
             SDL_RenderDrawLine(ren, x_axis_pos - 5, y, x_axis_pos + 5, y);
             // Afficher les valeurs des graduations en y
-            char label[10];
-            snprintf(label, 10, "%.*f", graph->axe_y->precision, graph->axe_y->max - fmodf(graph->axe_y->max, graph->axe_y->echelle_grad) - i * graph->axe_y->echelle_grad);
-            renderText(ren, (const char*)label, x_axis_pos - (graph->axe_y->precision + 1)*2*graph->axe_x->grad_text_size, y, color_axes, graph->axe_y->font_texte_grad);
+            char label[15];
+            snprintf(label, 15, "%.*f", graph->axe_y->precision, graph->axe_y->max - fmodf(graph->axe_y->max, graph->axe_y->echelle_grad) - i * graph->axe_y->echelle_grad);
+            int w, h;
+            TTF_SizeText(graph->axe_y->font_texte_grad, label, &w, &h);
+            if (w > TAILLE_MAX_TEXT_GRAD_X){
+                snprintf(label, 15, "%.2g", graph->axe_y->max - fmodf(0-graph->axe_y->max, graph->axe_y->echelle_grad) + i * graph->axe_y->echelle_grad);
+                TTF_SizeText(graph->axe_y->font_texte_grad, label, &w, &h);
+            }
+            if (x_axis_pos < w + 4*h){
+                renderText(ren, (const char*)label, x_axis_pos + w/2 + 2*h, y, color_axes, graph->axe_y->font_texte_grad);
+            } else {
+                renderText(ren, (const char*)label, x_axis_pos - w/2 - 2*h, y, color_axes, graph->axe_y->font_texte_grad);
+            }
         }
     }
 }

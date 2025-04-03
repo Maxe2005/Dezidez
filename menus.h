@@ -125,4 +125,13 @@ void resize_boutons_acceuil (Button* boutons[]);
  */
 void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre);
 
+/**
+ * Actualise tous les textes de l'interface en fonction de la langue choisie
+ * @param gr_ele Les éléments du grapheur
+ * @param grapheur_ele_3D Les éléments du grapheur 3D
+ * @param buttons Le tableau de boutons d'acceuil
+ * @param titre Le titre de la page d'accueil
+ */
+void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Button* buttons[], WrappedText *titre);
+
 #endif

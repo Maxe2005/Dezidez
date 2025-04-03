@@ -3,7 +3,7 @@
 TTF_Font* fonts[NB_FONTS] = {NULL};
 Colors* colors = NULL;
 Dimention dimention = _2D;
-Langue langue = FR;
+Langue langue = EN;
 Tous_les_JSON tous_les_JSON;
 int FEN_X = 1100;
 int FEN_Y = 800;
@@ -52,6 +52,8 @@ int nb_alea(int min, int max){
 char* get_lang_str(){
     if (langue == FR) return "fr";
     if (langue == EN) return "en";
+    if (langue == ES) return "es";
+    if (langue == AL) return "al";
     return "Problème de langue";
 }
 
@@ -93,6 +95,7 @@ cJSON* read_file_json (const char *filename) {
 
 void init_tous_les_json () {
     tous_les_JSON.json_erreurs = read_file_json("Ressources/JSON/erreurs.json");
+    tous_les_JSON.json_textes = read_file_json("Ressources/JSON/textes.json");
 }
 
 ErrorInfo get_error_message(int code) {
@@ -121,106 +124,20 @@ ErrorInfo get_error_message(int code) {
     return error_info;
 }
 
-// exemple :
-typedef struct {
-    char *id;
-    char *text;
-    SDL_Color color;
-} Button_2;
+char* get_texte (const char* entitee_name, const char* id){
+    cJSON *entitee = cJSON_GetObjectItem(tous_les_JSON.json_textes, entitee_name);
+    if (!entitee) return NULL; // Langue non trouvée
 
-typedef struct {
-    SDL_Color background_color;
-    Button_2 *buttons;
-    int button_count;
-} AppSettings;
+    cJSON *objet = cJSON_GetObjectItem(entitee, id);
+    if (!objet) return NULL; // Entitée non trouvée
 
-AppSettings load_settings(const char *filename) {
-    AppSettings settings = {0};
-    cJSON *json = read_file_json(filename);
-    if (!json) return settings;
+    cJSON *lang = cJSON_GetObjectItem(objet, get_lang_str());
+    if (!lang) return NULL; // ID non trouvé
 
-    // Charger la couleur du fond
-    cJSON *theme = cJSON_GetObjectItem(json, "theme");
-    if (theme) {
-        cJSON *bg_color = cJSON_GetObjectItem(theme, "background_color");
-        if (bg_color) {
-            settings.background_color.r = cJSON_GetObjectItem(bg_color, "r")->valueint;
-            settings.background_color.g = cJSON_GetObjectItem(bg_color, "g")->valueint;
-            settings.background_color.b = cJSON_GetObjectItem(bg_color, "b")->valueint;
-            settings.background_color.a = cJSON_GetObjectItem(bg_color, "a")->valueint;
-        }
-    }
-
-    // Charger les boutons
-    cJSON *buttons_array = cJSON_GetObjectItem(json, "buttons");
-    if (buttons_array) {
-        settings.button_count = cJSON_GetArraySize(buttons_array);
-        settings.buttons = malloc(settings.button_count * sizeof(Button_2));
-
-        for (int i = 0; i < settings.button_count; i++) {
-            cJSON *button_json = cJSON_GetArrayItem(buttons_array, i);
-            settings.buttons[i].id = strdup(cJSON_GetObjectItem(button_json, "id")->valuestring);
-            settings.buttons[i].text = strdup(cJSON_GetObjectItem(button_json, "text")->valuestring);
-
-            cJSON *color_json = cJSON_GetObjectItem(button_json, "color");
-            settings.buttons[i].color.r = cJSON_GetObjectItem(color_json, "r")->valueint;
-            settings.buttons[i].color.g = cJSON_GetObjectItem(color_json, "g")->valueint;
-            settings.buttons[i].color.b = cJSON_GetObjectItem(color_json, "b")->valueint;
-            settings.buttons[i].color.a = cJSON_GetObjectItem(color_json, "a")->valueint;
-        }
-    }
-
-    cJSON_Delete(json);
-    return settings;
-}
-// Fonction pour libérer la mémoire des paramètres
-void free_settings(AppSettings *settings) {
-    for (int i = 0; i < settings->button_count; i++) {
-        free(settings->buttons[i].id);
-        free(settings->buttons[i].text);
-    }
-    free(settings->buttons);
-}
-void save_settings(const char *filename, const AppSettings *settings) {
-    cJSON *json = cJSON_CreateObject();
-
-    // Enregistrement de la couleur du fond
-    cJSON *theme = cJSON_CreateObject();
-    cJSON *bg_color = cJSON_CreateObject();
-    cJSON_AddNumberToObject(bg_color, "r", settings->background_color.r);
-    cJSON_AddNumberToObject(bg_color, "g", settings->background_color.g);
-    cJSON_AddNumberToObject(bg_color, "b", settings->background_color.b);
-    cJSON_AddNumberToObject(bg_color, "a", settings->background_color.a);
-    cJSON_AddItemToObject(theme, "background_color", bg_color);
-    cJSON_AddItemToObject(json, "theme", theme);
-
-    // Enregistrement des boutons
-    cJSON *buttons_array = cJSON_CreateArray();
-    for (int i = 0; i < settings->button_count; i++) {
-        cJSON *button_json = cJSON_CreateObject();
-        cJSON_AddStringToObject(button_json, "id", settings->buttons[i].id);
-        cJSON_AddStringToObject(button_json, "text", settings->buttons[i].text);
-
-        cJSON *color_json = cJSON_CreateObject();
-        cJSON_AddNumberToObject(color_json, "r", settings->buttons[i].color.r);
-        cJSON_AddNumberToObject(color_json, "g", settings->buttons[i].color.g);
-        cJSON_AddNumberToObject(color_json, "b", settings->buttons[i].color.b);
-        cJSON_AddNumberToObject(color_json, "a", settings->buttons[i].color.a);
-        cJSON_AddItemToObject(button_json, "color", color_json);
-
-        cJSON_AddItemToArray(buttons_array, button_json);
-    }
-    cJSON_AddItemToObject(json, "buttons", buttons_array);
-
-    // Sauvegarde dans un fichier
-    char *json_string = cJSON_Print(json);
-    FILE *file = fopen(filename, "w");
-    if (file) {
-        fprintf(file, "%s", json_string);
-        fclose(file);
-    }
-
-    free(json_string);
-    cJSON_Delete(json);
+    return strdup(lang->valuestring);
 }
 
+void free_tous_les_json () {
+    cJSON_Delete(tous_les_JSON.json_erreurs);
+    cJSON_Delete(tous_les_JSON.json_textes);
+}

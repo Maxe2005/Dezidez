@@ -17,13 +17,6 @@
 #define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
 #define TAILLE_BANDE_DROITE 150
 
-#define HEADER_HEIGHT 100
-#define BUTTON_WIDTH 200
-#define BUTTON_HEIGHT 50
-#define BUTTON_MARGIN 30
-#define SCROLL_SPEED 30  // Vitesse du scroll
-#define SCROLL_OFFSET_MIN -100
-
 #define NB_FONTS 8
 extern TTF_Font* fonts[NB_FONTS];
 
@@ -58,12 +51,13 @@ typedef struct {
 } ErrorInfo;
 
 typedef enum {
-    FR, EN
+    FR, EN, ES, AL
 } Langue;
 extern Langue langue;
 
 typedef struct {
     cJSON *json_erreurs;
+    cJSON *json_textes;
 } Tous_les_JSON;
 extern Tous_les_JSON tous_les_JSON;
 
@@ -112,6 +106,19 @@ ErrorInfo get_error_message(int code);
  * Initialise tous les fichiers JSON
  */
 void init_tous_les_json ();
+
+/**
+ * Renvoie le texte correspondant à une entité et un identifiant donnés dans le fichier JSON "textes.json"
+ * @param entitee_name Le nom de l'entité
+ * @param id L'identifiant de l'entité
+ * @return Le texte correspondant à l'entité et l'identifiant donnés
+ */
+char* get_texte (const char* entitee_name, const char* id);
+
+/**
+ * Libère la mémoire allouée pour tous les fichiers JSON
+ */
+void free_tous_les_json ();
 
 #include "color_picker.h"
 

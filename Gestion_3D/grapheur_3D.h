@@ -9,11 +9,7 @@
 
 
 typedef struct {
-    
-} Graph_3D;
-
-typedef struct {
-    Graph_3D* graph;
+    Graph_3D_1* graph_3D_1;
     Bande_haute* bande_haute;
     Bande_droite* bande_droite;
 } Grapheur_3D_elements;

@@ -7,22 +7,6 @@ Faites pas chier ...
 bye !
 
 
-test \n test \n test
-
-ezlfjlz jfbzobf louzebfuz lluefbzlef leuflz  ueblfuzlf lefbl lz ulebf   lzublz lzuelbze l  lzueb lzueblz leurbirùaz ù ub ù  erb  ubelz leblbuzle l ubzleb  ljeblbzlel zlebrlzb lzeblzjber zlejrbzlerb
-
-- ici
-- la
-- et la aussi
-- et tient ...
-
-puis il y a
-
-* d'abord
-* ensuite
-* et pour finir
-* ça, juste ça
-
 # Nos structures :
 
 Pour développer notre grapheur nous avons utilisé plusieurs structures notamment pour coder les fonctions sous forme d'arbre mais également pour retourner les différentes erreurs possibles. Cette partie nous a été fournie au début du projet, nous y avons fait quelques modifications que nous allons vous présenter.
@@ -39,6 +23,7 @@ Nous avons ajouté également une structure code_erreur qui associe un nom d'err
 
 
 # PARTIE EVALUATEUR :
+
 L'objectif de l'évaluateur est de calculer une fonction (qui est sous la forme d'un arbre) à partir de variable x et y données. Son rôle est essentiel pour tracer des courbes, car il permet d'obtenir les points à afficher sur le graphique.
 Notre code se divise en deux fonctions principales : evaluateur, notre fonction principale qui interprète l'arbre, et calculer_fonction, une fonction auxiliaire qui applique des fonctions mathématiques standards.
 Fonction evaluateur :

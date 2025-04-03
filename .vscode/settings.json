@@ -9,12 +9,14 @@
     "string.h": "c",
     "gestion_3d_1.h": "c",
     "gestion_3d_2.h": "c",
-    "grapheur_3d.h": "c"
+    "grapheur_3d.h": "c",
+    "test.C": "cpp"
   },
 
   "github.copilot.chat.commitMessageGeneration.instructions": [
     {
       "text": "Be extremely detailed with the file changes and the reason for the change. Add lots of emojis."
     }
-  ]
+  ],
+  "cmake.sourceDirectory": "/home/maxubu/Code/Dezidez/cJSON"
 }

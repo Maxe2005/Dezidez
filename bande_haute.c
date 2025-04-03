@@ -9,7 +9,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
     bande_haute->texte_descriptif_borne_sup = malloc(sizeof(Button));
     bande_haute->texte_descriptif_expression = malloc(sizeof(Button));
     Button* but[] = {bande_haute->texte_descriptif_borne_inf, bande_haute->texte_descriptif_borne_sup, bande_haute->texte_descriptif_expression};
-    char* noms[] = {"Borne inférieure", "Borne supérieure", "Expression"};
+    char* id[] = {"Borne_inf", "Borne_sup", "expression"};
     int x = calcul_pos(params.width_elements, params.espace_entre_elements, num_element_du_premier_champs);
     for (int j = 0; j < 3; j++){
         but[j]->rect.w = params.width_elements[j+num_element_du_premier_champs];
@@ -18,7 +18,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
         x += params.width_elements[j+num_element_du_premier_champs] + params.espace_entre_elements;
         but[j]->rect.y = (TAILLE_BANDE_DESCRIPTIONS - but[j]->rect.h)/2 ;
         but[j]->is_survolable = 0;
-        but[j]->label = noms[j];
+        but[j]->label = get_texte("Bande_haute", id[j]);
         but[j]->color_text = colors->texte_descriptifs_bande_haut;
         but[j]->color_base = colors->bande_haute_description;
         but[j]->font_text = fonts[4];

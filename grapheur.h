@@ -8,10 +8,11 @@
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
 #define ZOOM_SPEED 5
-#define TAILLE_GRADUATION_MIN 50
-#define TAILLE_GRADUATION_MAX 100
+#define TAILLE_GRADUATION_MIN 80
+#define TAILLE_GRADUATION_MAX 130
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
 #define NB_EVALUATEUR_MAX 100
+#define TAILLE_MAX_TEXT_GRAD_X (int)(TAILLE_GRADUATION_MIN / 2)
 
 extern Message message;
 

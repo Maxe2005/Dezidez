@@ -44,15 +44,25 @@ Point2D project(Point3D p, Graph_3D_1* graph) {
     return projected;
 }
 
+int x_intersect_droite (int y, int x1, int y1, int x2, int y2){
+    if (y1 == y2) return -1; // Pas d'intersection
+    if (x1 == x2) return x1; // Ligne verticale
+    float m = (float)(y2 - y1) / (x2 - x1);
+    float p = y1 - m * x1;
+    return (int)(y - p) / m;
+}
+
 // Dessiner un axe avec des graduations
 void drawAxis(SDL_Renderer* renderer, Point3D start, Point3D end, int steps, Graph_3D_1* graph) {
     Point2D start2D = project(start, graph);
     Point2D end2D = project(end, graph);
     if (start2D.y < graph->origine_y_apres_bande_haut) {
-        //start2D.y = ((graph->origine_y_apres_bande_haut - start2D.y) * (end2D.x - start2D.x)) / (end2D.y - start2D.y) + start2D.x;
+        start2D.y = graph->origine_y_apres_bande_haut;
+        start2D.x = x_intersect_droite(graph->origine_y_apres_bande_haut, start2D.x, start2D.y, end2D.x, end2D.y);
     }
     if (end2D.y < graph->origine_y_apres_bande_haut) {
-        //end2D.y = ((graph->origine_y_apres_bande_haut - end2D.y) * (start2D.x - end2D.x)) / (start2D.y - end2D.y) + end2D.x;
+        end2D.y = graph->origine_y_apres_bande_haut;
+        end2D.x = x_intersect_droite(graph->origine_y_apres_bande_haut, start2D.x, start2D.y, end2D.x, end2D.y);
     }
     SDL_RenderDrawLine(renderer, start2D.x, start2D.y, end2D.x, end2D.y);
 
@@ -74,14 +84,8 @@ void drawAxis(SDL_Renderer* renderer, Point3D start, Point3D end, int steps, Gra
 
 void handle_event_3D_1 (SDL_Event e, Graph_3D_1* graph, int x_souris_px, int y_souris_px){
     if (is_souris_sur_rectangle((SDL_Rect){0, graph->origine_y_apres_bande_haut, FEN_X - TAILLE_BANDE_DROITE, FEN_Y - graph->origine_y_apres_bande_haut}, x_souris_px, y_souris_px)){
-        if (e.type == SDL_MOUSEBUTTONDOWN && e.button.button == SDL_BUTTON_LEFT) {
-            graph->dragging = 1;
-
-        } else if (e.type == SDL_MOUSEBUTTONUP && e.button.button == SDL_BUTTON_LEFT) {
-            graph->dragging = 0;
-
-        } else if (e.type == SDL_MOUSEMOTION) {
-            if (e.motion.state & SDL_BUTTON_LMASK) {
+        if (e.type == SDL_MOUSEMOTION) {
+            if (e.motion.state & SDL_BUTTON_RMASK) {
                 float deltaX = e.motion.xrel * 0.01f;
                 float deltaY = e.motion.yrel * 0.01f;
                 Quaternion yaw = quaternionFromAxisAngle(0, 1, 0, deltaX);
