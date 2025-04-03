@@ -1,37 +1,42 @@
 #include "menus.h"
 
 void ecran_acceuil (SDL_Renderer* ren, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D){
+    Accueil accueil;
     // Initialisation des boutons
     Button button_mode_emploi, button_remerciements, button_grapheur, button_grapheur_3D;
-    Button* buttons[NB_BOUTONS_ACCUEIL];
-    init_buttons_accueil(buttons, &button_mode_emploi, &button_remerciements, &button_grapheur, &button_grapheur_3D);
+    init_buttons_accueil(accueil.buttons, &button_mode_emploi, &button_remerciements, &button_grapheur, &button_grapheur_3D);
 
     // Chargement du fond d'ecran
-    Background* bg = malloc(sizeof(Background));
-    init_background(ren, "bg2.jpg", bg);
+    accueil.bg = malloc(sizeof(Background));
+    init_background(ren, "bg2.jpg", accueil.bg);
 
-    WrappedText *titre = malloc(sizeof(WrappedText));
+    accueil.titre = malloc(sizeof(WrappedText));
 
-    resize_ecran_acceuil(buttons, bg, titre);
+    accueil.lang_bt = malloc(sizeof(Langues_bt));
+    init_bt_langues(ren, accueil.lang_bt);
+
+    resize_ecran_acceuil(&accueil);
     int running = 1;
     while (running) {
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
-        affiche_background(ren, bg);
-        affiche_titre(ren, titre);
-        affiche_boutons_accueil(ren, buttons);
+        affiche_background(ren, accueil.bg);
+        affiche_titre(ren, accueil.titre);
+        affiche_boutons_accueil(ren, accueil.buttons);
+        affiche_langues(ren, accueil.lang_bt);
         updateDisplay(ren);
 
-        handle_events_accueil(buttons, ren, bg, titre, &running, gr_ele, grapheur_ele_3D);
+        handle_events_accueil(ren, &accueil, &running, gr_ele, grapheur_ele_3D);
     }
-    free_background(bg);
-    free(titre);
+    free_background(accueil.bg);
+    free(accueil.titre);
 }
 
-void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre){
-    resize_background(bg);
-    resize_boutons_acceuil(buttons);
-    *titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
+void resize_ecran_acceuil (Accueil* accueil){
+    resize_background(accueil->bg);
+    resize_boutons_acceuil(accueil->buttons);
+    resize_lang_bt(accueil->lang_bt);
+    *accueil->titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
 }
 
 void affiche_titre (SDL_Renderer* ren, WrappedText *titre){
@@ -59,7 +64,7 @@ void affiche_titre (SDL_Renderer* ren, WrappedText *titre){
 
 void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button* button_remerciements, Button* button_grapheur, Button* button_grapheur_3D) {
     int button_height = 60;
-    int button_width = 300;
+    int button_width = 350;
     int button_margin_x = 20;
     int button_margin_y = 20;
     int marge_fen = 20;
@@ -89,7 +94,7 @@ void init_buttons_accueil(Button* buttons[], Button* button_mode_emploi, Button*
 
 void resize_boutons_acceuil (Button* boutons[]){
     int button_height = 60;
-    int button_width = 300;
+    int button_width = 350;
     int button_margin_x = 20;
     int button_margin_y = 20;
     int marge_fen = 20;
@@ -122,7 +127,7 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]) {
     }
 }
 
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, WrappedText *titre, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D) {
+void handle_events_accueil(SDL_Renderer* ren, Accueil* accueil, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D) {
     SDL_Event e;
     while (SDL_PollEvent(&e)) {
         if (e.type == SDL_QUIT) *running = 0;
@@ -130,26 +135,29 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
         if (e.type == SDL_WINDOWEVENT && e.window.event == SDL_WINDOWEVENT_RESIZED) {
             FEN_X = e.window.data1;
             FEN_Y = e.window.data2;
-            resize_ecran_acceuil(buttons, bg, titre);
+            resize_ecran_acceuil(accueil);
         }
 
         if (e.type == SDL_MOUSEMOTION) {
             int x = e.motion.x, y = e.motion.y;
             for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
-                if (x >= buttons[i]->rect.x && x <= buttons[i]->rect.x + buttons[i]->rect.w &&
-                    y >= buttons[i]->rect.y && y <= buttons[i]->rect.y + buttons[i]->rect.h) {
-                    buttons[i]->hovered = 1;
+                if (x >= accueil->buttons[i]->rect.x && x <= accueil->buttons[i]->rect.x + accueil->buttons[i]->rect.w &&
+                    y >= accueil->buttons[i]->rect.y && y <= accueil->buttons[i]->rect.y + accueil->buttons[i]->rect.h) {
+                        accueil->buttons[i]->hovered = 1;
                 } else {
-                    buttons[i]->hovered = 0;
+                    accueil->buttons[i]->hovered = 0;
                 }
             }
+            if (is_souris_sur_rectangle(accueil->lang_bt->actual_lang.rect, x, y)){
+                accueil->lang_bt->actual_lang.hovered = 1;
+            } else accueil->lang_bt->actual_lang.hovered = 0;
         }
         
         if (e.type == SDL_MOUSEBUTTONUP) {
             int x = e.button.x, y = e.button.y;
             for (int i = 0; i < NB_BOUTONS_ACCUEIL; i++) {
-                if (x >= buttons[i]->rect.x && x <= buttons[i]->rect.x + buttons[i]->rect.w &&
-                    y >= buttons[i]->rect.y && y <= buttons[i]->rect.y + buttons[i]->rect.h) {
+                if (x >= accueil->buttons[i]->rect.x && x <= accueil->buttons[i]->rect.x + accueil->buttons[i]->rect.w &&
+                    y >= accueil->buttons[i]->rect.y && y <= accueil->buttons[i]->rect.y + accueil->buttons[i]->rect.h) {
                     int mode_quitter = 1; // Si 0 on ferme la fenêtre, si 1 on reste sur le menu principal
                     switch (i) {
                         case 0:
@@ -166,9 +174,20 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                             break;
                     }
                     if (!mode_quitter) *running = 0;
-                    buttons[i]->hovered = 0;
-                    resize_ecran_acceuil(buttons, bg, titre);
+                    accueil->buttons[i]->hovered = 0;
+                    resize_ecran_acceuil(accueil);
                     return;
+                }
+            }
+        
+            if (is_souris_sur_rectangle(accueil->lang_bt->actual_lang.rect, x, y)){
+                accueil->lang_bt->langues_dispo_visibles = !accueil->lang_bt->langues_dispo_visibles;
+            }
+            for (int j = 0; j < NB_LANGUES; j++) {
+                if (is_souris_sur_rectangle(accueil->lang_bt->langues_dispo[j].rect, x, y)){
+                    langue = j;
+                    accueil->lang_bt->actual_lang.image = accueil->lang_bt->langues_dispo[j].image;
+                    set_all_textes_by_lang(gr_ele, grapheur_ele_3D, accueil);
                 }
             }
         }
@@ -193,9 +212,101 @@ void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg,
                     break;
             }
             if (!mode_quitter) *running = 0;
-            resize_ecran_acceuil(buttons, bg, titre);
+            resize_ecran_acceuil(accueil);
         }
     }
+}
+
+
+void init_bt_langues (SDL_Renderer* ren, Langues_bt* lang_bt){
+    lang_bt->taille = 50;
+    lang_bt->espace_entre = 10;
+    lang_bt->langues_dispo_visibles = false;
+
+    char filename[30];
+    sprintf(filename, "Icons/drapeaux/%s.png", get_lang_str());
+    lang_bt->actual_lang.image = load_image(ren, filename);
+    lang_bt->actual_lang.is_survolable = 1;
+    lang_bt->actual_lang.hovered = 0;
+    lang_bt->actual_lang.color_base = (SDL_Color){0,0,0,0};
+    lang_bt->actual_lang.color_hover = (SDL_Color){0,0,0,0};
+    lang_bt->actual_lang.pourcentage_place = 100;
+    lang_bt->actual_lang.rect.w = lang_bt->taille;
+    lang_bt->actual_lang.rect.h = lang_bt->actual_lang.rect.w;
+    lang_bt->actual_lang.radius = lang_bt->actual_lang.rect.w / 2;
+    lang_bt->actual_lang.taille_bonus_hover_x = 0.2 * lang_bt->actual_lang.rect.w;
+    lang_bt->actual_lang.taille_bonus_hover_y = 0.2 * lang_bt->actual_lang.rect.h;
+
+    int lang_actuelle = langue;
+    for (int i = 0; i < NB_LANGUES; i++) {
+        langue = i;
+        char filename[30];
+        sprintf(filename, "Icons/drapeaux/%s.png", get_lang_str());
+        lang_bt->langues_dispo[i].image = load_image(ren, filename);
+        lang_bt->langues_dispo[i].is_survolable = 0;
+        lang_bt->langues_dispo[i].color_base = (SDL_Color){0,0,0,0};
+        lang_bt->langues_dispo[i].pourcentage_place = 80;
+        lang_bt->langues_dispo[i].rect.w = lang_bt->taille;
+        lang_bt->langues_dispo[i].rect.h = lang_bt->langues_dispo[i].rect.w;
+        lang_bt->langues_dispo[i].radius = lang_bt->langues_dispo[i].rect.w / 2;
+    }
+    langue = lang_actuelle;
+
+    resize_lang_bt(lang_bt);
+
+    lang_bt->rect_fond.x = lang_bt->langues_dispo[NB_LANGUES-1].rect.x - lang_bt->espace_entre;
+    lang_bt->rect_fond.y = lang_bt->taille;
+    lang_bt->rect_fond.w = (NB_LANGUES+1) * (lang_bt->taille + lang_bt->espace_entre);
+    lang_bt->rect_fond.h = lang_bt->taille;
+}
+
+void resize_lang_bt (Langues_bt* lang_bt){
+    lang_bt->actual_lang.rect.x = FEN_X - 2*lang_bt->actual_lang.rect.w;
+    lang_bt->actual_lang.rect.y = lang_bt->actual_lang.rect.h;
+    for (int i = 0; i < NB_LANGUES; i++) {
+        lang_bt->langues_dispo[i].rect.x = FEN_X - 2*lang_bt->langues_dispo[i].rect.w - (i+1) * (lang_bt->taille + lang_bt->espace_entre);
+        lang_bt->langues_dispo[i].rect.y = lang_bt->langues_dispo[i].rect.h;
+    }
+    lang_bt->rect_fond.x = lang_bt->langues_dispo[NB_LANGUES-1].rect.x - lang_bt->espace_entre;
+}
+
+void affiche_langues (SDL_Renderer* ren, Langues_bt* lang_bt){
+    if (lang_bt->langues_dispo_visibles){
+        roundedBoxRGBA(ren, lang_bt->rect_fond.x, lang_bt->rect_fond.y, lang_bt->rect_fond.x + lang_bt->rect_fond.w, lang_bt->rect_fond.y + lang_bt->rect_fond.h, 
+            lang_bt->rect_fond.h/2, 150, 150, 150, 255);
+    }
+    
+    renderImageButton(ren, &lang_bt->actual_lang);
+
+    if (lang_bt->langues_dispo_visibles){
+        for (int i = 0; i < NB_LANGUES; i++) {
+            renderImageButton(ren, &lang_bt->langues_dispo[i]);
+        }
+    }
+}
+
+void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Accueil* accueil) {
+    // Page d'accueil
+    char* id[] = {"Mode_emploi", "Remerciements", "Grapheur_2D", "Grapheur_3D"};
+    for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
+        accueil->buttons[j]->label = get_texte("Acceuil", id[j]);
+    }
+    *accueil->titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
+
+    // Grapheur 2D
+    // bande droite
+    gr_ele->bande_droite->bouton_centrer.label = get_texte("Bande_droite", "centrer");
+    // bande haute
+    gr_ele->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
+    gr_ele->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
+    gr_ele->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
+
+    // Grapheur 3D
+    // bande haute
+    grapheur_ele_3D->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
+    grapheur_ele_3D->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
+    grapheur_ele_3D->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
+
 }
 
 
@@ -377,27 +488,3 @@ void free_background (Background* bg){
     free(bg);
 }
 
-
-void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Button* buttons[], WrappedText *titre) {
-    // Page d'accueil
-    char* id[] = {"Mode_emploi", "Remerciements", "Grapheur_2D", "Grapheur_3D"};
-    for (int j = 0; j < NB_BOUTONS_ACCUEIL; j++){
-        buttons[j]->label = get_texte("Acceuil", id[j]);
-    }
-    *titre = text_wrapper(fonts[0], get_texte("Acceuil", "titre"), FEN_X - 20);
-
-    // Grapheur 2D
-    // bande droite
-    gr_ele->bande_droite->bouton_centrer.label = get_texte("Bande_droite", "centrer");
-    // bande haute
-    gr_ele->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
-    gr_ele->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
-    gr_ele->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
-
-    // Grapheur 3D
-    // bande haute
-    grapheur_ele_3D->bande_haute->texte_descriptif_borne_inf->label = get_texte("Bande_haute", "borne_inf");
-    grapheur_ele_3D->bande_haute->texte_descriptif_borne_sup->label = get_texte("Bande_haute", "borne_sup");
-    grapheur_ele_3D->bande_haute->texte_descriptif_expression->label = get_texte("Bande_haute", "expression");
-
-}

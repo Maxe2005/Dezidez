@@ -6,6 +6,7 @@
 #include "Gestion_3D/grapheur_3D.h"
 
 #define NB_BOUTONS_ACCUEIL 4
+#define NB_LANGUES 2
 
 typedef struct {
     SDL_Rect dstRect;
@@ -16,6 +17,22 @@ typedef struct {
     SDL_Color color_filtre;
     SDL_Rect filtre;
 } Background;
+
+typedef struct {
+    ImageButton actual_lang;
+    ImageButton langues_dispo[NB_LANGUES];
+    SDL_Rect rect_fond;
+    bool langues_dispo_visibles;
+    int taille; // Le diamètre des cercles en pixels
+    int espace_entre; // L'espacement entre 2 drapeaux
+} Langues_bt;
+
+typedef struct {
+    Button* buttons[NB_BOUTONS_ACCUEIL];
+    Background* bg;
+    WrappedText *titre;
+    Langues_bt* lang_bt;
+} Accueil;
 
 /**
  * Début du lancement du jeu
@@ -51,15 +68,13 @@ void affiche_boutons_accueil(SDL_Renderer* ren, Button* buttons[]);
 
 /**
  * Gère les événements des boutons de l'écran d'accueil
- * @param buttons Le tableau de boutons
  * @param ren Un pointeur sur une structure contenant l'état du rendu
- * @param bg L'image de fond
- * @param titre Le titre wrappé
+ * @param acceuil Les éléments de l'acceuil
  * @param running Un pointeur sur un entier qui permet de quitter la boucle de jeu
  * @param gr_ele Les éléments du grapheur
  * @param grapheur_ele_3D Les éléments du grapheur 3D
  */
-void handle_events_accueil(Button* buttons[], SDL_Renderer* ren, Background* bg, WrappedText *titre, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
+void handle_events_accueil(SDL_Renderer* ren, Accueil* accueil, int *running, Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D);
 
 /**
  * Affiche une page de texte scrollable
@@ -119,19 +134,36 @@ void resize_boutons_acceuil (Button* boutons[]);
 
 /**
  * Redimentionne tout l'ecran d'accueil
- * @param boutons Un tableau avec tous les boutons à redimentionner
- * @param bg La structure nessessaire pour l'image de fond
- * @param titre Le titre wrappé
+ * @param acceuil Les éléments de l'acceuil
  */
-void resize_ecran_acceuil (Button* buttons[], Background* bg, WrappedText *titre);
+void resize_ecran_acceuil (Accueil* accueil);
 
 /**
  * Actualise tous les textes de l'interface en fonction de la langue choisie
  * @param gr_ele Les éléments du grapheur
  * @param grapheur_ele_3D Les éléments du grapheur 3D
- * @param buttons Le tableau de boutons d'acceuil
- * @param titre Le titre de la page d'accueil
+ * @param acceuil Les éléments de l'acceuil
  */
-void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Button* buttons[], WrappedText *titre);
+void set_all_textes_by_lang (Grapheur_elements *gr_ele, Grapheur_3D_elements *grapheur_ele_3D, Accueil* accueil);
+
+/**
+ * Affiche le selectionneur de langues
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param lang_bt La structure pour la selection des langues
+ */
+void affiche_langues (SDL_Renderer* ren, Langues_bt* lang_bt);
+
+/**
+ * Initialise le selectionneur de langues
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param lang_bt La structure pour la selection des langues
+ */
+void init_bt_langues (SDL_Renderer* ren, Langues_bt* lang_bt);
+
+/**
+ * Redimentionne la position du séléctionneur de laugue
+ * @param lang_bt La structure pour la selection des langues
+ */
+void resize_lang_bt (Langues_bt* lang_bt);
 
 #endif
