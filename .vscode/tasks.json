@@ -79,7 +79,17 @@
             "*.c",
             "-g",
             "-o",
-            "test"
+            "main",
+            "Gestion_3D/*.c",
+            "SDL2_gfx/*.c",
+            "cJSON/cJSON.c",
+            "-Iinclude",
+            "-Llib",
+            "-lmingw32",
+            "-lSDL2main",
+            "-lSDL",
+            "-lSDL2_ttf",
+            "-lSDL2_image"
         ],
         "group": {
             "kind": "build",

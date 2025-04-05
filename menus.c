@@ -110,6 +110,7 @@ void resize_boutons_acceuil (Button* boutons[]){
             origines_x[k] = FEN_X/2 - (nb_bts_par_ligne[k] * button_width + (nb_bts_par_ligne[k] - 1) * button_margin_x)/2;
         }
         k++;
+        if (k >= NB_BOUTONS_ACCUEIL) break;
         nb_bts_par_ligne[k] = NB_BOUTONS_ACCUEIL;
         for (int i = 0; i < k; i++) {
             nb_bts_par_ligne[k] -= nb_bts_par_ligne[i];
@@ -182,7 +183,7 @@ void handle_events_accueil(SDL_Renderer* ren, Accueil* accueil, int *running, Gr
         
             if (is_souris_sur_rectangle(accueil->lang_bt->actual_lang.rect, x, y)){
                 accueil->lang_bt->langues_dispo_visibles = !accueil->lang_bt->langues_dispo_visibles;
-            }
+            } else accueil->lang_bt->langues_dispo_visibles = false;
             for (int j = 0; j < NB_LANGUES; j++) {
                 if (is_souris_sur_rectangle(accueil->lang_bt->langues_dispo[j].rect, x, y)){
                     langue = j;
@@ -345,10 +346,12 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     int marge = FEN_X / 7;
     MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);
 
-    
-    int scroll_offset_min = -40; // Décalage vertical minimum du scrolling
-    int scroll_offset = scroll_offset_min/2; // Décalage vertical du scrolling
-    int SCROLL_SPEED = 30; // Vitesse de défilement
+    int taille_x_scrollbar = 20;
+    int marge_x_scrollbar = taille_x_scrollbar;
+    int marge_y_scrollbar = 10;
+    Scrollbar scrollbar;
+    init_scrollbar(&scrollbar, FEN_X - marge_x_scrollbar - taille_x_scrollbar, taille_header + marge_y_scrollbar, taille_x_scrollbar, FEN_Y - taille_header - 2*marge_y_scrollbar, md_txt.total_height);
+
     int mode_quitter = 0; // Les différentes façons de quitter l'ecrant texte : 0: pas quitter, 1: quitter la fenêtre, 2:quitter et revenir au menu principal 
     int running = 1;
     SDL_Event event;
@@ -367,17 +370,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
                 free_MarkdownText(&md_txt);
                 marge = FEN_X / 7;
                 md_txt = charge_markdown(fonts_md, markdown_file, marge);
-            }
-
-            if (event.type == SDL_MOUSEWHEEL) {
-                scroll_offset -= event.wheel.y * SCROLL_SPEED;
-                if (scroll_offset < scroll_offset_min) scroll_offset = scroll_offset_min;
-                if (scroll_offset > md_txt.total_height - md_txt.fist_line.wrapped_text.total_height) scroll_offset = md_txt.total_height - md_txt.fist_line.wrapped_text.total_height;
-            }
-
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_DOWN) scroll_offset += SCROLL_SPEED;
-                if (event.key.keysym.sym == SDLK_UP) scroll_offset -= SCROLL_SPEED;
+                resize_scrollbar(&scrollbar, FEN_X - taille_x_scrollbar - marge_x_scrollbar, FEN_Y - taille_header - 2*marge_y_scrollbar, md_txt.total_height);
             }
 
             if (event.type == SDL_KEYUP) {
@@ -393,7 +386,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
                     running = 0;
                 }
             }
-        
+
             if (event.type == SDL_MOUSEMOTION){
                 if (is_souris_sur_rectangle(bouton_retour.rect, event.motion.x, event.motion.y)){
                     bouton_retour.hovered = 1;
@@ -403,12 +396,14 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
                     bouton_retour.pourcentage_place = 80;
                 }
             }
-        }
         
+            handle_scrollbar_event(&scrollbar, &event);
+        }        
         SDL_SetRenderDrawColor(ren, 0, 0, 0, 255);
         SDL_RenderClear(ren);
         affiche_background(ren, bg);
-        render_markdown(ren, &md_txt, scroll_offset - taille_header, marge);
+        render_markdown(ren, &md_txt, scrollbar.scroll_offset - taille_header - 0.2*taille_header, marge);
+        render_scrollbar(ren, &scrollbar);
         renderHeader(ren, titre, fonts[3], FEN_X, taille_header);
         renderImageButton(ren, &bouton_retour);
         updateDisplay(ren);
@@ -421,6 +416,91 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     free(bg);
     return mode_quitter - 1;
 }
+
+void init_scrollbar(Scrollbar* sb, int x, int y, int width, int height, int total_height) {
+    sb->x = x;
+    sb->y = y;
+    sb->width = width;
+    sb->height = height;
+    sb->total_content_height = total_height;
+    sb->scroll_offset = 0;
+    sb->scroll_speed = 30;
+    sb->grabbed = 0;
+    sb->click_offset_y = 0;
+    resize_scrollbar(sb, x, height, total_height);
+}
+
+void render_scrollbar(SDL_Renderer* ren, Scrollbar* sb) {
+    roundedBoxRGBA(ren, sb->x, sb->y, sb->x + sb->width, sb->y + sb->height, sb->width / 2 -2, 100, 100, 100, 255);
+
+    float scroll_ratio = (float)sb->scroll_offset / sb->max_scroll;
+    if (scroll_ratio > 1.0f) scroll_ratio = 1.0f;
+
+    sb->thumb.y = sb->y + scroll_ratio * sb->thumb_travel;
+
+    roundedBoxRGBA(ren, sb->thumb.x, sb->thumb.y, sb->thumb.x + sb->thumb.w, sb->thumb.y + sb->thumb.h, sb->thumb.w / 2 -2, 200, 200, 200, 255);
+}
+
+void handle_scrollbar_event(Scrollbar* sb, SDL_Event* event) {
+    if (event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT) {
+        if (SDL_PointInRect(&(SDL_Point){event->button.x, event->button.y}, &sb->thumb)) {
+            sb->grabbed = 1;
+            sb->click_offset_y = event->button.y - sb->thumb.y;
+        }
+    }
+
+    if (event->type == SDL_MOUSEBUTTONUP && event->button.button == SDL_BUTTON_LEFT) {
+        sb->grabbed = 0;
+    }
+
+    if (event->type == SDL_MOUSEMOTION && sb->grabbed) {
+        int new_thumb_y = event->motion.y - sb->click_offset_y;
+        if (new_thumb_y < sb->y) new_thumb_y = sb->y;
+        if (new_thumb_y > sb->y + sb->height - sb->thumb.h)
+            new_thumb_y = sb->y + sb->height - sb->thumb.h;
+
+        float scroll_ratio = (float)(new_thumb_y - sb->y) / sb->thumb_travel;
+        sb->scroll_offset = scroll_ratio * sb->max_scroll;
+    }
+
+    if (event->type == SDL_MOUSEWHEEL) {
+        sb->scroll_offset -= event->wheel.y * sb->scroll_speed;
+        if (sb->scroll_offset < 0) sb->scroll_offset = 0;
+        if (sb->scroll_offset > sb->max_scroll) sb->scroll_offset = sb->max_scroll;
+    }
+
+    if (event->type == SDL_KEYDOWN) {
+        if (event->key.keysym.sym == SDLK_DOWN) {
+            sb->scroll_offset += sb->scroll_speed;
+            if (sb->scroll_offset > sb->max_scroll) sb->scroll_offset = sb->max_scroll;
+        }
+        if (event->key.keysym.sym == SDLK_UP) {
+            sb->scroll_offset -= sb->scroll_speed;
+            if (sb->scroll_offset < 0) sb->scroll_offset = 0;
+        }
+    }
+}
+
+void resize_scrollbar(Scrollbar* sb, int x, int height, int total_height) {
+    sb->x = x;
+    sb->height = height;
+    sb->total_content_height = total_height;
+
+    float ratio = (float)sb->height / sb->total_content_height;
+    if (ratio > 1.0f) ratio = 1.0f;
+
+    int thumb_height = sb->height * ratio;
+    sb->max_scroll = sb->total_content_height - sb->height/2;
+    sb->thumb_travel = sb->height - thumb_height;
+    if (sb->thumb_travel < 1) sb->thumb_travel = 1;
+
+    float scroll_ratio = (float)sb->scroll_offset / sb->max_scroll;
+    if (scroll_ratio > 1.0f) scroll_ratio = 1.0f;
+
+    int thumb_y = sb->y + scroll_ratio * sb->thumb_travel;
+    sb->thumb = (SDL_Rect){ sb->x, thumb_y, sb->width, thumb_height };
+}
+
 
 int ecran_remerciements (SDL_Renderer* ren){
     char filename[60];
