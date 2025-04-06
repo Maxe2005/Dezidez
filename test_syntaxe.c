@@ -10,10 +10,10 @@ void test_valide1() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    //printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
+    if (syntaxeVerbose >= 1) printf("Test valide 1 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
     //afficher_arbre(a);
     //afficher_arbre2(a, 0);
-    afficher_arbre_couleur(a);
+    if (syntaxeVerbose >= 2) afficher_arbre_couleur(a);
 }
 
 void test_valide2() {
@@ -27,11 +27,11 @@ void test_valide2() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ECHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test valide 2 : %s : erreur %d\n", erreur ==0 ? "OK" : "ECHEC", erreur);
     //printf("fg a = %d\n", a.pjeton_preced->jeton.lexem);
     //afficher_arbre(&a);
     //afficher_arbre2(a, 0);
-    afficher_arbre_couleur(a);
+    if (syntaxeVerbose >= 2) afficher_arbre_couleur(a);
 }
 
 void test_valide3() {
@@ -43,9 +43,9 @@ void test_valide3() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    printf("Test valide 3 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
+    if (syntaxeVerbose >= 1) printf("Test valide 3 : %s\n", erreur == 0 ? "OK" : "ÉCHEC");
     //afficher_arbre2(a, 0);
-    afficher_arbre_couleur(a);
+    if (syntaxeVerbose >= 2) afficher_arbre_couleur(a);
 }
 
 void test_erreur_operateurs_a_la_suite1() {
@@ -59,7 +59,7 @@ void test_erreur_operateurs_a_la_suite1() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur operateurs a la suite 1 : %s : erreur %d\n", erreur == MEMBRE_VIDE ? "OK" : "ECHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test erreur operateurs a la suite 1 : %s : erreur %d\n", erreur == MEMBRE_VIDE ? "OK" : "ECHEC", erreur);
 }
 
 void test_erreur_operateurs_a_la_suite2() {
@@ -73,7 +73,7 @@ void test_erreur_operateurs_a_la_suite2() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur opérateurs à la suite 2 : %s\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC");
+    if (syntaxeVerbose >= 1) printf("Test erreur opérateurs à la suite 2 : %s\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC");
 }
 
 void test_erreur_manque_operateur() {
@@ -85,7 +85,7 @@ void test_erreur_manque_operateur() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur );
+    if (syntaxeVerbose >= 1) printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur );
 }
 
 void test_erreur_manque_parenthese() {
@@ -98,7 +98,7 @@ void test_erreur_manque_parenthese() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == PROBLEMES_NOMBRE_PARENTHESES ? "OK" : "ÉCHEC", erreur );
+    if (syntaxeVerbose >= 1) printf("Test erreur manque opérateur : %s. Erreur=%d\n", erreur == PROBLEMES_NOMBRE_PARENTHESES ? "OK" : "ÉCHEC", erreur );
 }
 
 // Fonction principale qui exécute tous les tests
@@ -106,7 +106,7 @@ void tester_syntaxe() {
     test_valide1();
     test_valide2();
     test_valide3();
-    /*test_erreur_operateurs_a_la_suite1();
+    test_erreur_operateurs_a_la_suite1();
     test_erreur_operateurs_a_la_suite2();
     test_erreur_manque_operateur();
     test_erreur_manque_parenthese();
@@ -114,9 +114,9 @@ void tester_syntaxe() {
     test_probleme_parentheses_fonctions2();
     test_probleme_apres_reel();
     test_membre_vide();
-    test_parenthese_fermee_1er_jeton();*/
-    //test_expression_valide();
-    //test_cos_plus_sin();
+    test_parenthese_fermee_1er_jeton();
+    test_expression_valide();
+    test_cos_plus_sin();
 }
 
 
@@ -145,9 +145,9 @@ void test_expression_valide() {
     };
     typeerreur erreur = 0;
     Node* a = Syntaxique(tab, &erreur);
-    printf("Test expression valide : %s. Erreur=%d\n", erreur == 0 ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test expression valide : %s. Erreur=%d\n", erreur == 0 ? "OK" : "ÉCHEC", erreur);
     //afficher_arbre2(a, 0);
-    afficher_arbre_couleur(a);
+    if (syntaxeVerbose >= 2) afficher_arbre_couleur(a);
 
 }
 
@@ -158,7 +158,7 @@ void test_parenthese_fermee_1er_jeton() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test parenthèse fermée 1er jeton : %s. Erreur=%d\n", erreur == PARENTHESE_FERMEE_1_ER_JETON ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test parenthèse fermée 1er jeton : %s. Erreur=%d\n", erreur == PROBLEMES_NOMBRE_PARENTHESES ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_membre_vide() {
@@ -171,7 +171,7 @@ void test_membre_vide() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test membre vide : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test membre vide : %s. Erreur=%d\n", erreur == MEMBRE_VIDE ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_probleme_apres_reel() {
@@ -184,7 +184,7 @@ void test_probleme_apres_reel() {
     };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test problème après réel : %s. Erreur=%d\n", erreur == PROBLEME_APRES_REEL ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test problème après réel : %s. Erreur=%d\n", erreur == PROBLEME_APRES_REEL ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_probleme_parentheses_fonctions1() {
@@ -196,7 +196,7 @@ void test_probleme_parentheses_fonctions1() {
     
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test problème parenthèses fonctions (cos5) : %s. Erreur=%d\n", erreur == PROBLEME_PARENTHESES_FONCTIONS ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test problème parenthèses fonctions (cos5) : %s. Erreur=%d\n", erreur == PROBLEME_PARENTHESES_FONCTIONS ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_probleme_parentheses_fonctions2() {
@@ -209,7 +209,7 @@ void test_probleme_parentheses_fonctions2() {
         };
     typeerreur erreur = 0;
     Syntaxique(tab, &erreur);
-    printf("Test problème parenthèses fonctions (cos(5) non fermé) : %s. Erreur=%d\n", erreur == PROBLEME_PARENTHESES_FONCTIONS ? "OK" : "ÉCHEC", erreur);
+    if (syntaxeVerbose >= 1) printf("Test problème parenthèses fonctions (cos(5) non fermé) : %s. Erreur=%d\n", erreur == PROBLEMES_NOMBRE_PARENTHESES ? "OK" : "ÉCHEC", erreur);
 }
 
 void test_cos_plus_sin() {
@@ -228,8 +228,8 @@ void test_cos_plus_sin() {
     };
 
     // Afficher la liste de jetons
-    printf("Expression: cos(3) + sin(2)\n");
-    afficher_liste_jetons(tab, 0, 9);
+    if (syntaxeVerbose >= 1) printf("Expression: cos(3) + sin(2)\n");
+    if (syntaxeVerbose >= 2) afficher_liste_jetons(tab, 0, 9);
 
     // Création de l'arbre par la fonction Syntaxique
     typeerreur erreur = 0;
@@ -268,21 +268,28 @@ void test_cos_plus_sin() {
     racine->pjeton_preced = cos;
     racine->pjeton_suiv = sin;
 
-    cos->pjeton_preced = NULL;
-    cos->pjeton_suiv = val3;
+    cos->pjeton_preced = val3;
+    cos->pjeton_suiv = NULL;
 
-    sin->pjeton_preced = NULL;
-    sin->pjeton_suiv = val2;
+    sin->pjeton_preced = val2;
+    sin->pjeton_suiv = NULL;
 
     // Comparaison des deux arbres
     bool arbres_identiques = comparer_arbres(arbre_syntaxique, racine);
 
-    printf("Test cos(3) + sin(2) : %s. Erreur=%d\n",
+    if (syntaxeVerbose >= 1) printf("Test cos(3) + sin(2) : %s. Erreur=%d\n",
            (erreur == 0 && arbres_identiques) ? "OK" : "ÉCHEC", erreur);
 
     // Afficher arbre
     //afficher_arbre2(arbre_syntaxique,0);
-    afficher_arbre_couleur(racine);
+    if (syntaxeVerbose >= 2) {
+        printf("affichange arbre racine :\n");
+        afficher_arbre_couleur(racine);
+        printf("affichange arbre syntaxique :\n");
+        afficher_arbre_couleur(arbre_syntaxique);
+        printf("comparaison =%d :\n", arbres_identiques);
+        
+    }
 
     // Libération de la mémoire
     liberer_arbre(arbre_syntaxique);

@@ -4,6 +4,18 @@
 #define TAILLE_MAX 100
 #define MAX_DEPTH TAILLE_MAX
 
+static const int syntaxeVerbose = 1;
+/*
+|-------------|-----------|
+| Verbose     | level     |
+|-------------|-----------|
+| None        |     0     |
+| print_tests |     1     |
+| print_tests+|     2     |
+| Debug       |     10     |
+|-------------|-----------|
+*/
+
 //énumération des différents types de lexems existants
 typedef enum
 {

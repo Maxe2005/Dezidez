@@ -146,7 +146,7 @@ void afficher_arbre_rec(Node* racine, char* prefixe, int est_dernier) {
     // Convertir le jeton en chaîne et l'afficher
 
     jeton_to_string(racine->jeton, valeur_jeton, sizeof(valeur_jeton));
-    printf("racine->jeton.lexem=%d\n", racine->jeton.lexem);
+     if (syntaxeVerbose >= 10) printf("racine->jeton.lexem=%d\n", racine->jeton.lexem);
     //printf("%s [%s]\n", lexem_string[racine->jeton.lexem], valeur_jeton);
     
     // Créer un nouveau préfixe pour les enfants
@@ -333,33 +333,41 @@ bool comparer_arbres(Node* arbre1, Node* arbre2) {
 
     // Si un seul des pointeurs est NULL, les arbres sont différents
     if (arbre1 == NULL || arbre2 == NULL) {
+        if (syntaxeVerbose >= 10) printf("un seul des pointeurs est NULL\n");
+        if (syntaxeVerbose >= 10) printf("arbre1 == NULL = %d\n", arbre1 == NULL);
+        if (syntaxeVerbose >= 10) printf("arbre2 == NULL = %d\n", arbre2 == NULL);
         return false;
     }
 
     // Comparaison des jetons
     if (arbre1->jeton.lexem != arbre2->jeton.lexem) {
+        if (syntaxeVerbose >= 10) printf("arbre1->jeton.lexem != arbre2->jeton.lexem\n");
         return false;
     }
 
     // Comparaison des valeurs selon le type de lexem
     switch (arbre1->jeton.lexem) {
         case REEL:
-            if (arbre1->jeton.valeur.reel -arbre2->jeton.valeur.reel > 0.0001
-            || arbre2->jeton.valeur.reel -arbre1->jeton.valeur.reel > 0.0001){
+            if (syntaxeVerbose >= 10) printf("REEL\n");
+            if (arbre1->jeton.valeur.reel - arbre2->jeton.valeur.reel > 0.0001
+             || arbre2->jeton.valeur.reel - arbre1->jeton.valeur.reel > 0.0001){
                 return false;
             }
             break;
         case OPERATEUR:
+            if (syntaxeVerbose >= 10) printf("OPERATEUR\n");
             if (arbre1->jeton.valeur.operateur !=arbre2->jeton.valeur.operateur) {
                 return false;
             }
             break;
         case FONCTION:
+            if (syntaxeVerbose >= 10) printf("FONCTION\n");
             if (arbre1->jeton.valeur.fonction !=arbre2->jeton.valeur.fonction) {
                 return false;
             }
             break;
         case VARIABLE:
+            if (syntaxeVerbose >= 10) printf("VARIABLE\n");
             if (arbre1->jeton.valeur.variable !=arbre2->jeton.valeur.variable) {
                 return false;
             }

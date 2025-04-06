@@ -12,9 +12,9 @@ Node* arbrevide(){
 
 Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
 
-    afficher_liste_jetons(tab, debut, fin);
+    if (syntaxeVerbose >= 2) afficher_liste_jetons(tab, debut, fin);
     int  indoputile = minIndice(tab, debut, fin, erreur);
-    printf("indoputile=%d\n", indoputile);
+    if (syntaxeVerbose >= 10) printf("indoputile=%d\n", indoputile);
     if (*erreur != 0){
         return arbrevide();
     }
@@ -39,10 +39,12 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
         switch (tab[debut].lexem){
             case FONCTION:
                 if (tab[debut + 1].lexem != PAR_OUV){
-                        *erreur = PROBLEME_PARENTHESES_FONCTIONS;
-                        return arbrevide();
+                    if (syntaxeVerbose >= 10) printf("PROBLEME_PARENTHESES_FONCTIONS dans fonctions tab[debut + 1].lexem != PAR_OUV\n");
+                    *erreur = PROBLEME_PARENTHESES_FONCTIONS;
+                    return arbrevide();
                 }
                 if ((tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)){
+                    if (syntaxeVerbose >= 10) printf("MEMBRE VIDE dans fonctions (tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
@@ -58,10 +60,12 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 break;
             case PAR_OUV:
                 if (tab[fin].lexem != PAR_FERM){
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OU tab[fin].lexem != PAR_FERMV\n");
                     *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
-                if ((tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)){
+                if ((tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)){
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV (tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
                     return arbrevide();
                 }
@@ -77,6 +81,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 }
                 break;
             case PAR_FERM:
+                if (syntaxeVerbose >= 10) printf("PARENTHESE_FERMEE_1_ER_JETON dans PAR_FERM\n");
                 *erreur = PARENTHESE_FERMEE_1_ER_JETON;
                 return arbrevide(); 
                 break;

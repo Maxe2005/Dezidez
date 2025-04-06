@@ -22,7 +22,7 @@ main_compile_only:
 	$(CC) main.c -o $(EXEC) $(CFLAGS)
 
 run:
-	./$(EXEC)
+	@ ./$(EXEC)
 
 # clear the terminal
 clear:

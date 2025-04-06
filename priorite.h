@@ -7,6 +7,7 @@
 #include <string.h>
 #include <float.h>
 #include "Structures.h"
+#include "affiche_syntaxe.h"
 
 static const char opPriorite[] = {
     [PLUS] = 0, 
