@@ -159,6 +159,10 @@ bool parenthese(int debut, int fin, typejeton *tab){
 
 Node* Syntaxique(typejeton *tab, typeerreur *erreur){
     int fin = calculTaille(tab);
+    if(fin == -1) {
+        *erreur = ABSENCE_FIN;
+        return arbrevide();
+    }
     Node* arbrePlein = (Node*)malloc(sizeof(Node));
     arbrePlein = operateur( tab, 0, fin, erreur);
     return arbrePlein;
