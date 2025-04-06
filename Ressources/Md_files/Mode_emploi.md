@@ -38,6 +38,120 @@ Le fichier qui nous a été fourni contenait 6 structures différentes :
 Nous avons ajouté également une structure code_erreur qui associe un nom d'erreur à un code d'erreur, par exemple : RACINE_NEGATIVE=301, il est impossible de calculer la racine d'un nombre négatif donc si l'utilisateur demande en entrée d'en faire une le code renverra cette erreur.
 
 
+ Explication de la fonction Analyse_Lexicale
+
+La fonction 'Analyse_Lexicale' transforme une expression mathématique sous forme de chaîne de caractères en un tableau de jetons (tokens). Elle permet de décomposer l'expression en éléments que l'on peut facilement manipuler pour des opérations d'analyse syntaxique ultérieures.
+Ce processus de tokenisation est une étape préalable fondamentale pour la future analyse et évaluation de l'expression mathématiques.
+
+## Fonctionnement global
+
+La fonction prend quatre paramètres:
+* 'TabToken' : tableau qui contiendra les tokens générés
+* 'Expression' : la chaîne de caractères représentant l'expression mathématique
+* 'erreur' : pointeur vers une variable qui contiendra le code d'erreur en cas de problème
+* 'Dimension' : indique si l'expression est à 1 ou 2 variables (0 pour une dimension, 1 pour deux dimensions)
+
+**Important**: L'analyseur lexical ne prend en compte que les caractères en minuscules. Toute expression doit être en minuscules pour être correctement analysée.
+
+## Sous-fonctions utilisées
+
+La fonction 'Analyse_Lexicale' suit une séquence de traitement en trois étapes principales, chacune utilisant une sous-fonction dédiée:
+
+1. 'ExpressionSansLesEspaces'
+   Cette fonction supprime tous les espaces de l'expression mathématique.
+
+2. 'MultiplicationImplicite'
+   Cette fonction détecte et ajoute les opérateurs de multiplication implicites. Par exemple, elle transforme '2x' en '2*x'.
+
+3. 'DecompositionToken'
+   Cette fonction décompose l'expression en tokens individuels et les stocke dans le tableau 'TabToken', en tenant compte du paramètre de dimension.
+
+## Processus détaillé avec exemples
+
+Prenons l'expression '"3 + cos(5x)"' comme exemple.
+
+### Étape 1: Suppression des espaces
+'ExpressionSansLesEspaces' transforme '"3 + cos(5x)"' en '"3+cos(5x)"'.
+
+### Étape 2: Ajout des multiplications implicites
+'MultiplicationImplicite' détecte les multiplications implicites entre chiffres et variables. Elle transforme '"3+cos(5x)"' en '"3+cos(5*x)"'.
+
+### Étape 3: Création des tokens
+'DecompositionToken' décompose l'expression en tokens:
+* '3' → Token de type REEL avec valeur 3.0
+* '+' → Token de type OPERATEUR avec valeur PLUS
+* 'cos' → Token de type FONCTION avec valeur COS
+* '(' → Token de type PAR_OUV
+* '5' → Token de type REEL avec valeur 5.0
+* '*' → Token de type OPERATEUR avec valeur FOIS
+* 'x' → Token de type VARIABLE avec valeur 'x'
+* ')' → Token de type PAR_FERM
+* Ajout d'un token FIN à la fin
+
+## Comment 'DecompositionToken' identifie les tokens
+
+La fonction 'DecompositionToken' analyse caractère par caractère et utilise plusieurs sous-fonctions pour identifier correctement chaque token:
+
+* 'TokenReelPositif': Crée un token pour les nombres positifs
+* 'TokenReelNegatif': Gère les nombres négatifs (ex: "(-2.5)")
+* 'TokenOperateur': Identifie les opérateurs (+, -, *, /, **)
+* 'TokenFonction': Identifie les fonctions (sin, cos, abs, etc.)
+* 'TokenVariable': Identifie les variables (x, y) en fonction du paramètre 'Dimension'
+
+## Gestion des variables selon la dimension
+
+La fonction 'TokenVariable' utilise le paramètre 'Dimension' pour savoir quelles variables sont autorisées:
+* Si 'Dimension' = 0: seule la variable 'x' est autorisée
+* Si 'Dimension' = 1: les variables 'x' et 'y' sont autorisées
+
+## Gestion des erreurs
+
+La fonction signale plusieurs types d'erreurs possibles:
+* FONCTION_INCONNUE (101): Fonction non reconnue
+* NOMBRE_INVALIDE (102): Format de nombre incorrect (ex: "1.2.3")
+* CARACTERE_INCONNUE (103): Caractère non reconnu
+* VARIABLE_INCONNUE (104): Variable non autorisée selon la dimension
+
+## Exemple complet
+
+Pour l'expression '"2x + sin(3.5)"' avec 'Dimension' = 0:
+
+1. Suppression des espaces: '"2x+sin(3.5)"'
+2. Ajout des multiplications implicites: '"2*x+sin(3.5)"'
+3. Création des tokens:
+   * REEL (2.0)
+   * OPERATEUR (FOIS)
+   * VARIABLE ('x')
+   * OPERATEUR (PLUS)
+   * FONCTION (SIN)
+   * PAR_OUV
+   * REEL (3.5)
+   * PAR_FERM
+   * FIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # PARTIE EVALUATEUR :
 L'objectif de l'évaluateur est de calculer une fonction (qui est sous la forme d'un arbre) à partir de variable x et y données. Son rôle est essentiel pour tracer des courbes, car il permet d'obtenir les points à afficher sur le graphique.
 Notre code se divise en deux fonctions principales : evaluateur, notre fonction principale qui interprète l'arbre, et calculer_fonction, une fonction auxiliaire qui applique des fonctions mathématiques standards.
@@ -116,4 +230,4 @@ En appuyant sur le bouton "clic droit" de la souris, l'utilisateur active un mod
 
 ### 5.4 Évaluateur en x
 
-L'évaluateur, activé par un clic gauche, permet à l'utilisateur de visualiser deux droites qui coupent la première courbe de la liste des expressions. Ces droites suivent la position de la souris sur l'axe des abscisses. Un affichage fournit la valeur de `x` ainsi que la valeur de la fonction au point de clic.
+L'évaluateur, activé par un clic gauche, permet à l'utilisateur de visualiser deux droites qui coupent la première courbe de la liste des expressions. Ces droites suivent la position de la souris sur l'axe des abscisses. Un affichage fournit la valeur de 'x' ainsi que la valeur de la fonction au point de clic.
