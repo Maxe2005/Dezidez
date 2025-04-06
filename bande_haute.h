@@ -76,6 +76,8 @@ typedef struct {
     Button_mvt button_delete;
     SDL_Texture* image_button_visible;
     SDL_Texture* image_button_invisible;
+    bool is_moving; // Pour savoir si la bande d'expression est en train d'être déplacée
+    int moving_offset; // Pour savoir de combien la bande d'expression a été déplacée
 } Expression_fonction;
 
 typedef struct {
@@ -119,6 +121,13 @@ typedef struct {
  * @param bande_haute La bande d'entrées à afficher
  */
 void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
+ * Affiche la bande d'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande à afficher
+ */
+void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression);
 
 /**
  * Initialise la bande d'entrées
@@ -296,6 +305,22 @@ Exemples exemples_fonctions_2D ();
  * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
  */
 Exemples exemples_fonctions_3D ();
+
+/**
+ * Gère le mouvement de la bande d'expression
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param expression La bande de l'expression qui bouge
+ * @param motion La valeur du déplacement à effectuer.
+ */
+void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* expression, int motion);
+
+/**
+ * Permet de faire tous les changement néssecaires lorque l'ordre de position d'une bande d'expression est modifiée
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param i L'index de la nouvelle position de la bande d'expression à aclimater (elle doit déjà y avoir été déplacée)
+ * @param diection La direction du changement : 1 si l'index à augmenté, -1 si l'index à diminué. 
+ */
+void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction);
 
 
 #endif

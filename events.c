@@ -122,6 +122,10 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
     } else message.boutton_quitter.hovered = 0;
 
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
+        if (bande_haute->expressions[i]->is_moving){
+            moving_bande_expression(bande_haute, bande_haute->expressions[i], event.motion.yrel);
+            is_MOUSEMOTION_used = true;
+        }
         if (!is_MOUSEMOTION_used && bande_haute->expressions[i]->visible) {
             is_MOUSEMOTION_used = handle_event_color_picker_SDL_MOUSEMOTION(event, bande_haute->expressions[i]->color_picker, x_souris_px, y_souris_px);
             handle_event_entrees_expressions_MOUSEMOTION(event, bande_haute, bande_haute->expressions[i], x_souris_px, y_souris_px, is_MOUSEMOTION_used);
@@ -136,7 +140,13 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
 
 bool handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     bool clic_utile = false;
-
+    for (int i = 0; i < bande_haute->nb_expressions; i++) {
+        if (bande_haute->expressions[i]->is_moving){
+            bande_haute->expressions[i]->is_moving = false;
+            placement_pour_affichage_avec_offset(bande_haute->expressions[i], bande_haute->scroll_offset);
+            clic_utile = true;
+        }
+    }
     if (!clic_utile && is_souris_sur_rectangle(message.boutton_quitter.rect, x_souris_px, y_souris_px)){
         message.is_visible = 0;
         clic_utile = true;
@@ -163,6 +173,11 @@ bool handle_event_bande_haut_MOUSEBUTTONDOWN (SDL_Event event, Bande_haute* band
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
         if (!is_MOUSEBUTTONDOWN_used && bande_haute->expressions[i]->visible) {
             is_MOUSEBUTTONDOWN_used = handle_event_color_picker_MOUSEBUTTONDOWN(bande_haute->expressions[i]->color_picker, x_souris_px, y_souris_px);
+            if (!is_MOUSEBUTTONDOWN_used && bande_haute->expanding && is_souris_sur_rectangle(bande_haute->expressions[i]->button_deplacement.bt.rect, x_souris_px, y_souris_px)) {
+                    bande_haute->expressions[i]->is_moving = true;
+                    bande_haute->expressions[i]->moving_offset = 0;
+                    is_MOUSEBUTTONDOWN_used = true;
+            }
         }
     }
     return is_MOUSEBUTTONDOWN_used;
@@ -171,7 +186,21 @@ bool handle_event_bande_haut_MOUSEBUTTONDOWN (SDL_Event event, Bande_haute* band
 void handle_event_bande_haut_MOUSEWHEEL (SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     if (is_souris_sur_rectangle(bande_haute->surface, x_souris_px, y_souris_px)){
         if (bande_haute->expanding) {
+            int old_offset = bande_haute->scroll_offset;
             bande_haute->scroll_offset -= event.wheel.y * BANDE_EXPRESSIONS_ON_SCROLL_STEP;
+            int max_offset = (bande_haute->nb_expressions - 1) * bande_haute->params.height_bande_expression;
+            for (int i = 0; i < bande_haute->nb_expressions; i++) {
+                if (bande_haute->expressions[i]->is_moving){
+                    if (bande_haute->scroll_offset < 0){
+                        moving_bande_expression(bande_haute, bande_haute->expressions[i], 0 - old_offset);
+                    } else if (bande_haute->scroll_offset > max_offset){
+                        moving_bande_expression(bande_haute, bande_haute->expressions[i], max_offset - old_offset);
+                    } else {
+                        moving_bande_expression(bande_haute, bande_haute->expressions[i], 0 - event.wheel.y * BANDE_EXPRESSIONS_ON_SCROLL_STEP);
+                    }
+                    break;
+                }
+            }
         }
         if (!bande_haute->expanding) {
             bande_haute->scroll_offset -= event.wheel.y * BANDE_EXPRESSIONS_OFF_SCROLL_STEP;
@@ -236,10 +265,6 @@ bool handle_event_entrees_expressions_MOUSEBUTTONUP (SDL_Event event, Bande_haut
                 expression->color_picker->rect_moving = expression->color_picker->rect_initial;
                 expression->color_picker->boutton_quitter.rect = expression->color_picker->boutton_quitter_rect_base;
             }
-        }
-        if (is_souris_sur_rectangle(expression->button_deplacement.bt.rect, x_souris_px, y_souris_px)) {
-            // TODO
-            clic_utile = true;
         }
         if (is_souris_sur_rectangle(expression->button_visibilite.bt.rect, x_souris_px, y_souris_px)) {
             expression->fonction.visible = !expression->fonction.visible;

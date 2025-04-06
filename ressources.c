@@ -121,6 +121,23 @@ void affiche_avertissements (SDL_Renderer* ren){
             color = (SDL_Color){255, 0, 0, 100};
         }
         roundedBoxRGBA(ren, 0, 0, FEN_X, FEN_Y, 0, color.r, color.g, color.b, color.a);
+
+        int marge_x = 20;
+        int marge_y = 10;
+        int probreme_width = 0;
+        int w;
+        Ligne_texte* current_line = &probleme.text.fist_ligne;
+        for (int i = 0; i < probleme.text.nb_lines; i++) {
+            TTF_SizeUTF8(fonts[0], current_line->text, &w, NULL);
+            if (w > probreme_width) probreme_width = w;
+            current_line = current_line->ligne_suivante;
+        }
+
+        // Fond de l'en-tête
+        SDL_SetRenderDrawColor(ren, color.r, color.g, color.b, 200);
+        SDL_Rect fond = {(FEN_X - probreme_width)/2 - marge_x, FEN_Y/2 - probleme.text.total_height/2 - marge_y, probreme_width + 2*marge_x, probleme.text.total_height + 2*marge_y};
+        SDL_RenderFillRect(ren, &fond);
+
         render_text_wrapped(ren, probleme.text, (SDL_Rect){0, 0, FEN_X, FEN_Y}, (SDL_Color){255,255,255,255}, ALIGN_CENTER_X, ALIGN_MIDDLE_Y);
         renderText(ren, "Cliquez pour fermer", FEN_X/2, FEN_Y - 100, (SDL_Color){255,255,255,255}, fonts[6]);
     }
