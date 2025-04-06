@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #define TailleMax 100
 
@@ -12,6 +13,11 @@
  * @param buffer : chaine de caractère temporaire ayant les même caractèristique que Expression
  */
 void ExpressionSansLesEspaces (char *Expression,int SizeExpression,char *NewExpression);
+/**
+ * Transforme tout les caractères majuscules de l'expression en minuscule
+ * @param str : pointeur chaine de caractère
+ */
+void MajtoMin(char *str);
 /**
  * Renvoie 1 si l'element recherché est dans le tableau sinon renvoie 0
  * @param tab : tableaude chaine de caractère

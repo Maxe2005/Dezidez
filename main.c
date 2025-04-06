@@ -2,9 +2,9 @@
 #include <string.h>
 
 // exemple qui fonctionne avec 1 variable: 
-//"(-sinc(2x*y + 1))+10x"
-//"exp(5x + con(2.5))"
-//"2x+x**2 +log(x)"
+//"(-SiNc(2x*y + 1))+10x"
+//"Exp(5x + con(2.5))"
+//"2x+x**2 +Log(x)"
 
 //Exemple d'erreur traité :
 //"( - fonctioninconnue(2*x + 5 ) )"    (fonction inconnue)     erreur 101
@@ -31,8 +31,6 @@
 // "3.1.4.1.5x+y"                       (Nombre invalide)       erreur 102
 //"xy+ .69 "                            (Nombre invalide)       erreur 102
 // "2x + !! sin(2**5)"                  (Caractère inconnue)    erreur 103
-// "EXP(2x + 18)"                       (Caractère inconnue) car majuscule pas supporter    erreur 103
-
 
 
 int main (){

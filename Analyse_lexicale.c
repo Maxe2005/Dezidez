@@ -27,6 +27,12 @@ void ExpressionSansLesEspaces (char *Expression,int SizeExpression,char *buffer)
     memset(buffer, '\0', sizeof(buffer));
 }
 
+void MajtoMin(char *str) {
+    while (*str) {
+        *str = tolower(*str);
+        str++;
+    }
+}
 
 // Fonction qui vérifie si un caractère est dans un tableau de chaînes
 int IsInTab(char *tab, int size, char element) {
@@ -355,7 +361,8 @@ void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[Taille
 void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension){
     int tailleExpression = strlen(Expression);
     char buffert[TailleMax];
-    ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
+    ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace
+    MajtoMin(Expression); // On retire toute les majuscules
     MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
     tailleExpression = strlen(Expression);
     DecompositionToken(Expression,tailleExpression,TabToken,erreur,Dimension);//transforme l'expression en un tableau de Token 
