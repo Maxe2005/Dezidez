@@ -90,7 +90,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     return arbre;
                 }
                 else{
-                    *erreur = PROBLEME_APRES_REEL;
+                    *erreur = PROBLEME_APRES_REEL_OU_VARIABLE;
                     return arbrevide();
                 }
                 break;

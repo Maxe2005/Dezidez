@@ -4,7 +4,7 @@
 #define TAILLE_MAX 100
 #define MAX_DEPTH TAILLE_MAX
 
-static const int syntaxeVerbose = 10;
+static const int syntaxeVerbose = 1;
 /*
 |-------------|-----------|
 | Verbose     | level     |
@@ -74,7 +74,7 @@ typedef enum {
     PROBLEMES_NOMBRE_PARENTHESES = 223, // ((.....), ((()))))))))))
 
     // ERREUR REEL 23X
-    PROBLEME_APRES_REEL = 231, // 2,3,4
+    PROBLEME_APRES_REEL_OU_VARIABLE = 231, // 2,3,4
 
     //ERREUR TAILLE 24X
     ABSENCE_FIN = 241, //debut>fin, absence token END
