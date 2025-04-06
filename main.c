@@ -14,7 +14,6 @@
 // " log(sinc(1.1.1.1 ))"               (Nombre invalide)       erreur 102
 //"x + 18...9 "                         (Nombre invalide)       erreur 102
 // "2x + $ sin(2**5)"                   (Caractère inconnue)    erreur 103
-// "SinC(2x + 18)"                      (Caractère inconnue) car majuscule pas supporter    erreur 103
 
 
 
