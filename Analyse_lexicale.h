@@ -67,12 +67,12 @@ typejeton TokenOperateur (char *Element);
  */
 typejeton TokenVariable (char *Element, int* erreur,int  Dimension);
 /**
- * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel POSITIF'
+ * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel'
  * @param Element : chaine de caractère 
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */
-typejeton TokenReelPositif (char *Element , int* erreur);
+typejeton TokenReel (char *Element , int* erreur);
 
 /**
  * Permet de transformer une expression en un tableau de Token
@@ -82,13 +82,8 @@ typejeton TokenReelPositif (char *Element , int* erreur);
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */ 
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int  Dimension);
+void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int  Dimension);
 
-/**
- * Renvoie le bon Token correrspond dans au string rentré en paramètre dans le cas d'un reel NEGATIF (extrait uniquement le réel negatif de l'element rentré)   ;)
- * @param Element : chaine de caractère de la forme (-0546516545)
- */
-typejeton TokenReelNegatif (char *Element);
 
 /**
  * retourne 1 si plus d'un point dans le str nombre, 0 sinon
