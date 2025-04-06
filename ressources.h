@@ -9,7 +9,7 @@
 #include <stdbool.h>
 #include <ctype.h>
 #include "gestionGraphique.h"
-#include "cJSON/cJSON.h"
+#include "cJSON_test/cJSON.h"
 #include "evaluateur.h"
 #include "Analyse_lexicale.h"
 
