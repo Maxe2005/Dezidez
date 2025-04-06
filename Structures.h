@@ -4,7 +4,7 @@
 #define TAILLE_MAX 100
 #define MAX_DEPTH TAILLE_MAX
 
-static const int syntaxeVerbose = 1;
+static const int syntaxeVerbose = 10;
 /*
 |-------------|-----------|
 | Verbose     | level     |
