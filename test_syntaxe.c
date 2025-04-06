@@ -16,7 +16,6 @@ void tester_syntaxe() {
     test_cos_parenthese_ouverte_5_erreur();
     test_cos_3_fois_cos_2_valide();
     test_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide();
-
     test_4_minus_53_erreur();
     test_0_plus_0_valide();
     test_5_3_minus_4_2_valide();

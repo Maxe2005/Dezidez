@@ -8,6 +8,53 @@
 #include <float.h>
 #include "Structures.h"
 
+static const int syntaxeVerbose = 1;
+/*
+|---------------------------|-----------|
+| Verbose                   |   level   |
+|---------------------------|-----------|
+| None                      |     0     |
+| print tests results       |     1     |
+| print tests with trees    |     2     |
+| All                       |     10    |
+|---------------------------|-----------|
+*/
+
+static const char* lexem_string[] = {
+    [REEL] = "REEL",
+    [OPERATEUR] = "OPERATEUR",
+    [FONCTION] = "FONCTION",
+    [ERREUR] = "ERREUR",
+    [FIN] = "FIN",
+    [PAR_OUV] = "PAR_OUV",
+    [PAR_FERM] = "PAR_FERM",
+    [VARIABLE] = "VARIABLE",
+    [BAR_OUV] = "BAR_OUV",
+    [BAR_FERM] = "BAR_FERM",
+    [ABSOLU] = "ABSOLU"
+};
+
+static const char* operateur_string[] = {
+    [PLUS] = "PLUS",
+    [MOINS] = "MOINS",
+    [FOIS] = "FOIS",
+    [DIV] = "DIV",
+    [PUIS] = "PUIS"
+};
+
+static const char* fonction_string[] = {
+    [ABS] = "ABS",
+    [SIN] = "SIN",
+    [SQRT] = "SQRT",
+    [LOG] = "LOG",
+    [COS] = "COS",
+    [TAN] = "TAN",
+    [EXP] = "EXP",
+    [ENTIER] = "ENTIER",
+    [VAL_NEG] = "VAL_NEG",
+    [SINC] = "SINC"
+};
+
 static const char* get_error_message[] = {
     [0] = "AUCUNE ERREUR",
     [PROBLEME_PARENTHESES_FONCTIONS] = "PROBLEME_PARENTHESES_FONCTIONS",
