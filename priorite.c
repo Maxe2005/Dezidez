@@ -70,14 +70,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     return arbrevide();
                 }
                 else{
-                    Node* FG = operateur(tab, debut + 1, fin - 1, erreur);
-                    Node* arbre = (Node*)malloc(sizeof(Node));
-                    *arbre = (Node){
-                        .pjeton_preced = FG,
-                        .pjeton_suiv = NULL,
-                        .jeton = tab[debut]
-                    };
-                    return arbre;
+                    return operateur(tab, debut + 1, fin - 1, erreur);
                 }
                 break;
             case PAR_FERM:
