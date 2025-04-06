@@ -86,6 +86,7 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                 return arbrevide(); 
                 break;
             case REEL:
+            case VARIABLE:
                 if (fin - debut == 0){
                     Node* arbre = (Node*)malloc(sizeof(Node));
                     *arbre = (Node){
