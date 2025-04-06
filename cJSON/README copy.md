@@ -181,7 +181,7 @@ The cJSON port in vcpkg is kept up to date by Microsoft team members and communi
 If you installed it via CMake or the Makefile, you can include cJSON like this:
 
 ```c
-#include <cjson_test/cJSON.h>
+#include <cjson/cJSON.h>
 ```
 
 ### Data Structure
