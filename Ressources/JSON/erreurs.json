@@ -1,19 +1,34 @@
 {
     "fr": {
-        "1": { "message": "Fichier introuvable.", "severity": "high" },
-        "2": { "message": "Mémoire insuffisante.", "severity": "medium" },
-        "301": { "message": "Racine négative", "severity": "low" },
-        "302": { "message": "Logarithme négatif", "severity": "low"},
-        "303": { "message": "Logarithme nul", "severity": "low"},
-        "304": { "message": "Tangente nulle", "severity": "low"},
-        "305": { "message": "Sinus Cardinal nul", "severity": "low"},
-        "311": { "message": "Division par Zéro", "severity": "low"},
-        "312": { "message": "Zéro puissance Zéro", "severity": "low"},
-        "313": { "message": "Zéro puissance négative", "severity": "low"}
+        "1": { "message": "PROBLEME DE CONVERSION", "severity": "low" },
+        "2": { "message": "BORNE INF SUPERIEUR A BORNE SUP", "severity": "low" },
+        "3": { "message": "BORNE SUP INFERIEUR A BORNE INF", "severity": "low" },
+        
+        "101": { "message": "Fonction inconnue", "severity": "high" },
+        "102": { "message": "Nombre invalide", "severity": "medium" },
+        "103": { "message": "Caractère inconnu", "severity": "medium" },
+        "104": { "message": "Variable inconnue", "severity": "medium" },
 
+        "301": { "message": "Racine négative", "severity": "medium" },
+        "302": { "message": "Logarithme négatif", "severity": "medium"},
+        "303": { "message": "Logarithme nul", "severity": "medium"},
+        "304": { "message": "Tangente nulle", "severity": "medium"},
+        "305": { "message": "Sinus Cardinal nul", "severity": "medium"},
+        "311": { "message": "Division par Zéro", "severity": "medium"},
+        "312": { "message": "Zéro puissance Zéro", "severity": "medium"},
+        "313": { "message": "Zéro puissance négative", "severity": "medium"}
     },
     "en": {
-        "1": { "message": "File not found.", "severity": "high" },
-        "2": { "message": "Insufficient memory.", "severity": "medium" }
+        "1": { "message": "CONVERSION PROBLEM", "severity": "low" },
+        "2": { "message": "LOWER BOUND GREATER THAN UPPER BOUND", "severity": "low" },
+        "3": { "message": "UPPER BOUND LESS THAN LOWER BOUND", "severity": "low" },
+        "301": { "message": "Negative root", "severity": "medium" },
+        "302": { "message": "Negative logarithm", "severity": "medium"},
+        "303": { "message": "Zero logarithm", "severity": "medium"},
+        "304": { "message": "Zero tangent", "severity": "medium"},
+        "305": { "message": "Cardinal sine zero", "severity": "medium"},
+        "311": { "message": "Division by Zero", "severity": "medium"},
+        "312": { "message": "Zero to the power of Zero", "severity": "medium"},
+        "313": { "message": "Zero to the power of negative number", "severity": "medium"}
     }
 }

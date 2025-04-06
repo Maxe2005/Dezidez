@@ -8,8 +8,6 @@
 #include "Gestion_3D/gestion_3D_1.h"
 #include "Gestion_3D/gestion_3D_2.h"
 
-
-
 /**
  * Gère l'évènement MOUSEWHEEL relatif au graphique
  * @param event L'événement à gérer

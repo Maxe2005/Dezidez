@@ -1,7 +1,5 @@
 #include "bande_haute.h"
 
-Message message;
-
 void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
     int num_element_du_premier_champs = 3;
@@ -289,12 +287,13 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
         float test = strtof(expression->borne_inf->text, &end);
         if (*end != '\0') {
             strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_inf->champs_texte->rect);
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         
         } else if(test > expression->fonction.borne_sup){
             strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
-            set_message("BORNE INF SUPERIEUR A BORNE SUP", expression->borne_inf->champs_texte->rect);
+            ErrorInfo error = get_error_message(2);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         }
         else {
             strcpy(expression->borne_inf->text_backup, expression->borne_inf->text);
@@ -310,12 +309,13 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
         float test = strtof(expression->borne_sup->text, &end);
         if (*end != '\0') {
             strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_sup->champs_texte->rect);
-        } 
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
+        }
         else if(expression->fonction.borne_inf > test){
             strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
-            set_message("BORNE SUP INFERIEUR A BORNE INF", expression->borne_sup->champs_texte->rect);
+            ErrorInfo error = get_error_message(3);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
         }
         else {
             strcpy(expression->borne_sup->text_backup, expression->borne_sup->text);
@@ -331,6 +331,14 @@ void execute_expression (Expression_fonction* expression){
         typejeton TabToken[TailleMax] = {};
         int erreur = 0;
         Analyse_Lexicale(TabToken, expression->expression->text, &erreur);
+        if (erreur){
+            set_probleme(erreur);
+            expression->fonction.visible = 0;
+            expression->button_visibilite.bt.image = expression->image_button_invisible;
+            return;
+        }
+        expression->fonction.visible = 1;
+        expression->button_visibilite.bt.image = expression->image_button_visible;
         expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }
@@ -340,17 +348,6 @@ void execute_champs_select_and_change_focus (Expression_fonction* expression, Se
     if (expression->entree_selectionnee == BORNE_SUP) charge_valeur_borne_sup(expression);
     if (expression->entree_selectionnee == EXPRESSION) execute_expression(expression);
     expression->entree_selectionnee = nouvelle_entree;
-}
-
-void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
-    message.start_time = time(NULL);
-    message.button_base.label = text_erreur;
-    message.is_visible = 1;
-    message.button_base.rect.x = endroit_erreur.x;
-    message.button_base.rect.y = endroit_erreur.y + FEN_Y/16;
-    message.button_base.rect.w = FEN_X/4;
-    message.button_base.rect.h = FEN_Y/16;
-
 }
 
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
@@ -446,6 +443,7 @@ void free_bande_expression (Expression_fonction* expression){
 
 void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
     free_bande_expression(bande_haute->expressions[num_expression]);
+    if (num_expression == 0) 
     for (int i = num_expression; i < bande_haute->nb_expressions - 1; i++) {
         bande_haute->expressions[i] = bande_haute->expressions[i+1];
         bande_haute->expressions[i]->numero = i;

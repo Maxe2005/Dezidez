@@ -14,8 +14,6 @@
 #define NB_EVALUATEUR_MAX 100
 #define TAILLE_MAX_TEXT_GRAD_X (int)(TAILLE_GRADUATION_MIN / 2)
 
-extern Message message;
-
 typedef struct {
     int precision; // Précision des graduations (nombre de chiffres après la virgule)
     int nb_grad; // Nombre de graduations
@@ -181,11 +179,6 @@ void resize_precision_grad (Graph* graph);
  * @param y_souris_px La position en pixel de la souris
  */
 void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
-
-/**
- * Initialisation des constantes pour la structure message
- */
-void init_const_message();
 
 /**
  * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur

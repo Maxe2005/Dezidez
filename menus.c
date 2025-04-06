@@ -49,7 +49,7 @@ void affiche_titre (SDL_Renderer* ren, WrappedText *titre){
     int w;
     Ligne_texte* current_line = &titre->fist_ligne;
     for (int i = 0; i < titre->nb_lines; i++) {
-        TTF_SizeText(fonts[0], current_line->text, &w, NULL);
+        TTF_SizeUTF8(fonts[0], current_line->text, &w, NULL);
         if (w > titre_width) titre_width = w;
         current_line = current_line->ligne_suivante;
     }
@@ -346,7 +346,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
     int marge = FEN_X / 7;
     MarkdownText md_txt = charge_markdown(fonts_md, markdown_file, marge);
 
-    int taille_x_scrollbar = 20;
+    int taille_x_scrollbar = 15;
     int marge_x_scrollbar = taille_x_scrollbar;
     int marge_y_scrollbar = 10;
     Scrollbar scrollbar;
@@ -418,10 +418,7 @@ int ecran_text (SDL_Renderer* ren, const char* markdown_file, char* titre){
 }
 
 void init_scrollbar(Scrollbar* sb, int x, int y, int width, int height, int total_height) {
-    sb->x = x;
-    sb->y = y;
-    sb->width = width;
-    sb->height = height;
+    sb->track = (SDL_Rect){x, y, width, height};
     sb->total_content_height = total_height;
     sb->scroll_offset = 0;
     sb->scroll_speed = 30;
@@ -431,17 +428,18 @@ void init_scrollbar(Scrollbar* sb, int x, int y, int width, int height, int tota
 }
 
 void render_scrollbar(SDL_Renderer* ren, Scrollbar* sb) {
-    roundedBoxRGBA(ren, sb->x, sb->y, sb->x + sb->width, sb->y + sb->height, sb->width / 2 -2, 100, 100, 100, 255);
+    roundedBoxRGBA(ren, sb->track.x, sb->track.y, sb->track.x + sb->track.w, sb->track.y + sb->track.h, sb->track.w / 2 -2, 100, 100, 100, 255);
 
     float scroll_ratio = (float)sb->scroll_offset / sb->max_scroll;
     if (scroll_ratio > 1.0f) scroll_ratio = 1.0f;
 
-    sb->thumb.y = sb->y + scroll_ratio * sb->thumb_travel;
+    sb->thumb.y = sb->track.y + scroll_ratio * sb->thumb_travel;
 
     roundedBoxRGBA(ren, sb->thumb.x, sb->thumb.y, sb->thumb.x + sb->thumb.w, sb->thumb.y + sb->thumb.h, sb->thumb.w / 2 -2, 200, 200, 200, 255);
 }
 
 void handle_scrollbar_event(Scrollbar* sb, SDL_Event* event) {
+    if (!sb->is_usefull) return;
     if (event->type == SDL_MOUSEBUTTONDOWN && event->button.button == SDL_BUTTON_LEFT) {
         if (SDL_PointInRect(&(SDL_Point){event->button.x, event->button.y}, &sb->thumb)) {
             sb->grabbed = 1;
@@ -455,11 +453,11 @@ void handle_scrollbar_event(Scrollbar* sb, SDL_Event* event) {
 
     if (event->type == SDL_MOUSEMOTION && sb->grabbed) {
         int new_thumb_y = event->motion.y - sb->click_offset_y;
-        if (new_thumb_y < sb->y) new_thumb_y = sb->y;
-        if (new_thumb_y > sb->y + sb->height - sb->thumb.h)
-            new_thumb_y = sb->y + sb->height - sb->thumb.h;
+        if (new_thumb_y < sb->track.y) new_thumb_y = sb->track.y;
+        if (new_thumb_y > sb->track.y + sb->track.h - sb->thumb.h)
+            new_thumb_y = sb->track.y + sb->track.h - sb->thumb.h;
 
-        float scroll_ratio = (float)(new_thumb_y - sb->y) / sb->thumb_travel;
+        float scroll_ratio = (float)(new_thumb_y - sb->track.y) / sb->thumb_travel;
         sb->scroll_offset = scroll_ratio * sb->max_scroll;
     }
 
@@ -482,23 +480,29 @@ void handle_scrollbar_event(Scrollbar* sb, SDL_Event* event) {
 }
 
 void resize_scrollbar(Scrollbar* sb, int x, int height, int total_height) {
-    sb->x = x;
-    sb->height = height;
+    sb->track.x = x;
+    sb->track.h = height;
     sb->total_content_height = total_height;
 
-    float ratio = (float)sb->height / sb->total_content_height;
-    if (ratio > 1.0f) ratio = 1.0f;
+    float ratio = (float)sb->track.h / sb->total_content_height;
+    if (ratio > 1.0f) {
+        ratio = 1.0f;
+        sb->is_usefull = false;
+        sb->thumb = sb->track;
+    } else {
+        sb->is_usefull = true;
+        int thumb_height = sb->track.h * ratio;
+        if(thumb_height < sb->track.w) thumb_height = sb->track.w;
+        sb->max_scroll = sb->total_content_height - sb->track.h/2;
+        sb->thumb_travel = sb->track.h - thumb_height;
+        if (sb->thumb_travel < 1) sb->thumb_travel = 1;
 
-    int thumb_height = sb->height * ratio;
-    sb->max_scroll = sb->total_content_height - sb->height/2;
-    sb->thumb_travel = sb->height - thumb_height;
-    if (sb->thumb_travel < 1) sb->thumb_travel = 1;
+        float scroll_ratio = (float)sb->scroll_offset / sb->max_scroll;
+        if (scroll_ratio > 1.0f) scroll_ratio = 1.0f;
 
-    float scroll_ratio = (float)sb->scroll_offset / sb->max_scroll;
-    if (scroll_ratio > 1.0f) scroll_ratio = 1.0f;
-
-    int thumb_y = sb->y + scroll_ratio * sb->thumb_travel;
-    sb->thumb = (SDL_Rect){ sb->x, thumb_y, sb->width, thumb_height };
+        int thumb_y = sb->track.y + scroll_ratio * sb->thumb_travel;  
+        sb->thumb = (SDL_Rect){ sb->track.x, thumb_y, sb->track.w, thumb_height };
+    }
 }
 
 

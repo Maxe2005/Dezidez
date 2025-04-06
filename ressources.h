@@ -61,12 +61,63 @@ typedef struct {
 } Tous_les_JSON;
 extern Tous_les_JSON tous_les_JSON;
 
+typedef struct {
+    Button button_base;
+    ImageButton boutton_quitter;
+    int temps_affichage; // en secondes
+    bool is_visible;
+    time_t start_time;
+} Message;
+
+typedef enum {
+    LOW, MEDIUM, HIGH, CRITICAL
+} Severity;
+
+typedef struct {
+    WrappedText text;
+    bool is_visible;
+    Severity severity;
+} Probleme;
 
 /**
  * Initialise les différentes polices de caractère avec les tailles correspondantes
  * @param font Le tableau de police vide à remplire
  */
 void init_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Libère la mémoire allouée pour les polices de caractère
+ * @param font Le tableau de police à libérer
+ * @note Il est important de libérer la mémoire allouée pour les polices de caractère
+ *       pour éviter les fuites de mémoire. Cette fonction doit être appelée
+ *       lorsque les polices ne sont plus nécessaires.
+ */
+void free_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Initialisation des constantes pour la structure message
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ */
+void init_const_message(SDL_Renderer* ren);
+
+/**
+ * Prépare le message d'erreur à afficher
+ * @param text_erreur message d'erreur affiché
+ * @param endroit_erreur rectangle où l'erreur a été enregestré
+ */
+void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
+
+/**
+ * Prépare le problème à afficher
+ * @param code_erreur Le code d'erreur correspondant au problème à afficher
+ */
+void set_probleme (int code_erreur);
+
+/**
+ * Affiche le message d'erreur des champs des bornes d'entrées s'il y en a un et le message problème s'il y en a un
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ */
+void affiche_avertissements (SDL_Renderer* ren);
 
 /**
  * Change le mode de couleur

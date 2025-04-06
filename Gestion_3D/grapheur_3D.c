@@ -21,13 +21,7 @@ void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Ba
         affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
     }
 
-    if (message.is_visible){
-        if (time(NULL) - message.start_time > message.temps_affichage){
-            message.is_visible = 0;
-        } else {
-            renderButton(ren, &message.button_base);
-        }
-    }
+    affiche_avertissements(ren);
 }
 
 

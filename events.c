@@ -116,6 +116,11 @@ void handle_event_bande_haut_KEYUP (SDL_Event event, Bande_haute* bande_haute){
 
 bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     bool is_MOUSEMOTION_used = false;
+
+    if (!is_MOUSEMOTION_used && is_souris_sur_rectangle(message.boutton_quitter.rect, x_souris_px, y_souris_px)){
+        message.boutton_quitter.hovered = 1;
+    } else message.boutton_quitter.hovered = 0;
+
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
         if (!is_MOUSEMOTION_used && bande_haute->expressions[i]->visible) {
             is_MOUSEMOTION_used = handle_event_color_picker_SDL_MOUSEMOTION(event, bande_haute->expressions[i]->color_picker, x_souris_px, y_souris_px);
@@ -125,11 +130,17 @@ bool handle_event_bande_haut_MOUSEMOTION (SDL_Event event, Bande_haute* bande_ha
     if (!is_MOUSEMOTION_used && is_souris_sur_rectangle(bande_haute->button_new_expression.bt.rect, x_souris_px, y_souris_px)) {
         bande_haute->button_new_expression.bt.hovered = 1;
     } else bande_haute->button_new_expression.bt.hovered = 0;
+
     return is_MOUSEMOTION_used;
 }
 
 bool handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, Bande_haute* bande_haute, int x_souris_px, int y_souris_px){
     bool clic_utile = false;
+
+    if (!clic_utile && is_souris_sur_rectangle(message.boutton_quitter.rect, x_souris_px, y_souris_px)){
+        message.is_visible = 0;
+        clic_utile = true;
+    }
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
         if (!clic_utile && bande_haute->expressions[i]->visible) {
             clic_utile = handle_event_entrees_expressions_MOUSEBUTTONUP(event, bande_haute, bande_haute->expressions[i], x_souris_px, y_souris_px);
@@ -139,6 +150,7 @@ bool handle_event_bande_haut_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event, 
         ajout_bande_expression(ren, bande_haute);
         clic_utile = true;
     }
+    
     if (!clic_utile && is_souris_sur_rectangle(bande_haute->surface, x_souris_px, y_souris_px)) {
         bande_haute->expanding = !bande_haute->expanding;
         clic_utile = true;
@@ -381,22 +393,27 @@ int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
-            int is_MOUSEBUTTONUP_used = 0;
-            is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONUP_used){
-                is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, graph, *x_souris_px, *y_souris_px);
-                if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
-                else if (!is_MOUSEBUTTONUP_used){
-                    handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+            if (probleme.is_visible) probleme.is_visible = false;
+            else {
+                int is_MOUSEBUTTONUP_used = 0;
+                is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
+                if (!is_MOUSEBUTTONUP_used){
+                    is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, graph, *x_souris_px, *y_souris_px);
+                    if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                    else if (!is_MOUSEBUTTONUP_used){
+                        handle_event_graph_MOUSEBUTTONUP (ren, event, graph, *x_souris_px, *y_souris_px, bande_haute);
+                    }
                 }
             }
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {
-            bool is_MOUSEBUTTONDOWN_used = false;
-            is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
-                handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
+            if (!probleme.is_visible) {
+                bool is_MOUSEBUTTONDOWN_used = false;
+                is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
+                if (!is_MOUSEBUTTONDOWN_used && event.button.button == SDL_BUTTON_RIGHT){
+                    handle_event_graph_MOUSEBUTTONDOWN (event, graph, *x_souris_px, *y_souris_px);
+                }
             }
         }
 
@@ -451,19 +468,24 @@ int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute
         }
 
         if (event.type == SDL_MOUSEBUTTONUP) {
-            int is_MOUSEBUTTONUP_used = 0;
-            is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONUP_used){
-                is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, NULL, *x_souris_px, *y_souris_px);
-                if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
-                if (!is_MOUSEBUTTONUP_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
+            if (probleme.is_visible) probleme.is_visible = false;
+            else {
+                int is_MOUSEBUTTONUP_used = 0;
+                is_MOUSEBUTTONUP_used = handle_event_bande_haut_MOUSEBUTTONUP (ren, event, bande_haute, *x_souris_px, *y_souris_px);
+                if (!is_MOUSEBUTTONUP_used){
+                    is_MOUSEBUTTONUP_used = handle_event_bande_droite_MOUSEBUTTONUP(ren, event, bande_droite, bande_haute, NULL, *x_souris_px, *y_souris_px);
+                    if (is_MOUSEBUTTONUP_used == -1) return 2; // Retourner à l'accueil
+                    if (!is_MOUSEBUTTONUP_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
+                }
             }
         }
 
         if (event.type == SDL_MOUSEBUTTONDOWN) {
-            bool is_MOUSEBUTTONDOWN_used = false;
-            is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
-            if (!is_MOUSEBUTTONDOWN_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
+            if (!probleme.is_visible) {
+                bool is_MOUSEBUTTONDOWN_used = false;
+                is_MOUSEBUTTONDOWN_used = handle_event_bande_haut_MOUSEBUTTONDOWN (event, bande_haute, *x_souris_px, *y_souris_px);
+                if (!is_MOUSEBUTTONDOWN_used) handle_event_3D_1(event, graph_3D_1, *x_souris_px, *y_souris_px);
+            }
         }
 
         if (event.type == SDL_TEXTINPUT) {

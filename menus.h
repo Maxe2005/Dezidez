@@ -9,14 +9,14 @@
 #define NB_LANGUES 2
 
 typedef struct {
-    int x, y;                  // Position de la track
-    int width, height;        // Dimensions de la track
+    SDL_Rect track;         // Rectangle représentant la track
     int total_content_height; // Hauteur totale du contenu à scroller
     int scroll_offset;        // Décalage vertical actuel
     int scroll_speed;         // Vitesse de scroll via clavier/souris
     SDL_Rect thumb;         // Rectangle représentant le thumb
     int max_scroll;          // Hauteur maximale du scroll
     int thumb_travel;      // Distance que le thumb peut parcourir
+    bool is_usefull;        // Est-ce que le scroll est utile ? (0 si pas de scroll)
 
     int grabbed;              // Est-ce que le thumb est attrapé ?
     int click_offset_y;       // Décalage clic-souris dans le thumb

@@ -33,7 +33,7 @@ void init_boutton_centrer (SDL_Renderer* ren, Bande_droite* bande_droite){
     bande_droite->bouton_centrer.font_text = fonts[6];
     bande_droite->bouton_centrer.font_text_hover = fonts[7];
     int width, height;
-    TTF_SizeText(bande_droite->bouton_centrer.font_text, bande_droite->bouton_centrer.label, &width, &height);
+    TTF_SizeUTF8(bande_droite->bouton_centrer.font_text, bande_droite->bouton_centrer.label, &width, &height);
     bande_droite->bouton_centrer.rect.w = width + 30;
     bande_droite->bouton_centrer.rect.h = height + 20;
     bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
