@@ -34,10 +34,15 @@
 
 int main (){
     typejeton TokenListe[TailleMax]; //tableau de sortie
-    char str[TailleMax]  = "2x + . sin(2**5)" ; //expression tester
+    char str[TailleMax]  = "2X + . SiN(2**5)" ; //expression tester
     int erreur = 0; //on initialise l'erreur (0 par défault)
     Analyse_Lexicale(TokenListe,str,&erreur,0);    
     printf("ERREUR : %d",erreur); //print d'éventuelle erreur
+
+    // On affiche le contenu de TokenListe
+
+    afficher_tableau_jetons(TokenListe, TailleMax);
+    
     return 0;
 }
 

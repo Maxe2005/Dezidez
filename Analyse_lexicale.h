@@ -107,3 +107,15 @@ int PlusieursVirgules (char *nombre);
 void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension);
 
 //*erreur = 101;
+
+/**
+ * Permet d'afficher un jeton unique
+ * @param jeton : jeton de type typejeton 
+ */
+void afficher_jeton(typejeton jeton);
+/**
+ * Permet d'afficher un jeton unique
+ * @param tableau : tableau de jeton
+ * @param taille : taille du tableau
+ */
+void afficher_tableau_jetons(typejeton tableau[], int taille);
