@@ -14,21 +14,21 @@ Leur humour dans les commentaires de code ? Discutable, mais apprécié.
 
 Parmi eux, on trouve :
 
-Un(e) stratège de l’arithmétique, capable de gérer une division sans provoquer une guerre nucléaire (/ 0, on pense à toi).
+Un(e) stratège de l’arithmétique, capable de gérer une division sans provoquer une guerre nucléaire (/ 0, on pense à toi). Cf Pierre.
 
-Un(e) philosophe de la structure conditionnelle, pour qui chaque else est une quête intérieure.
+Un(e) philosophe de la structure conditionnelle, pour qui chaque else est une quête intérieure. Cf Esteban.
 
-Un(e) sorcier(e) du débogage, qui parle couramment le langage des warnings obscurs.
+Un(e) sorcier(e) du débogage, qui parle couramment le langage des warnings obscurs. Cf Maxence
 
-Un(e) alchimiste des variables, transformant int en or pur (ou au moins en un résultat correct à trois décimales près).
+Un(e) alchimiste des variables, transformant int en or pur (ou au moins en un résultat correct à trois décimales près). Cf Arthur.
 
-Un(e) spécialiste du Makefile, dont l’incantation magique a fait apparaître un exécutable là où il n’y avait que du désespoir.
+Un(e) spécialiste du Makefile, dont l’incantation magique a fait apparaître un exécutable là où il n’y avait que du désespoir. Cf Titouan.
 
-Un(e) esthète du printf, capable de rendre un message d’erreur presque poétique.
+Un(e) esthète du printf, capable de rendre un message d’erreur presque poétique. Cf Yann.
 
-Un(e) architecte de la modularité, qui a séparé le code en fichiers comme Moïse a séparé la mer.
+Un(e) architecte de la modularité, qui a séparé le code en fichiers comme Moïse a séparé la mer. Cf Baptiste.
 
-Et enfin, un(e) ninja silencieus(e), qui a tout corrigé à 4h du matin, pendant que le reste du monde rêvait de pizza.
+Et enfin, Timothée, un(e) ninja silencieus(e), qui a tout corrigé à 4h du matin, pendant que le reste du monde rêvait de pizza.
 
 Le résultat ?
 Une calculatrice fonctionnelle, efficace, belle (oui, belle, objectivement, pour un programme en C), et surtout : qui ne plante presque jamais.
