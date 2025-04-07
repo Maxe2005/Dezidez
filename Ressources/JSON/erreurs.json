@@ -12,7 +12,7 @@
         "201": { "message": "Parenthèse manquante pour la fonction", "severity": "medium" },
         "211": { "message": "Opération incomplète", "severity": "medium" },
         "221": { "message": "Parenthèse fermée avant d'être ouverte", "severity": "medium" },
-        "223": { "message": "Erreur dans le nombre de parenthèses", "severity": "medium" },
+        "222": { "message": "Erreur dans le nombre de parenthèses", "severity": "medium" },
         "231": { "message": "Deux réels adjacents", "severity": "medium" },
         "241": { "message": "Jeton de fin manquant", "severity": "medium" },
 

@@ -85,6 +85,7 @@ void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
 
 void set_probleme (int code_erreur){
     ErrorInfo error = get_error_message(code_erreur);
+
     probleme.text = text_wrapper(fonts[1], error.message, FEN_X/2);
     probleme.is_visible = true;
     if (strcmp(error.severity, "low") == 0){
@@ -225,7 +226,7 @@ ErrorInfo get_error_message(int code) {
 
     char code_str[10];
     sprintf(code_str, "%d", code);  // Convertit l'entier en chaîne
-
+    printf("%s",code_str);
     cJSON *lang_json = cJSON_GetObjectItem(tous_les_JSON.json_erreurs, get_lang_str());
     if (!lang_json) return error_info; // Langue non trouvée
 

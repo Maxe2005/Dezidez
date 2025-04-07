@@ -346,7 +346,7 @@ void execute_expression (Expression_fonction* expression){
         typeerreur erreur_2 = 0;
         Node* arbre = buildSyntaxTree(TabToken, &erreur_2);
         if (erreur_2){
-            set_probleme(erreur_2);
+            set_probleme((int)erreur_2);
             expression->fonction.visible = 0;
             expression->button_visibilite.bt.image = expression->image_button_invisible;
             return;
