@@ -7,7 +7,7 @@ git clone https://github.com/DaveGamble/cJSON.git
 
 ### Ligne de compilation Windows
 
-gcc -o main *.c Gestion_3D/*.c SDL2_gfx/*.c cJSON/cJSON.C -Iinclude -Llib-lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image
+gcc -o main *.c Gestion_3D/*.c SDL2_gfx/*.c cJSON/cJSON.C -Iinclude -Llib -lmingw32 -lSDL2main -lSDL2 -lSDL2_ttf -lSDL2_mixer -lSDL2_image
 
 
 ### Ligne de compilation Ubuntu

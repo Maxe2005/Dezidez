@@ -547,7 +547,6 @@ void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
 Exemples exemples_fonctions_2D (){
     Exemples ex;
     ex.nb_exemples = 1;
-    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
     ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
     ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
     for (int i = 0; i < ex.nb_exemples; i++) {
@@ -556,12 +555,6 @@ Exemples exemples_fonctions_2D (){
 
     int i = -1;
     ex.nom_f[++i] = "x";
-    typejeton x;
-    x.lexem=VARIABLE;
-    x.valeur.variable='x';
-    Node* X_ARBRE = malloc(sizeof(Node));
-    *X_ARBRE = creation_arbre(x,NULL,NULL);
-    ex.arbres[i] = X_ARBRE;
     ex.interval[i][0] = "-5";
     ex.interval[i][1] = "5";
 
@@ -571,65 +564,23 @@ Exemples exemples_fonctions_2D (){
 Exemples exemples_fonctions_3D (){
     Exemples ex;
     ex.nb_exemples = 2;
-    ex.arbres = malloc(sizeof(Node*) * ex.nb_exemples);
     ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
     ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
     for (int i = 0; i < ex.nb_exemples; i++) {
         ex.interval[i] = malloc(sizeof(const char*) * 2);
     }
-
-    // x
-    typejeton x;
-    x.lexem=VARIABLE;
-    x.valeur.variable='x';
-    // y
-    typejeton y;
-    y.lexem=VARIABLE;
-    y.valeur.variable='y';
-    // Racine
-    typejeton Racine;
-    Racine.lexem=FONCTION;
-    Racine.valeur.fonction=SQRT;
-    // Sinus
-    typejeton Sinus;
-    Sinus.lexem=FONCTION;
-    Sinus.valeur.fonction=SIN;
-    // Addition
-    typejeton Addition;
-    Addition.lexem=OPERATEUR;
-    Addition.valeur.operateur=PLUS;
-    // Multiplication
-    typejeton Multiplication;
-    Multiplication.lexem=OPERATEUR;
-    Multiplication.valeur.operateur=FOIS;
-    Node* X_ARBRE = malloc(sizeof(Node));
-    *X_ARBRE = creation_arbre(x,NULL,NULL);
-    Node* Y_ARBRE = malloc(sizeof(Node));
-    *Y_ARBRE = creation_arbre(y,NULL,NULL);
-    Node* Y_carre_ARBRE = malloc(sizeof(Node));
-    *Y_carre_ARBRE = creation_arbre(Multiplication,Y_ARBRE,Y_ARBRE);
-    Node* X_carre_ARBRE = malloc(sizeof(Node));
-    *X_carre_ARBRE = creation_arbre(Multiplication,X_ARBRE,X_ARBRE);
-    Node* SOMME_ARBRE = malloc(sizeof(Node));
-    *SOMME_ARBRE = creation_arbre(Addition,X_carre_ARBRE,Y_carre_ARBRE);
-    Node* Racine_ARBRE = malloc(sizeof(Node));
-    *Racine_ARBRE = creation_arbre(Racine,SOMME_ARBRE,NULL);
-    Node* SINUS_ARBRE = malloc(sizeof(Node));
-    *SINUS_ARBRE = creation_arbre(Sinus,Racine_ARBRE,NULL);
-
+    
     int i = -1;
     ex.nom_f[++i] = "sin(sqrt(x*x + y*y))";
-    ex.arbres[i] = SINUS_ARBRE;
     ex.interval[i][0] = "-5";
     ex.interval[i][1] = "5";
 
     ex.nom_f[++i] = "x*x + y*y";
-    ex.arbres[i] = SOMME_ARBRE;
     ex.interval[i][0] = "-2";
     ex.interval[i][1] = "2";
 
     return ex;
-}
+}  
 
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     if (bande_haute->nb_expressions >= NB_EXPRESSIONS_MAX) return; // TODO : message d'erreur
@@ -647,7 +598,8 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
 
 
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
-    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = exemples.arbres[bande_haute->nb_expressions % exemples.nb_exemples];
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = NULL;
+    //bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = exemples.arbres[bande_haute->nb_expressions % exemples.nb_exemples];
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, exemples.nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples]);
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][0]);
     strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][1]);
@@ -658,6 +610,7 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_sup = test + 2;
     charge_valeur_borne_inf(bande_haute->expressions[bande_haute->nb_expressions]);
     charge_valeur_borne_sup(bande_haute->expressions[bande_haute->nb_expressions]);
+    execute_expression(bande_haute->expressions[bande_haute->nb_expressions]);
     bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text);
     bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text);
     bande_haute->expressions[bande_haute->nb_expressions]->expression->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->expression->text);
