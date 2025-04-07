@@ -1,100 +1,340 @@
-# Here's how our interface works
 
-It's simple...
+# Cómo usarlo:
 
-Don't mess with us...
+- Funciones utilizables: sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entero(),
+- Para valores negativos, siempre usa paréntesis, p. ej.: sin(-2) => sin((-2)) o -4 => (-4)
+- Para potencias usa ** p. ej.: x elevado a y => x**y
+- Para números decimales usa '.' no ','
+- Todas las letras mayúsculas se consideran minúsculas
 
-bye!
+## 1. Inicio:
 
-# Our structures:
+La pantalla de inicio facilita el acceso a funciones como el manual de usuario, agradecimientos o el inicio del modo de visualización, con una versión 3D en desarrollo.
 
-To develop our graphing tool, we used several structures, notably to code functions in the form of a tree and to return the various possible errors. This part was provided to us at the beginning of the project, and we made some modifications that we will present to you.
-The file provided to us contained 6 different structures:
+## 2. Regresar:
 
-- tree: takes a token (TypeToken), a next tree, and a previous tree as parameters.
-- typeToken: takes the type of token value (typeLexeme) and the token value (typeValue) as parameters.
-- typeValue: takes as a parameter whether the token value, which can be a real number, a function, an operator, and we decided to add the possibility of including a variable (char) that will take the value x or y to plot a function with two variables.
-- typeFunction: takes a mathematical function (exp, sin, cos, etc.) as a parameter.
-- typeOperator: takes an operator (plus, minus, times, div, power) as a parameter.
-- typeLexeme: takes the name of the type of token value as a parameter.
+Para volver a los menús anteriores sin reiniciar el programa, haz clic en el icono de la casa o usa la tecla "Retroceso" o "Regresar".
 
-We also added an error_code structure that associates an error name with an error code, for example: NEGATIVE_ROOT=301, it is impossible to calculate the root of a negative number, so if the user requests to do so, the code will return this error.
+## 3. Barra superior:
 
-# EVALUATOR PART:
+Permite mostrar y modificar hasta 20 expresiones con funciones interactivas.
 
-The goal of the evaluator is to calculate a function (which is in the form of a tree) based on given variables x and y. Its role is essential for plotting curves, as it allows obtaining the points to display on the graph.
-Our code is divided into two main functions: evaluator, our main function that interprets the tree, and calculate_function, an auxiliary function that applies standard mathematical functions.
-Evaluator function:
+- Cambio de color: Selecciona un nuevo color en tiempo real a través del icono de la rueda de color.
+- Ocultar una función: Oculta o muestra una función según sea necesario en tiempo real.
+- Eliminar una función: Haz clic en el icono de la papelera para eliminar una expresión.
+- Modificar límites: Ajusta los límites de una expresión a través de una ventana de texto para mayor flexibilidad.
 
-Its objective is to decode the input tree. It takes as input:
-- The function in the form of a tree
-- The values of x and y
-- The error_code pointer.
-It returns the result of the input function, calculated from the variables x and y.
-This function is recursive and has four stopping cases. The first is if the error_code pointer changes value, which means there is an error in the function to be calculated, and thus the tree decoding must be stopped once an error appears. The second stopping case is if the main token of the tree does not have a type. Finally, the function will stop if the main token of the tree is a real number or a variable, which means we have reached a leaf of the tree.
-Once this is done, we use a switch function to look at the type of the main token of the input tree. If it is:
+## 4. Visualización de funciones:
 
-- A variable: we return the value of the variable obtained as input to the function.
-- A real number: we return the value of the real number.
-- An operator: we use a divide-and-conquer method to calculate the operation.
-- A function: we then use the second function of our program.
-Calculate_function function:
+La evaluación de funciones actualiza dinámicamente su representación gráfica.
 
-This function takes as input the type of mathematical function f, the variable x on which to apply f, and the error_code pointer. It returns the application f(x). The possible function types are universal mathematical functions such as sin, cos, or ln.
-We first use a switch function to determine which function it is, then we check for any errors before calculating f(x).
-In case of error:
-In case of error (e.g., division by zero, logarithm of a negative number...), the function returns an incorrect value and modifies the error_code pointer to signal the problem. This allows, for example, stopping the evaluation or displaying an appropriate message to the user.
+- Zoom: Usa la rueda del ratón para ajustar la visualización del gráfico.
+- Centrado: Restablece la visualización con la tecla "C" o el botón "Recentralizar" (próximamente).
+- Traslación de ejes: Arrastra en el gráfico con un clic derecho para navegar por la curva.
+- Evaluador de x: Activa con un clic izquierdo para mostrar las coordenadas de un punto en la curva.
 
-# Graphical Display
+# Nuestras estructuras:
 
-## 1. Home Screen
+Para desarrollar nuestro graficador, utilizamos varias estructuras, en particular para codificar funciones como un árbol, pero también para devolver los diferentes errores posibles. Esta parte nos fue proporcionada al inicio del proyecto; hicimos algunas modificaciones que les presentaremos.
+El archivo que se nos proporcionó contenía 6 estructuras diferentes:
 
-The home screen facilitates user interaction. It provides access to various features, such as viewing the user manual, displaying acknowledgments, or launching a display mode. Currently, the program offers a 2D display, but a 3D version for functions with two variables is under development by our engineers.
+- árbol: toma como parámetros un token (TipoToken), un árbol siguiente y un árbol anterior.
+- tipotoken: toma como parámetros el tipo de valor del token (tipoLexema) y el valor del token (tipoValor).
+- tipovalor: toma como parámetros si el valor del token, que puede ser un real, una función, un operador, y decidimos agregar también la posibilidad de incluir una variable (char) que tomará x o y como su valor para poder graficar una función con dos variables.
+- tipofuncion: toma como parámetro una función matemática (exp, sin, cos, ...).
+- tipooperador: toma como parámetro un operador (más, menos, veces, dividir, potencia).
+- tipolexema: toma como parámetro el nombre del tipo de valor del token.
 
-## 2. Return Functionalities
+También agregamos una estructura código_error que asocia un nombre de error con un código de error, por ejemplo: RAIZ_NEGATIVA=301, es imposible calcular la raíz de un número negativo, por lo que si el usuario solicita como entrada hacer uno, el código devolverá este error.
 
-A return functionality allows the user to go back to previous menus without restarting the program. They can return to the home screen by clicking on the house icon in the text menus or by pressing the "Backspace" or "Return" key on the keyboard.
+# Explicación de la función Análisis_Léxico
 
-## 3. Top Bar
+La función 'Análisis_Léxico' transforma una expresión matemática en forma de una cadena de caracteres en una matriz de tokens. Descompone la expresión en elementos que pueden manipularse fácilmente para operaciones de análisis sintáctico posteriores.
 
-The user can display up to 20 expressions. By default, a basic function is presented for each case. The user can then click on an expression to modify it. Additionally, when typing in one of the three text areas of the top bar, they can interact with the following functions:
+Este proceso de tokenización es un paso preliminar fundamental para el análisis y evaluación futuros de la expresión matemática.
 
-### 3.1 Change Color
+## Operación global
 
-The program offers the ability to customize the color of functions via a color selection menu. This menu is activated by clicking on the color wheel icon. Once open, it allows changing the color of functions in real-time (even while holding the left click).
+La función toma cuatro parámetros:
+* 'MatrizToken': matriz que contendrá los tokens generados
+* 'Expresión': la cadena de caracteres que representa la expresión matemática
+* 'error': puntero a una variable que contendrá el código de error en caso de un problema
+* 'Dimensión': indica si la expresión es de 1 o 2 variables (0 para una dimensión, 1 para dos dimensiones)
 
-### 3.2 Hide a Function
+**Importante**: El analizador léxico considera las letras mayúsculas como minúsculas.
 
-This feature allows the user to hide or display functions of their choice in real-time, according to their needs.
+**Importante**: Para números decimales, usa puntos, no comas.
 
-### 3.3 Delete a Function
+## Subfunciones utilizadas
 
-The user can delete expressions by clicking on the trash icon with the left mouse button.
+La función 'Análisis_Léxico' sigue una secuencia de procesamiento de tres pasos, cada uno usando una subfunción dedicada:
 
-### 3.4 Modify Bounds
+1. 'ExpresiónSinEspacios'
+   Esta función elimina todos los espacios de la expresión matemática.
 
-A text window allows the user to modify the bounds of an expression in real-time for time savings and more flexibility.
+2. 'MultiplicaciónImplícita'
+   Esta función detecta y agrega operadores de multiplicación implícitos. Por ejemplo, transforma '2x' en '2*x'.
 
-## 4. Expression Processing
+3. 'DescomposiciónToken'
+   Esta función descompone la expresión en tokens individuales y los almacena en la matriz 'MatrizToken', teniendo en cuenta el parámetro de dimensión.
 
-Once the expression is entered, it undergoes lexical and then syntactic analysis to prepare for further processing.
+## Proceso detallado con ejemplos
 
-## 5. Function Display
+Tomemos la expresión '"3 + cos(5x)"' como ejemplo.
 
-The tree generated during the analysis is used to associate each value of the interval with its corresponding image on the screen, thanks to the evaluation function. This process repeats in real-time, allowing for dynamic updates of the display.
+### Paso 1: Eliminación de espacios
+'ExpresiónSinEspacios' transforma '"3 + cos(5x)"' en '"3+cos(5x)"'.
+
+### Paso 2: Agregar multiplicaciones implícitas
+'MultiplicaciónImplícita' detecta multiplicaciones implícitas entre dígitos y variables. Transforma '"3+cos(5x)"' en '"3+cos(5*x)"'.
+
+### Paso 3: Creación de tokens
+'DescomposiciónToken' descompone la expresión en tokens:
+* '3' → token de tipo REAL con valor 3.0
+* '+' → token de tipo OPERADOR con valor MÁS
+* 'cos' → token de tipo FUNCIÓN con valor COS
+* '(' → token de tipo PAR_ABRE
+* '5' → token de tipo REAL con valor 5.0
+* '*' → token de tipo OPERADOR con valor VECES
+* 'x' → token de tipo VARIABLE con valor 'x'
+* ')' → token de tipo PAR_CIERRA
+* Agregar un token FIN al final
+
+## Cómo 'DescomposiciónToken' identifica los tokens
+
+La función 'DescomposiciónToken' analiza carácter por carácter y utiliza varias subfunciones para identificar correctamente cada token:
+
+* 'TokenRealPositivo': Crea un token para números positivos
+* 'TokenRealNegativo': Maneja números negativos (p. ej., "(-2.5)")
+* 'TokenOperador': Identifica operadores (+, -, *, /, **)
+* 'TokenFunción': Identifica funciones (sin, cos, abs, etc.)
+* 'TokenVariable': Identifica variables (x, y) según el parámetro 'Dimensión'
+
+## Gestión de variables por dimensión
+
+La función 'TokenVariable' usa el parámetro 'Dimensión' para saber qué variables están permitidas:
+* Si 'Dimensión' = 0: solo se permite la variable 'x'
+* Si 'Dimensión' = 1: se permiten las variables 'x' e 'y'
+
+## Gestión de errores
+
+La función informa varios tipos de errores posibles:
+* FUNCIÓN_DESCONOCIDA (101): Función no reconocida
+* NÚMERO_INVÁLIDO (102): Formato de número incorrecto (p. ej., "1.2.3")
+* CARÁCTER_DESCONOCIDO (103): Carácter no reconocido
+* VARIABLE_DESCONOCIDA (104): Variable no permitida según la dimensión
+
+## Ejemplo completo
+
+Para la expresión '"2x + sin(3.5)"' con 'Dimensión' = 0:
+
+1. Eliminación de espacios: '"2x+sin(3.5)"'
+2. Agregar multiplicaciones implícitas: '"2*x+sin(3.5)"'
+3. Creación de tokens:
+   * REAL (2.0)
+   * OPERADOR (VECES)
+   * VARIABLE ('x')
+   * OPERADOR (MÁS)
+   * FUNCIÓN (SIN)
+   * PAR_ABRE
+   * REAL (3.5)
+   * PAR_CIERRA
+   * FIN
+
+# Análisis sintáctico
+
+### crearNodoVacío
+
+Utilidad: Devuelve un árbol vacío
+
+Toma como parámetro:
+
+-Nada
+
+Operación de la función:
+
+-Crea hijos izquierdo (hi) y derecho (hd) vacíos
+
+### construirÁrbolExpresión
+
+Utilidad: Construye recursivamente el árbol a partir de una matriz de tokens
+
+Toma como parámetro:
+
+-una matriz de tokens
+-el índice de la primera celda a analizar
+-el índice de la última celda a analizar
+-el error recuperado por la última llamada recursiva (el error predeterminado es 0).
+
+Operación de la función:
+
+Si hay un error en la última llamada recursiva: devuelve un árbol vacío al final de la rama
+
+Si el índice de inicio > índice de fin: devuelve error = MIEMBRO_VACÍO
+
+Si hay un operador: divide el árbol en el operador en hijo izquierdo e hijo derecho.
+
+De lo contrario, devuelve un error en los siguientes casos:
+
+- PROBLEMAS_PARÉNTESIS_FUNCIÓN: falta un paréntesis después de una función o si el paréntesis no se cierra
+- MIEMBRO_VACÍO: si un operador no está rodeado de objetos procesables, si los paréntesis están vacíos
+- PARÉNTESIS_CERRADO_1ER_TOKEN: si se cierra un paréntesis sin haberse abierto
+- PROBLEMAS_NÚMERO_PARÉNTESIS: si el número de paréntesis de apertura es diferente del número de paréntesis de cierre
+- PROBLEMA_DESPUÉS_REAL_O_VARIABLE: Supuestamente imposible
+- AUSENCIA_FIN: si falta el token "FIN"
+
+### encontrarOperadorDeMenorPrioridad
+
+Utilidad: Devuelve el operador donde dividir entre el hijo izquierdo y el hijo derecho.
+
+Toma como parámetro:
+
+-una matriz de tokens
+-el índice de la primera celda a analizar
+-el índice de la última celda a analizar
+-el error recuperado por la última llamada recursiva (el error predeterminado es 0).
+
+Operación de la función:
+
+Inicializa la profundidad de complejidad de los paréntesis a 0
+Establece el índice de división a -1 de forma predeterminada.
+
+índiceOperadorMínimo = -1 si no hay operador en la función
+prioridadOperadorMínimo representa el operador en el que separar la matriz de tokens.
+
+Itera a través de la matriz celda por celda y verifica si hay un operador
+
+Si la celda es un operador, la profundidad actual de los paréntesis es cero y el operador de la celda actual es más adecuado para la división:
+índiceOperadorMínimo = índice actual
+prioridadOperadorMínimo = celda actual
+
+Si la celda es un PAR_ABRE:
+la profundidad relacionada con los paréntesis aumenta
+
+Si la celda es un PAR_CIERRA:
+la profundidad relacionada con los paréntesis disminuye
+
+Si la profundidad de los paréntesis no es cero (=> número de PAR_ABRE != número de PAR_CIERRA)
+error = PROBLEMAS_NÚMERO_PARÉNTESIS
+
+### encontrarLongitudExpresión
+
+Utilidad: Devuelve el tamaño de la matriz
+
+Toma como parámetro:
+
+-Una matriz de tokens
+
+Operación de la función:
+
+Itera a través de la matriz y si la celda es una celda final, la función se detiene
+Si no se encuentra ningún FIN, entonces fin = -1
+
+### verificarEquilibrioParéntesis
+
+Utilidad: Devuelve un booleano basado en el equilibrio del número de paréntesis.
+
+Toma como parámetro:
+
+-índice del inicio de la matriz a analizar
+-índice del final de la matriz a analizar
+-la matriz de tokens
+
+Operación de la función:
+
+Itera a través de la matriz y cuenta el número de PAR_ABRE y PAR_CIERRA
+
+### construirÁrbolSintaxis
+
+Utilidad: Construye el árbol de sintaxis completo a partir de una secuencia de tokens
+
+Toma como parámetro:
+
+-la matriz de tokens
+-el último error devuelto por construirÁrbolExpresión (0 para la primera llamada)
+
+Operación de la función:
+
+Verifica si existe el token FIN
+Si existe, entonces el árbol se construye llamando a construirÁrbolExpresión
+De lo contrario, error = AUSENCIA_FIN
+
+# PARTE EVALUADOR:
+
+El objetivo del evaluador es calcular una función (que está en forma de árbol) a partir de las variables x e y dadas. Su función es esencial para trazar curvas, ya que permite obtener los puntos para mostrar en el gráfico.
+Nuestro código se divide en dos funciones principales: evaluador, nuestra función principal que interpreta el árbol, y calcular_función, una función auxiliar que aplica funciones matemáticas estándar.
+Función evaluador:
+
+Su propósito es decodificar el árbol de entrada. Toma como entrada:
+- La función en forma de árbol
+- Los valores de x e y
+- El puntero código_error.
+Devuelve el resultado de la función de entrada, calculado a partir de las variables x e y.
+Esta función es recursiva y tiene cuatro casos de parada. El primero es si el puntero código_error cambia de valor, lo que significa que hay un error en la función a calcular y, por lo tanto, la decodificación del árbol debe detenerse una vez que aparece un error. El segundo caso de parada es si el token principal del árbol no tiene un tipo. Finalmente, la función se detendrá si el token principal del árbol es un real o una variable, lo que significa que hemos llegado a una hoja del árbol.
+Una vez hecho esto, miramos usando una función switch el tipo del token principal del árbol de entrada, si es:
+
+- Una variable: devolvemos el valor de la variable que recuperamos como entrada de función.
+- Un real: devolvemos el valor del real.
+- Un operador: usamos un método de divide y vencerás para calcular la operación.
+- Una función: entonces usamos la segunda función de nuestro programa.
+Función calcular_función:
+
+Esta función toma como entrada el tipo de la función matemática f, la variable x en la que se aplica f y el puntero código_error. Devuelve la aplicación f(x). Los tipos de funciones posibles son funciones matemáticas universales como sin, cos o ln.
+Primero miramos usando una función switch qué función es, luego verificamos que no haya ningún error antes de calcular f(x).
+En caso de error:
+En caso de error (p. ej., división por cero, logaritmo de un número negativo...), la función devuelve un valor incorrecto y modifica el puntero código_error para señalar el problema. Esto permite, por ejemplo, detener la evaluación o mostrar un mensaje apropiado al usuario.
+
+# Visualización gráfica
+
+## 1. Inicio
+
+La pantalla de inicio facilita la interacción con el usuario. Proporciona acceso a varias funciones, como consultar el manual de usuario, mostrar agradecimientos o iniciar un modo de visualización. Actualmente, el programa ofrece una visualización 2D, pero nuestros ingenieros están desarrollando una versión 3D para funciones con dos variables.
+
+## 2. Funciones de retorno
+
+Una función de retorno permite al usuario volver a los menús anteriores sin reiniciar el programa. Pueden volver a la pantalla de inicio haciendo clic en el icono en forma de casa en los menús de texto o presionando la tecla "Retroceso" o "Regresar" en el teclado.
+
+## 3. Barra superior
+
+El usuario puede mostrar hasta 20 expresiones. De forma predeterminada, se presenta una función básica para cada caso. El usuario puede hacer clic en una expresión para modificarla. Además, al escribir en una de las tres áreas de texto de la barra superior, pueden interactuar con las siguientes funciones:
+
+### 3.1 Cambio de color
+
+El programa ofrece la posibilidad de personalizar el color de las funciones a través de un menú de selección de color. Este menú se activa haciendo clic en el icono de la rueda de color. Una vez abierto, permite cambiar el color de las funciones en tiempo real (incluso manteniendo el clic izquierdo).
+
+### 3.2 Ocultar una función
+
+Esta función permite al usuario ocultar o mostrar las funciones de su elección en tiempo real, según sus necesidades.
+
+### 3.3 Eliminar una función
+
+El usuario puede eliminar expresiones haciendo clic en el icono de la papelera con el clic izquierdo del ratón.
+
+### 3.4 Modificar límites
+
+Una ventana de texto permite al usuario modificar los límites de una expresión en tiempo real, para ahorrar tiempo y tener más flexibilidad.
+
+## 4. Procesamiento de expresiones
+
+Una vez que se introduce la expresión, se somete a un análisis léxico y luego sintáctico para prepararla para su posterior procesamiento.
+
+## 5. Visualización de funciones
+
+El árbol generado durante el análisis se utiliza para asociar cada valor del intervalo con su imagen correspondiente en la pantalla, utilizando la función de evaluación. Este proceso se repite en tiempo real, lo que permite actualizaciones dinámicas de la visualización.
 
 ### 5.1 Zoom
 
-For better graphical analysis, the program allows zooming in and out using the mouse wheel. This modifies the displayed interval of the function.
+Para un mejor análisis gráfico, el programa permite acercar o alejar con la rueda del ratón. Esto modifica el intervalo mostrado de la función.
 
-### 5.2 Centering
+### 5.2 Centrado
 
-The centering feature allows quickly resetting the display. Simply press the "C" key on the keyboard. A "Recenter" button will soon be added to the right bar of the window.
+La función de centrado permite restablecer rápidamente la visualización. Simplemente presiona la tecla "C" en el teclado. Pronto se agregará un botón "Recentralizar" a la barra derecha de la ventana.
 
-### 5.3 Translation of the Reference Frame
+### 5.3 Traslación de ejes
 
-By pressing the right mouse button, the user activates a "sliding" mode that allows them to intuitively navigate the graph.
+Al presionar el botón "clic derecho" del ratón, el usuario activa un modo de "arrastre" que les permite navegar por el gráfico de forma intuitiva.
 
-### 5.4 Evaluator in x
+### 5.4 Evaluador de x
 
-The evaluator, activated by a left-click, allows the user to visualize two lines that intersect the first curve of the expression list. These lines follow the position of the mouse on the x-axis. A display provides the value of `x` as well as the value of the function at the click point.
+El evaluador, activado por un clic izquierdo, permite al usuario visualizar dos líneas que se cruzan con la primera curva en la lista de expresiones. Estas líneas siguen la posición del ratón en el eje x. Una pantalla proporciona el valor de 'x' así como el valor de la función en el punto de clic.
+```
