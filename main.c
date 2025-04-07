@@ -33,15 +33,17 @@
 
 
 int main (){
-    typejeton TokenListe[TailleMax]; //tableau de sortie
-    char str[TailleMax]  = "x + y**2 +e " ; //expression tester
-    int erreur = 0; //on initialise l'erreur (0 par défault)
-    Analyse_Lexicale(TokenListe,str,&erreur,0);
-    // On affiche le contenu de TokenListe
 
+    typejeton TokenListe[TailleMax]; //tableau de sortie
+    char str[TailleMax]  = "1/(x**2 + y**2)" ; //expression tester
+    int erreur = 0; //on initialise l'erreur (0 par défault)
+    Analyse_Lexicale(TokenListe,str,&erreur,1);
+
+    // On affiche le contenu de TokenListe
+    
     afficher_tableau_jetons(TokenListe, TailleMax);
     printf("ERREUR : %d",erreur); //print d'éventuelle erreur
-    
+
     return 0;
 }
 
