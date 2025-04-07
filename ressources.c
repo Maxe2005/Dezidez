@@ -121,7 +121,7 @@ void affiche_avertissements (SDL_Renderer* ren){
         } else if (probleme.severity == CRITICAL){
             color = (SDL_Color){255, 0, 0, 100};
         }
-        roundedBoxRGBA(ren, 0, 0, FEN_X, FEN_Y, 0, color.r, color.g, color.b, color.a);
+        boxRGBA(ren, 0, 0, FEN_X, FEN_Y, color.r, color.g, color.b, color.a);
 
         int marge_x = 20;
         int marge_y = 10;

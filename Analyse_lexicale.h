@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /**
  * Retire tout les espaces de l'expression
@@ -10,6 +11,11 @@
  * @param buffer : chaine de caractère temporaire ayant les même caractèristique que Expression
  */
 void ExpressionSansLesEspaces (char *Expression,int SizeExpression,char *NewExpression);
+/**
+ * Transforme tout les caractères majuscules de l'expression en minuscule
+ * @param str : pointeur chaine de caractère
+ */
+void MajtoMin(char *str);
 /**
  * Renvoie 1 si l'element recherché est dans le tableau sinon renvoie 0
  * @param tab : tableaude chaine de caractère
@@ -99,3 +105,15 @@ int PlusieursVirgules (char *nombre);
 void Analyse_Lexicale (typejeton TabToken[TAILLE_MAX],char Expression[TAILLE_MAX],int* erreur,int  Dimension);
 
 //*erreur = 101;
+
+/**
+ * Permet d'afficher un jeton unique
+ * @param jeton : jeton de type typejeton 
+ */
+void afficher_jeton(typejeton jeton);
+/**
+ * Permet d'afficher un jeton unique
+ * @param tableau : tableau de jeton
+ * @param taille : taille du tableau
+ */
+void afficher_tableau_jetons(typejeton tableau[], int taille);

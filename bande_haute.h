@@ -49,6 +49,7 @@ typedef struct {
     float fx_min; // Le minimum de la fonction sur l'interval choisi
     bool visible; // Pour savoir si la courbe est affichée ou non sur le graph
     SDL_Color color;
+    bool is_erreur;
 } Fonction;
 
 // Un bouton en mouvement
