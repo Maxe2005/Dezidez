@@ -16,8 +16,8 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
     if (syntaxeVerbose >= 2) afficher_liste_jetons(tab, debut, fin);
     
     // Trouve l'opérateur de plus faible priorité dans la plage donnée
-    int indiceOperateurPrincipal = findLowestPriorityOperator(tab, debut, fin, erreur);
-    if (syntaxeVerbose >= 10) printf("indiceOperateurPrincipal=%d\n", indiceOperateurPrincipal);
+    int indOpPrincipal = findLowestPriorityOperator(tab, debut, fin, erreur);
+    if (syntaxeVerbose >= 10) printf("indOpPrincipal=%d\n", indOpPrincipal);
     
     // Si une erreur est survenue lors de la recherche de l'opérateur
     if (*erreur != 0) {
@@ -31,20 +31,17 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
     }
     
     // Cas où on a trouvé un opérateur principal
-    if (indiceOperateurPrincipal != -1) {
+    if (indOpPrincipal != -1) {
         // Construction récursive des sous-arbres gauche et droit
-        Node* sousArbreGauche = (Node*)malloc(sizeof(Node));
-        sousArbreGauche = buildExpressionTree(tab, debut, indiceOperateurPrincipal - 1, erreur);
-        
-        Node* sousArbreDroit = (Node*)malloc(sizeof(Node));
-        sousArbreDroit = buildExpressionTree(tab, indiceOperateurPrincipal + 1, fin, erreur);
+        Node* fg = buildExpressionTree(tab, debut, indOpPrincipal - 1, erreur);
+        Node* fd = buildExpressionTree(tab, indOpPrincipal + 1, fin, erreur);
         
         // Création du nœud pour l'opérateur avec ses sous-arbres
         Node* arbre = (Node*)malloc(sizeof(Node));
         *arbre = (Node){
-            .pjeton_preced = sousArbreGauche,
-            .pjeton_suiv = sousArbreDroit,
-            .jeton = tab[indiceOperateurPrincipal]
+            .pjeton_preced = fg,
+            .pjeton_suiv = fd,
+            .jeton = tab[indOpPrincipal]
         };
         return arbre;
     }
@@ -65,10 +62,10 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
                 }
 
                 // Création de l'arbre pour une fonction
-                Node* argument = buildExpressionTree(tab, debut + 2, fin - 1, erreur);
+                Node* fg = buildExpressionTree(tab, debut + 2, fin - 1, erreur);
                 Node* arbre = (Node*)malloc(sizeof(Node));
                 *arbre = (Node){
-                    .pjeton_preced = argument,
+                    .pjeton_preced = fg,
                     .pjeton_suiv = NULL,
                     .jeton = tab[debut]   
                 }; 
@@ -132,7 +129,7 @@ int findLowestPriorityOperator(typejeton *tab, int debut, int fin, typeerreur *e
     int indiceOperateurMinimal = -1;
     int prioriteOperateurMinimal = TAILLE_MAX;
 
-    // Parcours des jetons pour trouver l'opérateur de plus faible priorité
+    // Parcours les jetons pour trouver l'opérateur de plus faible priorité
     for (int i = debut; i <= fin; i++) {
         switch (tab[i].lexem) {
             case OPERATEUR:
