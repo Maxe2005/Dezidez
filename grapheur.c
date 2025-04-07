@@ -140,21 +140,22 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
     }
 }
 
-void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
-    if (fonction.borne_sup > graph->axe_x->min && fonction.borne_inf < graph->axe_x->max){
-        SDL_SetRenderDrawColor(ren, fonction.color.r, fonction.color.g, fonction.color.b, fonction.color.a);
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction* fonction){
+    if (fonction->borne_sup > graph->axe_x->min && fonction->borne_inf < graph->axe_x->max){
+        SDL_SetRenderDrawColor(ren, fonction->color.r, fonction->color.g, fonction->color.b, fonction->color.a);
         int nb_pts = graph->x;
-        float borne_sup = (fonction.borne_sup > graph->axe_x->max) ? graph->axe_x->max : fonction.borne_sup;
-        float borne_inf = (fonction.borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction.borne_inf;;
+        float borne_sup = (fonction->borne_sup > graph->axe_x->max) ? graph->axe_x->max : fonction->borne_sup;
+        float borne_inf = (fonction->borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction->borne_inf;;
         float step_size = (borne_sup - borne_inf) / nb_pts;
         float x, y_sur_graph, x_sur_graph;
         float fx;
         int code_erreur = 0;
         for (int i = 0; i < nb_pts; i++) {
             x = borne_inf + i * step_size;
-            fx = evaluateur(fonction.fonction_arbre, x, 0, &code_erreur);
+            fx = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
             if (code_erreur){
                 set_probleme(code_erreur);
+                fonction->is_erreur = true;
                 return;
             }
             if (fx >= graph->axe_y->min && fx <= graph->axe_y->max){
@@ -298,8 +299,8 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haut
     affiche_axes_graph(ren, graph, colors->axes);
 
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
-        if (bande_haute->expressions[i]->fonction.visible && bande_haute->expressions[i]->expression->text[0] != '\0') {
-            tracer_fonction(ren, graph, bande_haute->expressions[i]->fonction);
+        if (bande_haute->expressions[i]->fonction.visible && !bande_haute->expressions[i]->fonction.is_erreur && bande_haute->expressions[i]->expression->text[0] != '\0') {
+            tracer_fonction(ren, graph, &bande_haute->expressions[i]->fonction);
         }
     }
     if (bande_haute->expressions[0]->fonction.visible) affichage_graph_evaluateur(ren,graph);

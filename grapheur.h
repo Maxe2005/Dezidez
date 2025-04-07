@@ -126,7 +126,7 @@ void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size);
  * @param graph Le graphique à afficher
  * @param fonction La fonction à afficher
  */
-void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction);
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction* fonction);
 
 /**
  * Cherche et trouve le maximum et le minimum de la fonction. Et affecte les valeurs trouvés aux paramètres de la fonction

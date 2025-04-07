@@ -354,6 +354,7 @@ void execute_expression (Expression_fonction* expression){
         if (expression->fonction.fonction_arbre != NULL) {
             liberer_arbre(expression->fonction.fonction_arbre);
         }
+        expression->fonction.is_erreur = false;
         expression->fonction.fonction_arbre = arbre;
         expression->fonction.visible = 1;
         expression->button_visibilite.bt.image = expression->image_button_visible;
