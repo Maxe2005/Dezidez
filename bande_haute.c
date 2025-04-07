@@ -343,6 +343,7 @@ void execute_expression (Expression_fonction* expression){
             expression->button_visibilite.bt.image = expression->image_button_invisible;
             return;
         }
+        expression->expression->position_cursor = strlen(expression->expression->text);
         typeerreur erreur_2 = 0;
         Node* arbre = buildSyntaxTree(TabToken, &erreur_2);
         if (erreur_2){
@@ -358,7 +359,6 @@ void execute_expression (Expression_fonction* expression){
         expression->fonction.fonction_arbre = arbre;
         expression->fonction.visible = 1;
         expression->button_visibilite.bt.image = expression->image_button_visible;
-        expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }
 
