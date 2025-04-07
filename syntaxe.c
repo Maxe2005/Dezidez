@@ -1,6 +1,7 @@
 #include "syntaxe.h"
 
-Node* arbrevide(){
+Node* createEmptyNode() {
+    // Allocation et initialisation d'un nœud vide
     Node* arbre = (Node*)malloc(sizeof(Node));
     *arbre = (Node){
         .pjeton_preced = NULL,
@@ -10,77 +11,100 @@ Node* arbrevide(){
     return arbre;
 }
 
-Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
-
+Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur) {
+    // Affichage de débogage si activé
     if (syntaxeVerbose >= 2) afficher_liste_jetons(tab, debut, fin);
-    int  indoputile = minIndice(tab, debut, fin, erreur);
-    if (syntaxeVerbose >= 10) printf("indoputile=%d\n", indoputile);
-    if (*erreur != 0){
-        return arbrevide();
+    
+    // Trouve l'opérateur de plus faible priorité dans la plage donnée
+    int indiceOperateurPrincipal = findLowestPriorityOperator(tab, debut, fin, erreur);
+    if (syntaxeVerbose >= 10) printf("indiceOperateurPrincipal=%d\n", indiceOperateurPrincipal);
+    
+    // Si une erreur est survenue lors de la recherche de l'opérateur
+    if (*erreur != 0) {
+        return createEmptyNode();
     }
-    if (debut>fin){
+    
+    // Si la plage est vide (début > fin), c'est une erreur
+    if (debut > fin) {
         *erreur = MEMBRE_VIDE;
-        return arbrevide();
+        return createEmptyNode();
     }
-    if (indoputile != -1){
-        Node* Fg = (Node*)malloc(sizeof(Node));
-        Fg= operateur(tab, debut, indoputile - 1, erreur);
-        Node* Fd = (Node*)malloc(sizeof(Node));
-        Fd = operateur(tab,indoputile + 1, fin, erreur);
+    
+    // Cas où on a trouvé un opérateur principal
+    if (indiceOperateurPrincipal != -1) {
+        // Construction récursive des sous-arbres gauche et droit
+        Node* sousArbreGauche = (Node*)malloc(sizeof(Node));
+        sousArbreGauche = buildExpressionTree(tab, debut, indiceOperateurPrincipal - 1, erreur);
+        
+        Node* sousArbreDroit = (Node*)malloc(sizeof(Node));
+        sousArbreDroit = buildExpressionTree(tab, indiceOperateurPrincipal + 1, fin, erreur);
+        
+        // Création du nœud pour l'opérateur avec ses sous-arbres
         Node* arbre = (Node*)malloc(sizeof(Node));
         *arbre = (Node){
-            .pjeton_preced = Fg,
-            .pjeton_suiv = Fd,
-            .jeton = tab[indoputile]
+            .pjeton_preced = sousArbreGauche,
+            .pjeton_suiv = sousArbreDroit,
+            .jeton = tab[indiceOperateurPrincipal]
         };
         return arbre;
     }
-    else{
-        switch (tab[debut].lexem){
+    // Cas où il n'y a pas d'opérateur principal (expression simple ou entre parenthèses)
+    else {
+        switch (tab[debut].lexem) {
             case FONCTION:
-                if (tab[debut + 1].lexem != PAR_OUV){
+                // Vérification de la syntaxe pour les fonctions
+                if (tab[debut + 1].lexem != PAR_OUV) {
                     if (syntaxeVerbose >= 10) printf("PROBLEME_PARENTHESES_FONCTIONS dans fonctions tab[debut + 1].lexem != PAR_OUV\n");
                     *erreur = PROBLEME_PARENTHESES_FONCTIONS;
-                    return arbrevide();
+                    return createEmptyNode();
                 }
-                if ((tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)){
+                if ((tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)) {
                     if (syntaxeVerbose >= 10) printf("MEMBRE VIDE dans fonctions (tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
-                    return arbrevide();
+                    return createEmptyNode();
                 }
 
-                Node* Fg = operateur(tab, debut + 2, fin - 1, erreur);
+                // Création de l'arbre pour une fonction
+                Node* argument = buildExpressionTree(tab, debut + 2, fin - 1, erreur);
                 Node* arbre = (Node*)malloc(sizeof(Node));
                 *arbre = (Node){
-                    .pjeton_preced = Fg,
+                    .pjeton_preced = argument,
                     .pjeton_suiv = NULL,
                     .jeton = tab[debut]   
                 }; 
                 return arbre;
                 break;
+                
             case PAR_OUV:
-                if (tab[fin].lexem != PAR_FERM){
-                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OU tab[fin].lexem != PAR_FERMV\n");
+                // Vérification de la syntaxe pour les expressions entre parenthèses
+                if (tab[fin].lexem != PAR_FERM) {
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV tab[fin].lexem != PAR_FERM\n");
                     *erreur = MEMBRE_VIDE;
-                    return arbrevide();
+                    return createEmptyNode();
                 }
-                if ((tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)){
-                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV (tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)\n");
+                if ((tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)) {
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV (tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
-                    return arbrevide();
+                    return createEmptyNode();
                 }
-                else{
-                    return operateur(tab, debut + 1, fin - 1, erreur);
+                else {
+                    // Pour une expression entre parenthèses, on analyse le contenu sans les parenthèses
+                    return buildExpressionTree(tab, debut + 1, fin - 1, erreur);
                 }
                 break;
+                
             case PAR_FERM:
+                // Erreur: parenthèse fermante en premier jeton
                 if (syntaxeVerbose >= 10) printf("PARENTHESE_FERMEE_1_ER_JETON dans PAR_FERM\n");
                 *erreur = PARENTHESE_FERMEE_1_ER_JETON;
-                return arbrevide(); 
+                return createEmptyNode(); 
                 break;
+                
             case REEL:
             case VARIABLE:
-                if (fin - debut == 0){
+                // Cas des valeurs simples (réel ou variable)
+                if (fin - debut == 0) {
+                    // Si c'est le seul jeton, création d'un nœud feuille
                     Node* arbre = (Node*)malloc(sizeof(Node));
                     *arbre = (Node){
                         .pjeton_preced = NULL,
@@ -89,82 +113,98 @@ Node* operateur( typejeton *tab, int debut, int fin, typeerreur *erreur){
                     };
                     return arbre;
                 }
-                else{
+                else {
+                    // Erreur: il y a quelque chose après un réel ou une variable
                     *erreur = PROBLEME_APRES_REEL_OU_VARIABLE;
-                    return arbrevide();
+                    return createEmptyNode();
                 }
                 break;
+                
             default:
                 break;
         } 
     }
-    return arbrevide();
+    return createEmptyNode();
 }
 
-int minIndice(typejeton *tab,  int debut, int fin, typeerreur *erreur){
-    int depth = 0;
-    int minOperatorIndex = -1;
-    int minOperatorPriority = TAILLE_MAX;
+int findLowestPriorityOperator(typejeton *tab, int debut, int fin, typeerreur *erreur) {
+    int profondeurParentheses = 0;
+    int indiceOperateurMinimal = -1;
+    int prioriteOperateurMinimal = TAILLE_MAX;
 
+    // Parcours des jetons pour trouver l'opérateur de plus faible priorité
     for (int i = debut; i <= fin; i++) {
         switch (tab[i].lexem) {
             case OPERATEUR:
-                if (depth == 0 && opPriorite[tab[i].valeur.operateur] < minOperatorPriority) {
-                    minOperatorIndex = i;
-                    minOperatorPriority = opPriorite[tab[i].valeur.operateur];
+                // On ne considère que les opérateurs au niveau 0 des parenthèses
+                if (profondeurParentheses == 0 && opPriorite[tab[i].valeur.operateur] < prioriteOperateurMinimal) {
+                    indiceOperateurMinimal = i;
+                    prioriteOperateurMinimal = opPriorite[tab[i].valeur.operateur];
                 }
                 break;
             case PAR_OUV:
-                depth++;
+                // Entrée dans un niveau supplémentaire de parenthèses
+                profondeurParentheses++;
                 break;
             case PAR_FERM:
-                depth--;
+                // Sortie d'un niveau de parenthèses
+                profondeurParentheses--;
                 break;
             default:
                 break;
         }
     }
 
-    if (depth != 0) {
+    // Vérification de l'équilibre des parenthèses
+    if (profondeurParentheses != 0) {
         *erreur = PROBLEMES_NOMBRE_PARENTHESES;
         return -1;
     }
 
-    return minOperatorIndex;
+    return indiceOperateurMinimal;
 }
 
-
-int calculTaille(typejeton *tab){
-    for (int i = 0; i<TAILLE_MAX; i++){
-        if (tab[i].lexem == FIN){
-            return (i-1);
+int findExpressionLength(typejeton *tab) {
+    // Recherche du jeton FIN dans le tableau
+    for (int i = 0; i < TAILLE_MAX; i++) {
+        if (tab[i].lexem == FIN) {
+            return (i - 1);  // Retourne l'indice du dernier jeton avant FIN
         }
     }
-    return -1;
+    return -1;  // Retourne -1 si aucun jeton FIN n'est trouvé
 }
 
-bool parenthese(int debut, int fin, typejeton *tab){
-    int nbouv = 0;
-    int nbfer = 0;
-    for (int i = debut; i <= fin; i++){
-        if (tab[i].lexem == PAR_OUV){
-            nbouv = nbouv + 1;
+bool checkParenthesesBalance(int debut, int fin, typejeton *tab) {
+    int nombreParenthesesOuvrantes = 0;
+    int nombreParenthesesFermantes = 0;
+    
+    // Compte les parenthèses ouvrantes et fermantes
+    for (int i = debut; i <= fin; i++) {
+        if (tab[i].lexem == PAR_OUV) {
+            nombreParenthesesOuvrantes++;
         }
-        if(tab[i].lexem == PAR_FERM){
-            nbfer = nbfer + 1;
+        if (tab[i].lexem == PAR_FERM) {
+            nombreParenthesesFermantes++;
         }
     }
-    return nbouv == nbfer;
+    
+    // Les parenthèses sont équilibrées si le nombre est identique
+    return nombreParenthesesOuvrantes == nombreParenthesesFermantes;
 }
 
-Node* Syntaxique(typejeton *tab, typeerreur *erreur){
-    int fin = calculTaille(tab);
-    if (syntaxeVerbose >= 10) printf("calculTaille fin=%d\n", fin);
-    if(fin == -1) {
+Node* buildSyntaxTree(typejeton *tab, typeerreur *erreur) {
+    // Détermination de la fin effective de l'expression
+    int fin = findExpressionLength(tab);
+    if (syntaxeVerbose >= 10) printf("findExpressionLength fin=%d\n", fin);
+    
+    // Vérification de la présence du jeton FIN
+    if (fin == -1) {
         *erreur = ABSENCE_FIN;
-        return arbrevide();
+        return createEmptyNode();
     }
-    Node* arbrePlein = (Node*)malloc(sizeof(Node));
-    arbrePlein = operateur( tab, 0, fin, erreur);
-    return arbrePlein;
+    
+    // Construction de l'arbre d'expression
+    Node* arbreSyntaxique = (Node*)malloc(sizeof(Node));
+    arbreSyntaxique = buildExpressionTree(tab, 0, fin, erreur);
+    return arbreSyntaxique;
 }

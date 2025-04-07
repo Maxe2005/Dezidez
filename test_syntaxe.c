@@ -48,7 +48,7 @@ void tester_syntaxe() {
 void test_5_plus_3_valide() {
     typejeton tab[] = { {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 5 + 3
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -82,7 +82,7 @@ void test_5_plus_3_valide() {
 void test_parenthese_ouverte_7_fois_2_valide() {
     typejeton tab[] = { {PAR_OUV, {0}}, {REEL, {.reel = 7.0}}, {OPERATEUR, {.operateur = FOIS}}, {REEL, {.reel = 2.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: (7 * 2)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -116,7 +116,7 @@ void test_parenthese_ouverte_7_fois_2_valide() {
 void test_x_puis_2_valide() {
     typejeton tab[] = { {VARIABLE, {.variable = 'x'}}, {OPERATEUR, {.operateur = PUIS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: x ^ 2
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -151,7 +151,7 @@ void test_5_plus_etoile_3_erreur() {
     // 5 + * 3
     typejeton tab[] = { {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {OPERATEUR, {.operateur = FOIS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -167,7 +167,7 @@ void test_8_fois_plus_2_erreur() {
     // 8 * + 2
     typejeton tab[] = { {REEL, {.reel = 8.0}}, {OPERATEUR, {.operateur = FOIS}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -183,7 +183,7 @@ void test_5_plus_erreur() {
     // 5 +
     typejeton tab[] = { {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -199,7 +199,7 @@ void test_parenthese_ouverte_5_plus_erreur() {
     // (5 +
     typejeton tab[] = { {PAR_OUV, {0}}, {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -215,7 +215,7 @@ void test_cos_parenthese_ouverte_5_erreur() {
     // cos(5
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 5.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -237,7 +237,7 @@ void test_sin_3_fois_cos_2_valide() {
 
     // Création de l'arbre par la fonction Syntaxique
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Création manuelle de l'arbre attendu pour "sin(3) * cos(2)"
     // Niveau 1: Opérateur * principal
@@ -287,7 +287,7 @@ void test_cos_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide() {
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 3.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 6.0}}, {OPERATEUR, {.operateur = FOIS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = PLUS}}, {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 7.0}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = FOIS}}, {PAR_OUV, {0}}, {REEL, {.reel = 12.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
 
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu pour cos(3 + 6X) + cos(7) * (12 + 3)
     // Opérateur principal: +
@@ -372,7 +372,7 @@ void test_4_minus_53_valide() {
     // Expression: 4 - 53
     typejeton tab[] = { {REEL, {.reel = 4.0}}, {OPERATEUR, {.operateur = MOINS}}, {REEL, {.reel = 53.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -388,7 +388,7 @@ void test_0_plus_0_valide() {
     // Expression: 0 + 0
     typejeton tab[] = { {REEL, {.reel = 0.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 0.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 0 + 0
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -416,7 +416,7 @@ void test_5_3_minus_4_2_valide() {
     // Expression: 5.3 - 4.2
     typejeton tab[] = { {REEL, {.reel = 5.3}}, {OPERATEUR, {.operateur = MOINS}}, {REEL, {.reel = 4.2}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 5.3 - 4.2
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -444,7 +444,7 @@ void test_10_div_33_valide() {
     // Expression: 10 / 33
     typejeton tab[] = { {REEL, {.reel = 10.0}}, {OPERATEUR, {.operateur = DIV}}, {REEL, {.reel = 33.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 10 / 33
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -472,7 +472,7 @@ void test_3_valide() {
     // Expression: 3
     typejeton tab[] = { {REEL, {.reel = 3.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 3
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -492,7 +492,7 @@ void test_parenthese_erreur() {
     // Expression: ()
     typejeton tab[] = { {PAR_OUV, {0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -508,7 +508,7 @@ void test_X_valide() {
     // Expression: X
     typejeton tab[] = { {VARIABLE, {.variable = 'X'}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: X
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -528,7 +528,7 @@ void test_div_plus_moins_erreur() {
     // Expression: /+-+6987525+-//*-+
     typejeton tab[] = { {OPERATEUR, {.operateur = DIV}}, {OPERATEUR, {.operateur = PLUS}}, {OPERATEUR, {.operateur = MOINS}}, {REEL, {.reel = 6987525}}, {OPERATEUR, {.operateur = PLUS}}, {OPERATEUR, {.operateur = MOINS}}, {OPERATEUR, {.operateur = FOIS}}, {OPERATEUR, {.operateur = MOINS}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -544,7 +544,7 @@ void test_1_plus_2_plus_3_valide() {
     // Expression: 1 + 2 + 3
     typejeton tab[] = { {REEL, {.reel = 1.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 2.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 1 + 2 + 3
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -579,7 +579,7 @@ void test_cos_erreur() {
     // Expression: COS
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: COS
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -599,7 +599,7 @@ void test_sin_53_valide() {
     // Expression: SIN(53)
     typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {REEL, {.reel = 53.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: SIN(53)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -624,7 +624,7 @@ void test_cos_sin_parenthese_ouverte_erreur() {
     // Expression: COS(SIN())
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {PAR_FERM, {0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -640,7 +640,7 @@ void test_3_fois_cos_X_plus_X_fois_exp_2X_valide() {
     // Expression: 3 * COS(X) + X * EXP(2 * X)
     typejeton tab[] = { {REEL, {.reel = 3.0}}, {OPERATEUR, {.operateur = FOIS}}, {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = PLUS}}, {VARIABLE, {.variable = 'X'}}, {OPERATEUR, {.operateur = FOIS}}, {FONCTION, {.fonction = EXP}}, {PAR_OUV, {0}}, {REEL, {.reel = 2.0}}, {OPERATEUR, {.operateur = FOIS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 3 * COS(X) + X * EXP(2 * X)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -710,7 +710,7 @@ void test_cos_56_plus_sin_tan_12_valide() {
     // Expression: COS(56) + SIN(TAN(12))
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 56.0}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = PLUS}}, {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {FONCTION, {.fonction = TAN}}, {PAR_OUV, {0}}, {REEL, {.reel = 12.0}}, {PAR_FERM, {0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: COS(56) + SIN(TAN(12))
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -755,7 +755,7 @@ void test_expression_longue_valide() {
     // Expression: 321659876844689961112
     typejeton tab[] = { {REEL, {.reel = 321659876844689961112.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 321659876844689961112
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -775,7 +775,7 @@ void test_cos_valeur_tres_grande_valide() {
     // Expression: cos(69875658954712356157364)
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 69875658954712356157364.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: cos(69875658954712356157364)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -800,7 +800,7 @@ void test_valeur_precise_valide() {
     // Expression: 5.31654645611654897965
     typejeton tab[] = { {REEL, {.reel = 5.31654645611654897965}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: 5.31654645611654897965
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -820,7 +820,7 @@ void test_sin_X_valide() {
     // Expression: SIN( X )
     typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: SIN(X)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -845,7 +845,7 @@ void test_XEXP_erreur() {
     // Expression: XEXP
     typejeton tab[] = { {VARIABLE, {.variable = 'X'}}, {OPERATEUR, {.operateur = FOIS}}, {FONCTION, {.fonction = EXP}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -862,7 +862,7 @@ void test_val_neg_valide() {
     // Expression: VAL_NEG
     typejeton tab[] = { {VARIABLE, {.variable = 'V'}}, {OPERATEUR, {.operateur = MOINS}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: -V
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -887,7 +887,7 @@ void test_plus_3_erreur() {
     // Expression: +3
     typejeton tab[] = { {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -904,7 +904,7 @@ void test_sin_neg_x_erreur() {
     // Expression: sin(-x)
     typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {OPERATEUR, {.operateur = MOINS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -921,7 +921,7 @@ void test_sinc_3_div_0_valide() {
     // Expression: SINC(3/0)
     typejeton tab[] = { {FONCTION, {.fonction = SINC}}, {PAR_OUV, {0}}, {REEL, {.reel = 3.0}}, {OPERATEUR, {.operateur = DIV}}, {REEL, {.reel = 0.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: SINC(3/0)
     Node* racine = (Node*)malloc(sizeof(Node));
@@ -958,7 +958,7 @@ void test_sinc_3_div_0_valide() {
 void test_parenthese_ouverte_7_fois_2_sans_fin_erreur() {
     typejeton tab[] = { {PAR_OUV, {0}}, {REEL, {.reel = 7.0}}, {OPERATEUR, {.operateur = FOIS}}, {REEL, {.reel = 2.0}}, {PAR_FERM, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -975,7 +975,7 @@ void test_parenthese_ferme_5_plus_2_erreur() {
     // (5 +
     typejeton tab[] = { {PAR_FERM, {0}}, {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
@@ -991,7 +991,7 @@ void test_5_plus_parenthese_ferme_2_erreur() {
     // (5 +
     typejeton tab[] = { {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {PAR_FERM, {0}}, {REEL, {.reel = 2.0}}, {PAR_OUV, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
-    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+    Node* arbre_syntaxique = buildSyntaxTree(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
