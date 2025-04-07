@@ -10,7 +10,7 @@ float evaluateur(Node *racine,float valeur_x, float valeur_y ,int *code_erreur){
         case REEL: //décodage réels
             return racine->jeton.valeur.reel;
             break;
-        case VARIABLE:
+        case VARIABLE: // remplace la variable
             if (racine->jeton.valeur.variable=='x'){
                 return valeur_x;
         
