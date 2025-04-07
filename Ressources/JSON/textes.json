@@ -2,53 +2,75 @@
     "Bande_haute":{
         "borne_inf": {
             "fr": "Borne inférieure",
-            "en": "Lower bound"
+            "en": "Lower bound",
+            "al": "Untere Grenze",
+            "es": "Límite inferior"
         },
         "borne_sup":{
             "fr": "Borne supérieure",
-            "en": "Upper bound"
+            "en": "Upper bound",
+            "al": "Obere Grenze",
+            "es": "Límite superior"
         },
         "expression": {
             "fr": "Expression",
-            "en": "Expression"
+            "en": "Expression",
+            "al": "Ausdruck",
+            "es": "Expresión"
         }
     },
 
     "Bande_droite":{
         "centrer":{
             "fr": "Centrer",
-            "en": "Auto Scale"
+            "en": "Auto Scale",
+            "al": "Automatisch skalieren",
+            "es": "Escala automática"
         }
     },
 
     "Acceuil":{
         "titre":{
             "fr": "Grapheur d'expressions fonctionnelles",
-            "en": "Graphing functional expressions"
+            "en": "Graphing functional expressions",
+            "al": "Funktionale Ausdrücke grafisch darstellen",
+            "es": "Graficando expresiones funcionales"
         },
         "Mode_emploi":{
             "fr": "Mode d'emploi",
-            "en": "User manual"
+            "en": "User manual",
+            "al": "Benutzerhandbuch",
+            "es": "Manual de usuario"
         },
         "Remerciements":{
             "fr": "Remerciements",
-            "en": "Acknowledgements"
+            "en": "Acknowledgements",
+            "al": "Danksagung",
+            "es": "Agradecimientos"
         },
         "Grapheur_2D":{
             "fr": "Grapheur 2D",
-            "en": "2D Grapher"
+            "en": "2D Grapher",
+            "al": "2D-Diagrammer",
+            "es": "Grapher 2D"
         },
         "Grapheur_3D":{
             "fr": "Grapheur 3D",
-            "en": "3D Grapher"
+            "en": "3D Grapher",
+            "al": "3D-Diagrammer",
+            "es": "Grapher 3D"
         },
         "Titre_page_remerciement":{
             "fr": "Remerciements",
-            "en": "Acknowledgements"
+            "en": "Acknowledgements",
+            "al": "Danksagung",
+            "es": "Agradecimientos"
         },
         "Titre_page_mode_emploi":{
             "fr": "Mode d'emploi",
-            "en": "User manual"
+            "en": "User manual",
+            "al": "Benutzerhandbuch",
+            "es": "Manual de usuario"
         }
     }
 }

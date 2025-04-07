@@ -330,7 +330,7 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
-        typejeton TabToken[TailleMax] = {};
+        typejeton TabToken[TAILLE_MAX+1] = {};
         int dim;
         if (dimention == _2D) dim = 0;
         if (dimention == _3D) dim = 1;
@@ -346,7 +346,7 @@ void execute_expression (Expression_fonction* expression){
         typeerreur erreur_2 = 0;
         Node* arbre = buildSyntaxTree(TabToken, &erreur_2);
         if (erreur_2){
-            set_probleme(erreur_2);
+            set_probleme((int)erreur_2);
             expression->fonction.visible = 0;
             expression->button_visibilite.bt.image = expression->image_button_invisible;
             return;

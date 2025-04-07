@@ -4,8 +4,6 @@
 #include <string.h>
 #include <ctype.h>
 
-#define TailleMax 20
-
 /**
  * Retire tout les espaces de l'expression
  * @param Expression : chaine de caractère qui contient l'expression 
@@ -88,7 +86,7 @@ typejeton TokenReel (char *Element , int* erreur);
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */ 
-void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int  Dimension);
+void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TAILLE_MAX],int* erreur,int  Dimension);
 
 
 /**
@@ -104,7 +102,7 @@ int PlusieursVirgules (char *nombre);
  * @param erreur : pointeur vers une variable qui contiendra le numéro de l'erreur
  * @param Dimension : 0 si on est en 2 dimension et 1 si on est en 3 dimentions
  */
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension);
+void Analyse_Lexicale (typejeton TabToken[TAILLE_MAX],char Expression[TAILLE_MAX],int* erreur,int  Dimension);
 
 //*erreur = 101;
 

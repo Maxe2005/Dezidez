@@ -6,7 +6,7 @@
 #include "Gestion_3D/grapheur_3D.h"
 
 #define NB_BOUTONS_ACCUEIL 4
-#define NB_LANGUES 2
+#define NB_LANGUES 4
 
 typedef struct {
     SDL_Rect track;         // Rectangle représentant la track
