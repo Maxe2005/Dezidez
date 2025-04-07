@@ -12,6 +12,7 @@
 #include "cJSON/cJSON.h"
 #include "evaluateur.h"
 #include "Analyse_lexicale.h"
+#include "syntaxe.h"
 
 #define TAILLE_BANDE_DESCRIPTIONS 40 
 #define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)

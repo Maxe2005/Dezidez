@@ -7,7 +7,6 @@
 #include <string.h>
 #include <float.h>
 #include "Structures.h"
-#include "affiche_syntaxe.h"
 
 /**
  * Table de priorité des opérateurs
@@ -83,5 +82,11 @@ int findExpressionLength(typejeton *tab);
  * @return Un pointeur vers la racine de l'arbre syntaxique construit
  */
 Node* buildSyntaxTree(typejeton *tab, typeerreur *erreur);
+
+/**
+ * Libère la mémoire allouée pour un arbre syntaxique
+ * @param racine Pointeur vers la racine de l'arbre à libérer
+ */
+void liberer_arbre(Node* racine);
 
 #endif
