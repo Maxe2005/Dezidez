@@ -159,6 +159,7 @@ bool parenthese(int debut, int fin, typejeton *tab){
 
 Node* Syntaxique(typejeton *tab, typeerreur *erreur){
     int fin = calculTaille(tab);
+    if (syntaxeVerbose >= 10) printf("calculTaille fin=%d\n", fin);
     if(fin == -1) {
         *erreur = ABSENCE_FIN;
         return arbrevide();

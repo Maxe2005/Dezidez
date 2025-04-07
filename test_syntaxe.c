@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-static int nbTests = 0;
+static int nbTests = 0; // Compte le nombre de tests réalisés 
 
 // Fonction principale qui exécute tous les tests
 void tester_syntaxe() {
@@ -12,16 +12,16 @@ void tester_syntaxe() {
     test_5_plus_etoile_3_erreur();
     test_8_fois_plus_2_erreur();
     test_5_plus_erreur();
-    test_parenthese_ouverte_5_erreur();
+    test_parenthese_ouverte_5_plus_erreur();
     test_cos_parenthese_ouverte_5_erreur();
-    test_cos_3_fois_cos_2_valide();
-    test_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide();
-    test_4_minus_53_erreur();
+    test_sin_3_fois_cos_2_valide();
+    test_cos_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide();
+    test_4_minus_53_valide();
     test_0_plus_0_valide();
     test_5_3_minus_4_2_valide();
     test_10_div_33_valide();
     test_3_valide();
-    test_parenthese_ouverte_erreur();
+    test_parenthese_erreur();
     test_X_valide();
     test_div_plus_moins_erreur();
     test_1_plus_2_plus_3_valide();
@@ -33,11 +33,15 @@ void tester_syntaxe() {
     test_expression_longue_valide();
     test_cos_valeur_tres_grande_valide();
     test_valeur_precise_valide();
+    test_sin_X_valide();
     test_XEXP_erreur();
     test_val_neg_valide();
-    test_sinc();
-    test_plus_3_valide();
-    test_sin_neg_x_valide();
+    test_sin_neg_x_erreur();
+    test_plus_3_erreur();
+    test_sinc_3_div_0_valide();
+    test_parenthese_ouverte_7_fois_2_sans_fin_erreur();
+    test_parenthese_ferme_5_plus_2_erreur();
+    test_5_plus_parenthese_ferme_2_erreur();
 }
 
 // Fonctions de test
@@ -161,7 +165,7 @@ void test_5_plus_etoile_3_erreur() {
 
 void test_8_fois_plus_2_erreur() {
     // 8 * + 2
-    typejeton tab[] = { {REEL, {.reel = 8.0}}, {OPERATEUR, {.operateur = FOIS}}, {OPERATEUR, {.operateur = PUIS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
+    typejeton tab[] = { {REEL, {.reel = 8.0}}, {OPERATEUR, {.operateur = FOIS}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
@@ -191,7 +195,7 @@ void test_5_plus_erreur() {
     }
 }
 
-void test_parenthese_ouverte_5_erreur() {
+void test_parenthese_ouverte_5_plus_erreur() {
     // (5 +
     typejeton tab[] = { {PAR_OUV, {0}}, {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {FIN, {0}} };
     typeerreur erreur = 0;
@@ -209,21 +213,21 @@ void test_parenthese_ouverte_5_erreur() {
 
 void test_cos_parenthese_ouverte_5_erreur() {
     // cos(5
-    typejeton tab[] = { {FONCTION, {.fonction = COS}}, {REEL, {.reel = 5.0}}, {FIN, {0}} };
+    typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 5.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
     // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
-    if (syntaxeVerbose >= 1) printf("Test %d : cos(5 : %s. Erreur = %s\n", ++nbTests, (erreur == PROBLEME_PARENTHESES_FONCTIONS) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
+    if (syntaxeVerbose >= 1) printf("Test %d : cos(5 : %s. Erreur = %s\n", ++nbTests, (erreur == PROBLEMES_NOMBRE_PARENTHESES) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
     if (arbre_syntaxique != NULL) {
         liberer_arbre(arbre_syntaxique);
     }
 }
 
-void test_cos_3_fois_cos_2_valide() {
+void test_sin_3_fois_cos_2_valide() {
     // Tableau de jetons pour l'expression "sin(3) * cos(2)"
     typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {REEL, {.reel = 3.0}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = FOIS}}, {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 2.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
 
@@ -279,7 +283,7 @@ void test_cos_3_fois_cos_2_valide() {
     liberer_arbre(racine);
 }
 
-void test_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide() {
+void test_cos_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide() {
     typejeton tab[] = { {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 3.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 6.0}}, {OPERATEUR, {.operateur = FOIS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = PLUS}}, {FONCTION, {.fonction = COS}}, {PAR_OUV, {0}}, {REEL, {.reel = 7.0}}, {PAR_FERM, {0}}, {OPERATEUR, {.operateur = FOIS}}, {PAR_OUV, {0}}, {REEL, {.reel = 12.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
 
     typeerreur erreur = 0;
@@ -364,43 +368,13 @@ void test_3_plus_6X_fois_cos_7_fois_parenthese_12_plus_3_valide() {
     liberer_arbre(racine);
 }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-void test_4_minus_53_erreur() {
+void test_4_minus_53_valide() {
     // Expression: 4 - 53
     typejeton tab[] = { {REEL, {.reel = 4.0}}, {OPERATEUR, {.operateur = MOINS}}, {REEL, {.reel = 53.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
-    // Comparer les arbres
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
     bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
     if (syntaxeVerbose >= 1) printf("Test %d : 4 - 53 : %s. Erreur = %s\n", ++nbTests, (erreur == 0) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
@@ -514,7 +488,7 @@ void test_3_valide() {
     liberer_arbre(racine);
 }
 
-void test_parenthese_ouverte_erreur() {
+void test_parenthese_erreur() {
     // Expression: ()
     typejeton tab[] = { {PAR_OUV, {0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
@@ -611,8 +585,8 @@ void test_cos_erreur() {
     Node* racine = (Node*)malloc(sizeof(Node));
     racine->jeton.lexem = FONCTION; racine->jeton.valeur.fonction = COS; racine->pjeton_preced = NULL; racine->pjeton_suiv = NULL;
 
-    // Comparer les arbres
-    bool arbres_identiques = true;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
     if (syntaxeVerbose >= 1) printf("Test %d : cos : %s. Erreur = %s\n", ++nbTests, (erreur == PROBLEME_PARENTHESES_FONCTIONS && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
@@ -842,7 +816,7 @@ void test_valeur_precise_valide() {
     liberer_arbre(racine);
 }
 
-void test_sin_X_erreur() {
+void test_sin_X_valide() {
     // Expression: SIN( X )
     typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
@@ -873,26 +847,15 @@ void test_XEXP_erreur() {
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
-    // Construction manuelle de l'arbre attendu: X * EXP
-    Node* racine = (Node*)malloc(sizeof(Node));
-    racine->jeton.lexem = OPERATEUR; racine->jeton.valeur.operateur = FOIS;
-
-    Node* varX = (Node*)malloc(sizeof(Node));
-    varX->jeton.lexem = VARIABLE; varX->jeton.valeur.variable = 'X'; varX->pjeton_preced = NULL; varX->pjeton_suiv = NULL;
-
-    Node* expX = (Node*)malloc(sizeof(Node));
-    expX->jeton.lexem = FONCTION; expX->jeton.valeur.fonction = EXP; expX->pjeton_preced = NULL; expX->pjeton_suiv = NULL;
-
-    racine->pjeton_preced = varX; racine->pjeton_suiv = expX;
-
-    // Comparer les arbres
-    bool arbres_identiques = true;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
     if (syntaxeVerbose >= 1) printf("Test %d : X * EXP : %s. Erreur = %s\n", ++nbTests, (erreur == PROBLEME_PARENTHESES_FONCTIONS && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
     // Libération de la mémoire
-    liberer_arbre(arbre_syntaxique);
-    liberer_arbre(racine);
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
 }
 
 void test_val_neg_valide() {
@@ -910,8 +873,8 @@ void test_val_neg_valide() {
 
     racine->pjeton_preced = varV; racine->pjeton_suiv = NULL;
 
-    // Comparer les arbres
-    bool arbres_identiques = true;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
     if (syntaxeVerbose >= 1) printf("Test %d : -V : %s. Erreur = %s\n", ++nbTests, (erreur == MEMBRE_VIDE && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
@@ -920,15 +883,47 @@ void test_val_neg_valide() {
     liberer_arbre(racine);
 }
 
-void test_sinc() {
+void test_plus_3_erreur() {
+    // Expression: +3
+    typejeton tab[] = { {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
+    typeerreur erreur = 0;
+    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
+
+    if (syntaxeVerbose >= 1) printf("Test %d : +3 : %s. Erreur = %s\n", ++nbTests, (erreur == MEMBRE_VIDE && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
+
+    // Libération de la mémoire
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
+}
+
+void test_sin_neg_x_erreur() {
+    // Expression: sin(-x)
+    typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {OPERATEUR, {.operateur = MOINS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
+    typeerreur erreur = 0;
+    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
+
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
+
+    if (syntaxeVerbose >= 1) printf("Test %d : sin(-X) : %s. Erreur = %s\n", ++nbTests, (erreur == MEMBRE_VIDE && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
+
+    // Libération de la mémoire
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
+}
+
+void test_sinc_3_div_0_valide() {
     // Expression: SINC(3/0)
     typejeton tab[] = { {FONCTION, {.fonction = SINC}}, {PAR_OUV, {0}}, {REEL, {.reel = 3.0}}, {OPERATEUR, {.operateur = DIV}}, {REEL, {.reel = 0.0}}, {PAR_FERM, {0}}, {FIN, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
     // Construction manuelle de l'arbre attendu: SINC(3/0)
-
-
     Node* racine = (Node*)malloc(sizeof(Node));
     racine->jeton.lexem = FONCTION; racine->jeton.valeur.fonction = 1;
 
@@ -960,58 +955,50 @@ void test_sinc() {
     }
 }
 
-void test_plus_3_valide() {
-    // Expression: +3
-    typejeton tab[] = { {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 3.0}}, {FIN, {0}} };
+void test_parenthese_ouverte_7_fois_2_sans_fin_erreur() {
+    typejeton tab[] = { {PAR_OUV, {0}}, {REEL, {.reel = 7.0}}, {OPERATEUR, {.operateur = FOIS}}, {REEL, {.reel = 2.0}}, {PAR_FERM, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
-    // Construction manuelle de l'arbre attendu: +3
-    Node* racine = (Node*)malloc(sizeof(Node));
-    racine->jeton.lexem = OPERATEUR; racine->jeton.valeur.operateur = PLUS;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
-    Node* val3 = (Node*)malloc(sizeof(Node));
-    val3->jeton.lexem = REEL; val3->jeton.valeur.reel = 3.0; val3->pjeton_preced = NULL; val3->pjeton_suiv = NULL;
-
-    racine->pjeton_preced = NULL; racine->pjeton_suiv = val3;
-
-    // Comparer les arbres
-    bool arbres_identiques = true;
-
-    if (syntaxeVerbose >= 1) printf("Test %d : +3 : %s. Erreur = %s\n", ++nbTests, (erreur == MEMBRE_VIDE && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
+    if (syntaxeVerbose >= 1) printf("Test %d : (7 * 2) sans fin : %s. Erreur = %s\n", ++nbTests, (erreur == ABSENCE_FIN && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
     // Libération de la mémoire
-    liberer_arbre(arbre_syntaxique);
-    liberer_arbre(racine);
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
 }
 
-void test_sin_neg_x_valide() {
-    // Expression: sin(-x)
-    typejeton tab[] = { {FONCTION, {.fonction = SIN}}, {PAR_OUV, {0}}, {OPERATEUR, {.operateur = MOINS}}, {VARIABLE, {.variable = 'X'}}, {PAR_FERM, {0}}, {FIN, {0}} };
+void test_parenthese_ferme_5_plus_2_erreur() {
+    // (5 +
+    typejeton tab[] = { {PAR_FERM, {0}}, {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {REEL, {.reel = 2.0}}, {FIN, {0}} };
     typeerreur erreur = 0;
     Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
-    // Construction manuelle de l'arbre attendu: sin(-X)
-    Node* racine = (Node*)malloc(sizeof(Node));
-    racine->jeton.lexem = FONCTION; racine->jeton.valeur.fonction = SIN;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
-    Node* negX = (Node*)malloc(sizeof(Node));
-    negX->jeton.lexem = OPERATEUR; negX->jeton.valeur.operateur = MOINS;
+    if (syntaxeVerbose >= 1) printf("Test %d : )5 + 2 : %s. Erreur = %s\n", ++nbTests, (erreur == PROBLEMES_NOMBRE_PARENTHESES) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
-    Node* varX = (Node*)malloc(sizeof(Node));
-    varX->jeton.lexem = VARIABLE; varX->jeton.valeur.variable = 'X'; varX->pjeton_preced = NULL; varX->pjeton_suiv = NULL;
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
+}
 
-    negX->pjeton_preced = varX;
-    negX->pjeton_suiv = NULL;
-    racine->pjeton_preced = negX;
-    racine->pjeton_suiv = NULL;
+void test_5_plus_parenthese_ferme_2_erreur() {
+    // (5 +
+    typejeton tab[] = { {REEL, {.reel = 5.0}}, {OPERATEUR, {.operateur = PLUS}}, {PAR_FERM, {0}}, {REEL, {.reel = 2.0}}, {PAR_OUV, {0}}, {FIN, {0}} };
+    typeerreur erreur = 0;
+    Node* arbre_syntaxique = Syntaxique(tab, &erreur);
 
-    // Comparer les arbres
-    bool arbres_identiques = true;
+    // Dans ce cas, on attend une erreur, pas d'arbre à comparer
+    bool arbres_identiques = true; // Non applicable mais nécessaire pour l'affichage
 
-    if (syntaxeVerbose >= 1) printf("Test %d : sin(-X) : %s. Erreur = %s\n", ++nbTests, (erreur == MEMBRE_VIDE && arbres_identiques) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
+    if (syntaxeVerbose >= 1) printf("Test %d : )5 + 2( : %s. Erreur = %s\n", ++nbTests, (erreur == PARENTHESE_FERMEE_1_ER_JETON) ? "\033[0;32mOK\033[0m" : "\033[0;31mECHEC\033[0m", get_error_message[erreur]);
 
-    // Libération de la mémoire
-    liberer_arbre(arbre_syntaxique);
-    liberer_arbre(racine);
+    if (arbre_syntaxique != NULL) {
+        liberer_arbre(arbre_syntaxique);
+    }
 }
