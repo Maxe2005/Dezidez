@@ -330,7 +330,7 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
-        typejeton TabToken[TailleMax] = {};
+        typejeton TabToken[TAILLE_MAX+1] = {};
         int dim;
         if (dimention == _2D) dim = 0;
         if (dimention == _3D) dim = 1;
