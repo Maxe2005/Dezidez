@@ -235,8 +235,8 @@ typejeton TokenReel (char *Element, int* erreur){
 }  
 
 
-void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur,int dimension) {
-    char buffer[TailleMax];
+void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TAILLE_MAX],int* erreur,int dimension) {
+    char buffer[TAILLE_MAX];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
     int lenchiffre = 11;
     char *op[] = {"+","-","*","/","**"};
@@ -264,7 +264,7 @@ void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[Taille
         // Traitement des nombres
         if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
             int longueurdunombre = 0;
-            char reschiffre[TailleMax] = "";
+            char reschiffre[TAILLE_MAX] = "";
 
             // Continue tant que tu trouves des chiffres
             while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
@@ -318,7 +318,7 @@ void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[Taille
         //gestion des fonction et variable apparement
         else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
             int longueurident = 0;
-            char residentificateur[TailleMax] = "";
+            char residentificateur[TAILLE_MAX] = "";
 
             while (i + longueurident < SizeExpression && str[i + longueurident] != '\0') {
                 strenchainedecarac[0] = str[i + longueurident];
@@ -352,9 +352,9 @@ void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[Taille
     TabToken[indiceinjection].lexem = FIN;
 }
 
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur,int  Dimension){
+void Analyse_Lexicale (typejeton TabToken[TAILLE_MAX],char Expression[TAILLE_MAX],int* erreur,int  Dimension){
     int tailleExpression = strlen(Expression);
-    char buffert[TailleMax];
+    char buffert[TAILLE_MAX];
     ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
     MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
     tailleExpression = strlen(Expression);
