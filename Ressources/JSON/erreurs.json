@@ -9,6 +9,13 @@
         "103": { "message": "Caractère inconnu", "severity": "medium" },
         "104": { "message": "Variable inconnue", "severity": "medium" },
 
+        "201": { "message": "Parenthèse manquante pour la fonction", "severity": "medium" },
+        "211": { "message": "Opération incomplète", "severity": "medium" },
+        "221": { "message": "Parenthèse fermée avant d'être ouverte", "severity": "medium" },
+        "223": { "message": "Erreur dans le nombre de parenthèses", "severity": "medium" },
+        "231": { "message": "Deux réels adjacents", "severity": "medium" },
+        "241": { "message": "Jeton de fin manquant", "severity": "medium" },
+
         "301": { "message": "Racine négative", "severity": "medium" },
         "302": { "message": "Logarithme négatif", "severity": "medium"},
         "303": { "message": "Logarithme nul", "severity": "medium"},
@@ -30,5 +37,59 @@
         "311": { "message": "Division by Zero", "severity": "medium"},
         "312": { "message": "Zero to the power of Zero", "severity": "medium"},
         "313": { "message": "Zero to the power of negative number", "severity": "medium"}
+    },
+    
+    "es": {
+        "1": { "message": "PROBLEMA DE CONVERSIÓN", "severity": "low" },
+        "2": { "message": "LÍMITE INFERIOR SUPERIOR AL LÍMITE SUPERIOR", "severity": "low" },
+        "3": { "message": "LÍMITE SUPERIOR INFERIOR AL LÍMITE INFERIOR", "severity": "low" },
+        
+        "101": { "message": "Función desconocida", "severity": "high" },
+        "102": { "message": "Número no válido", "severity": "medium" },
+        "103": { "message": "Carácter desconocido", "severity": "medium" },
+        "104": { "message": "Variable desconocida", "severity": "medium" },
+
+        "201": { "message": "Paréntesis faltante para la función", "severity": "medium" },
+        "211": { "message": "Operación incompleta", "severity": "medium" },
+        "221": { "message": "Paréntesis cerrado antes de ser abierto", "severity": "medium" },
+        "223": { "message": "Error en el número de paréntesis", "severity": "medium" },
+        "231": { "message": "Dos números reales adyacentes", "severity": "medium" },
+        "241": { "message": "Falta el token de fin", "severity": "medium" },
+
+        "301": { "message": "Raíz negativa", "severity": "medium" },
+        "302": { "message": "Logaritmo negativo", "severity": "medium" },
+        "303": { "message": "Logaritmo nulo", "severity": "medium" },
+        "304": { "message": "Tangente nula", "severity": "medium" },
+        "305": { "message": "Seno cardinal nulo", "severity": "medium" },
+        "311": { "message": "División por cero", "severity": "medium" },
+        "312": { "message": "Cero elevado a cero", "severity": "medium" },
+        "313": { "message": "Cero elevado a un exponente negativo", "severity": "medium" }
+    },
+    "al": {
+        "1": { "message": "KONVERTIERUNGSPROBLEM", "severity": "low" },
+        "2": { "message": "UNTERE GRANZE ÜBER OBERE GRANZE", "severity": "low" },
+        "3": { "message": "OBERE GRANZE UNTER UNTERER GRANZE", "severity": "low" },
+        
+        "101": { "message": "Unbekannte Funktion", "severity": "high" },
+        "102": { "message": "Ungültige Zahl", "severity": "medium" },
+        "103": { "message": "Unbekanntes Zeichen", "severity": "medium" },
+        "104": { "message": "Unbekannte Variable", "severity": "medium" },
+
+        "201": { "message": "Fehlende Klammer für die Funktion", "severity": "medium" },
+        "211": { "message": "Unvollständige Operation", "severity": "medium" },
+        "221": { "message": "Klammer wurde geschlossen, bevor sie geöffnet wurde", "severity": "medium" },
+        "223": { "message": "Fehler bei der Anzahl der Klammern", "severity": "medium" },
+        "231": { "message": "Zwei benachbarte reale Zahlen", "severity": "medium" },
+        "241": { "message": "Fehlendes Endzeichen", "severity": "medium" },
+
+        "301": { "message": "Negative Wurzel", "severity": "medium" },
+        "302": { "message": "Negativer Logarithmus", "severity": "medium" },
+        "303": { "message": "Null Logarithmus", "severity": "medium" },
+        "304": { "message": "Null Tangens", "severity": "medium" },
+        "305": { "message": "Null Kardinal Sinus", "severity": "medium" },
+        "311": { "message": "Division durch Null", "severity": "medium" },
+        "312": { "message": "Null hoch Null", "severity": "medium" },
+        "313": { "message": "Null hoch negative Zahl", "severity": "medium" }
     }
+
 }

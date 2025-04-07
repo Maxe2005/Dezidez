@@ -113,27 +113,133 @@ Pour l'expression '"2x + sin(3.5)"' avec 'Dimension' = 0:
    * PAR_FERM
    * FIN
 
+# Dezidez
+Le projet consiste en la réalisation d'un grapheur d'expressions fonctionnelles, c'est à dire d'un logiciel destiné à représenter graphiquement des expressions du type: sin(x*abs(x))+2 , exp(x+(6*log(x+1))) etc...
 
 
+## Fichier : syntaxe.c
+
+### createEmptyNode
+
+utilité: Renvoie un arbre vide
+
+Prend en paramètre:
+
+        -Rien
+
+Fonctionnement de la fonction:
+
+        -Créée de fg et fd vides
+
+ 
+### buildExpressionTree
+
+utilité: Construit récursivement l'arbre à partir d'un tableau de jetons
+
+Prend en paramètre:
+
+        -un tableau de jetons
+        -l'indice de la première case à analyser
+        -l'indice de la dernière case à analyser
+        -l'erreur récupérée par le dernier appel récursif (l'erreur par défaut est 0).
+
+Fonctionnement de la fonction:
+
+        Si présence d'erreur au dernier appel récursif: renvoie un arbre vide au bout de la branche
+
+        Si l'indice du début > indice de fin : renvoie erreur = MEMBRE_VIDE
+
+        S'il y a un opérateur: scission de l'arbre sur l'opérateur en fg et fd.
+
+        Sinon, renvoie une erreur dans les cas suivant :
+
+                - PROBLEME_PARENTHESES_FONCTIONS : manque une parenthèse après une fonction ou si la parenthèse ne se ferme pas
+                - MEMBRE_VIDE : si un opérateur n'est pas entouré d'objets traitables, si des parenthèses sont vides
+                - PARENTHESE_FERMEE_1_ER_JETON : si une parenthèse est fermée sans avoir été ouverte
+                - PROBLEMES_NOMBRE_PARENTHESES : si le nombre de parenthèses ouvrante est différent du nombre de parenthèses fermentes
+                - PROBLEME_APRES_REEL_OU_VARIABLE : Supposé impossible
+                - ABSENCE_FIN : si le jeton "FIN" est manquant
+
+### findLowestPriorityOperator
+
+Utilité: Renvoie l'opérateur où faire la scission entre le fg et le fd.
+
+Prend en paramètre:
+
+        -un tableau de jetons
+        -l'indice de la première case à analyser
+        -l'indice de la dernière case à analyser
+        -l'erreur récupérée par le dernier appel récursif (l'erreur par défaut est 0).
+
+Fonctionnement de la fonction:
+
+        Initialise la profondeur de complexité des parenthèses à 0.
+
+        Met par défaut l'indice de scission à -1 .
+                
+                indiceOperateurMinimal = -1 si pas d'opérateur dans la fonction
+
+        prioritéOperateurMinimal représente l'opérateur sur lequel séparer le tableau de jetons.
+        
+        Parcours le tableau case par case et regarde s'il y a un opérateur
+        
+                Si la case est un opérateur, que la profondeur actuelle des parenthèses est nulle et que l'opérateur de la case actuelle est plus propice à la scission:
+                        indiceOperateurMinimal = indice actuel
+                        prioriteOperateurMinimal = case actuelle
+        
+                Si la case est une PAR_OUV:
+                        la profondeur liée aux parenthèses augmente
+
+                Si la case est une PAR_FERM:
+                        la profondeur liée aux parenthèses diminue
+                
+
+                Si la profondeur des parenthèses n'est pas nulle (=> nombre de PAR_OUV != nombre de PAR_FERM
+                        erreur = PROBLEMES_NOMBRE_PARENTHESES
 
 
+### findExpressionLength
 
+Utilité: Renvoie la taille du tableau
 
+Prend en paramètre:
 
+        -Un tableau de jetons
 
+Fonctionnement de la fonction:
+        
+        Parcours le tableau et si la case est une case fin, la fonction s'arrête
+        Si aucune FIN n'est trouvée alors fin = -1
 
+### checkParenthesesBalance
 
+Utilité: Renvoie un booléen par rapport à l'équilibre du nombre de parenthèses.
 
+Prend en paramètre:
 
+        -indice du début du tableau à analyser
+        -indice de fin du tableau à analyser
+        -le tableau de jetons
 
+Fonctionnement de la fonction:
 
+        Parcours le tableau et compte le nombre de PAR_OUV et de PAR_FERM
+        
 
+### buildSyntaxTree
 
+Utilité: Construit l'arbre syntaxique complet à partir d'une séquence de jetons
 
+Prend en paramètre:
 
+        -le tableau de jetons
+        -la dernière erreur renvoyée par buildExpressionTree (0 pour le premier appel)
 
+Fonctionnement de la fonction:
 
-
+        Vérifie si le jeton FIN existe
+        S'il existe alors l'abre se construit en appelant buildExpressionTree
+        Sinon erreur = ABSENCE_FIN
 
 
 # PARTIE EVALUATEUR :
