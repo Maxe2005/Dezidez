@@ -105,7 +105,7 @@ void MultiplicationImplicite (char *Expression,int SizeExpression,char *buffer){
     int i;
     int j =0;
     //on parcour Expression
-    for ( i = 0; i < SizeExpression-1; i++){
+    for ( i = 0; i < SizeExpression; i++){
         if ((IsInTab(chiffre,10,Expression[i]))&& (IsInTab(variable,2,Expression[i+1]))){//si Expression[i] est un chiffre et si Expression[i+1] est une varible
             
             buffer[j]=Expression[i];

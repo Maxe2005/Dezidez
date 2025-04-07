@@ -35,7 +35,7 @@
 int main (){
 
     typejeton TokenListe[TailleMax]; //tableau de sortie
-    char str[TailleMax]  = "1/(x**2 + y**2)" ; //expression tester
+    char str[TailleMax]  = "sin(x)" ; //expression tester
     int erreur = 0; //on initialise l'erreur (0 par défault)
     Analyse_Lexicale(TokenListe,str,&erreur,1);
 
