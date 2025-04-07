@@ -6,7 +6,7 @@
 
 #include "Structures.h"
 #include "affiche_syntaxe.h"
-#include "priorite.h"
+#include "syntaxe.h"
 
 void tester_syntaxe();
 

@@ -7,7 +7,6 @@
 #include "Structures.h"
 #include "affiche_syntaxe.h"
 #include "syntaxe.h"
-#include "priorite.h"
 #include "test_syntaxe.h"
 
 
