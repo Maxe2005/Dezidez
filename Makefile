@@ -7,7 +7,7 @@ CC := gcc
 SRC_DIRS := ./
 
 # set the compiler flags
-CFLAGS := -lm -lc
+CFLAGS := -lm
 
 # name of executable
 EXEC := main
@@ -22,7 +22,7 @@ main_compile_only:
 	$(CC) main.c -o $(EXEC) $(CFLAGS)
 
 run:
-	./$(EXEC)
+	@ ./$(EXEC)
 
 # clear the terminal
 clear:
