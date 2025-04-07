@@ -1,7 +1,5 @@
 #include "bande_haute.h"
 
-Message message;
-
 void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
     int num_element_du_premier_champs = 3;
@@ -9,7 +7,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
     bande_haute->texte_descriptif_borne_sup = malloc(sizeof(Button));
     bande_haute->texte_descriptif_expression = malloc(sizeof(Button));
     Button* but[] = {bande_haute->texte_descriptif_borne_inf, bande_haute->texte_descriptif_borne_sup, bande_haute->texte_descriptif_expression};
-    char* noms[] = {"Borne inférieure", "Borne supérieure", "Expression"};
+    char* id[] = {"Borne_inf", "Borne_sup", "expression"};
     int x = calcul_pos(params.width_elements, params.espace_entre_elements, num_element_du_premier_champs);
     for (int j = 0; j < 3; j++){
         but[j]->rect.w = params.width_elements[j+num_element_du_premier_champs];
@@ -18,7 +16,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
         x += params.width_elements[j+num_element_du_premier_champs] + params.espace_entre_elements;
         but[j]->rect.y = (TAILLE_BANDE_DESCRIPTIONS - but[j]->rect.h)/2 ;
         but[j]->is_survolable = 0;
-        but[j]->label = noms[j];
+        but[j]->label = get_texte("Bande_haute", id[j]);
         but[j]->color_text = colors->texte_descriptifs_bande_haut;
         but[j]->color_base = colors->bande_haute_description;
         but[j]->font_text = fonts[4];
@@ -131,6 +129,8 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
 
 void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut){
     expression->entree_selectionnee = SELECTION_NULL;
+    expression->is_moving = false;
+    expression->moving_offset = 0;
     expression->rect_initial.x = surface_bande_haut.x;
     expression->rect_initial.h = params.height_bande_expression;
     expression->rect_initial.y = surface_bande_haut.y + expression->numero * (expression->rect_initial.h); // pour centrer : (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but[j]->champs_texte->rect.h)/2 ;
@@ -289,12 +289,13 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
         float test = strtof(expression->borne_inf->text, &end);
         if (*end != '\0') {
             strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_inf->champs_texte->rect);
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         
         } else if(test > expression->fonction.borne_sup){
             strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
-            set_message("BORNE INF SUPERIEUR A BORNE SUP", expression->borne_inf->champs_texte->rect);
+            ErrorInfo error = get_error_message(2);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         }
         else {
             strcpy(expression->borne_inf->text_backup, expression->borne_inf->text);
@@ -310,12 +311,13 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
         float test = strtof(expression->borne_sup->text, &end);
         if (*end != '\0') {
             strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_sup->champs_texte->rect);
-        } 
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
+        }
         else if(expression->fonction.borne_inf > test){
             strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
-            set_message("BORNE SUP INFERIEUR A BORNE INF", expression->borne_sup->champs_texte->rect);
+            ErrorInfo error = get_error_message(3);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
         }
         else {
             strcpy(expression->borne_sup->text_backup, expression->borne_sup->text);
@@ -329,8 +331,20 @@ void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
         typejeton TabToken[TailleMax] = {};
+        int dim;
+        if (dimention == _2D) dim = 0;
+        if (dimention == _3D) dim = 1;
+        else dim = 0;
         int erreur = 0;
-        Analyse_Lexicale(TabToken, expression->expression->text, &erreur);
+        Analyse_Lexicale(TabToken, expression->expression->text, &erreur, dim);
+        if (erreur){
+            set_probleme(erreur);
+            expression->fonction.visible = 0;
+            expression->button_visibilite.bt.image = expression->image_button_invisible;
+            return;
+        }
+        expression->fonction.visible = 1;
+        expression->button_visibilite.bt.image = expression->image_button_visible;
         expression->expression->position_cursor = strlen(expression->expression->text);
     }
 }
@@ -340,17 +354,6 @@ void execute_champs_select_and_change_focus (Expression_fonction* expression, Se
     if (expression->entree_selectionnee == BORNE_SUP) charge_valeur_borne_sup(expression);
     if (expression->entree_selectionnee == EXPRESSION) execute_expression(expression);
     expression->entree_selectionnee = nouvelle_entree;
-}
-
-void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
-    message.start_time = time(NULL);
-    message.button_base.label = text_erreur;
-    message.is_visible = 1;
-    message.button_base.rect.x = endroit_erreur.x;
-    message.button_base.rect.y = endroit_erreur.y + FEN_Y/16;
-    message.button_base.rect.w = FEN_X/4;
-    message.button_base.rect.h = FEN_Y/16;
-
 }
 
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
@@ -384,40 +387,87 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
     }
 }
 
+void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression){
+    Entree_texte *target_champs = NULL;
+    const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
+    boxRGBA(ren, expression->rect_affiche.x, expression->rect_affiche.y, expression->rect_affiche.x + expression->rect_affiche.w, expression->rect_affiche.y + expression->rect_affiche.h, expression->bg_color.r, expression->bg_color.g, expression->bg_color.b, expression->bg_color.a);
+    for (int i = 0; i < NB_ENTREES; i++) {
+        target_champs = expression->champs_entrees[i];
+        if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
+            target_champs->cursorVisible = !target_champs->cursorVisible;
+            target_champs->lastCursorToggle = SDL_GetTicks();
+        }
+        if (i != expression->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
+            target_champs->champs_texte->label = texte_defaut[i];
+        } else {
+            strcpy(target_champs->display, target_champs->text);
+            if (expression->entree_selectionnee == target_champs->type_entree){
+                if (target_champs->cursorVisible){
+                    insert_char(target_champs->display, target_champs->position_cursor, '|');
+                } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+            }
+            target_champs->champs_texte->label = target_champs->display;
+        }
+        renderButton(ren, target_champs->champs_texte);
+    }
+    affiche_boutton_color_picker(ren, expression->color_picker);
+    renderImageButton(ren, &expression->button_deplacement.bt);
+    renderImageButton(ren, &expression->button_visibilite.bt);
+    renderImageButton(ren, &expression->button_delete.bt);
+}
+
+void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* expression, int motion){
+    expression->moving_offset += motion;
+    bool is_on = true;
+    if (expression->rect_initial.y - bande_haute->scroll_offset + expression->moving_offset < bande_haute->surface.y){
+        expression->moving_offset = bande_haute->surface.y - expression->rect_initial.y + bande_haute->scroll_offset;
+        is_on = false;
+    }
+    if (expression->rect_initial.y + expression->rect_initial.h - bande_haute->scroll_offset + expression->moving_offset > bande_haute->surface.y + bande_haute->surface.h){
+        expression->moving_offset = bande_haute->surface.y + bande_haute->surface.h - expression->rect_initial.y + bande_haute->scroll_offset - expression->rect_initial.h;
+        is_on = false;
+    }
+    if (expression->numero < bande_haute->nb_expressions-1 && expression->moving_offset > bande_haute->params.height_bande_expression / 2){
+        expression->moving_offset = expression->moving_offset - bande_haute->params.height_bande_expression;
+        int i = expression->numero;
+        bande_haute->expressions[i] = bande_haute->expressions[i+1];
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, -1);
+        placement_pour_affichage_avec_offset(bande_haute->expressions[i], bande_haute->scroll_offset);
+        bande_haute->expressions[i+1] = expression;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i+1, 1);
+    } else if (expression->numero > 0 && 0-expression->moving_offset > bande_haute->params.height_bande_expression / 2){
+        expression->moving_offset = bande_haute->params.height_bande_expression + expression->moving_offset;
+        int i = expression->numero;
+        bande_haute->expressions[i] = bande_haute->expressions[i-1];
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, 1);
+        placement_pour_affichage_avec_offset(bande_haute->expressions[i], bande_haute->scroll_offset);
+        bande_haute->expressions[i-1] = expression;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i-1, -1);
+    }
+    if (!is_on) {
+        //expression->is_moving = false;
+        //placement_pour_affichage_avec_offset(expression, bande_haute->scroll_offset);
+    }
+}
+
 void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute){
     // Fond de la bande haute des champs
     affiche_bande_arrondis_en_bas(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_haute_expressions);
 
     // Texte affiché (ajoute un curseur clignotant)
-    const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
-    Entree_texte *target_champs = NULL;
+    int num_bande_moving = -1;
     for (int j = 0; j < bande_haute->nb_expressions; j++) {
-        if (bande_haute->expressions[j]->visible) {
-            boxRGBA(ren, bande_haute->expressions[j]->rect_affiche.x, bande_haute->expressions[j]->rect_affiche.y, bande_haute->expressions[j]->rect_affiche.x + bande_haute->expressions[j]->rect_affiche.w, bande_haute->expressions[j]->rect_affiche.y + bande_haute->expressions[j]->rect_affiche.h, bande_haute->expressions[j]->bg_color.r, bande_haute->expressions[j]->bg_color.g, bande_haute->expressions[j]->bg_color.b, bande_haute->expressions[j]->bg_color.a);
-            for (int i = 0; i < NB_ENTREES; i++) {
-                target_champs = bande_haute->expressions[j]->champs_entrees[i];
-                if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
-                    target_champs->cursorVisible = !target_champs->cursorVisible;
-                    target_champs->lastCursorToggle = SDL_GetTicks();
-                }
-                if (i != bande_haute->expressions[j]->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
-                    target_champs->champs_texte->label = texte_defaut[i];
-                } else {
-                    strcpy(target_champs->display, target_champs->text);
-                    if (bande_haute->expressions[j]->entree_selectionnee == target_champs->type_entree){
-                        if (target_champs->cursorVisible){
-                            insert_char(target_champs->display, target_champs->position_cursor, '|');
-                        } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
-                    }
-                    target_champs->champs_texte->label = target_champs->display;
-                }
-                renderButton(ren, target_champs->champs_texte);
-            }
-            affiche_boutton_color_picker(ren, bande_haute->expressions[j]->color_picker);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_deplacement.bt);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_visibilite.bt);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_delete.bt);
+        if (bande_haute->expressions[j]->is_moving){
+            num_bande_moving = j;
+            boxRGBA(ren, bande_haute->expressions[j]->rect_initial.x, bande_haute->expressions[j]->rect_initial.y - bande_haute->scroll_offset, bande_haute->expressions[j]->rect_initial.x + bande_haute->expressions[j]->rect_initial.w, bande_haute->expressions[j]->rect_initial.y - bande_haute->scroll_offset + bande_haute->expressions[j]->rect_initial.h, 
+                        170, 85, 85, 150);
+        } else if (bande_haute->expressions[j]->visible) {
+            affiche_bande_expression(ren, bande_haute->expressions[j]);
         }
+    }
+    if (num_bande_moving > -1){
+        placement_pour_affichage_avec_offset(bande_haute->expressions[num_bande_moving], bande_haute->scroll_offset - bande_haute->expressions[num_bande_moving]->moving_offset);
+        affiche_bande_expression(ren, bande_haute->expressions[num_bande_moving]);
     }
 
     // Fond de la bande haute des descriptions
@@ -444,35 +494,39 @@ void free_bande_expression (Expression_fonction* expression){
     free(expression);
 }
 
+void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction){
+    bande_haute->expressions[i]->numero = i;
+    if (bande_haute->expressions[i]->numero % 2 == 0){
+        bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_1;
+        bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_2;
+    } else {
+        bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_2;
+        bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_1;
+    }
+    bande_haute->expressions[i]->rect_initial.y += direction * bande_haute->params.height_bande_expression;
+    for (int j = 0; j < 3; j++) {
+        bande_haute->expressions[i]->champs_entrees[j]->position_initiale.y += direction * bande_haute->params.height_bande_expression;
+        
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base = bande_haute->expressions[i]->bg_color_oppo;
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover = bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base;
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover.a = 150;
+    }
+    bande_haute->expressions[i]->color_picker->boutton_y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_deplacement.rect_base.y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_visibilite.rect_base.y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_delete.rect_base.y += direction * bande_haute->params.height_bande_expression;
+
+    bande_haute->expressions[i]->button_deplacement.bt.color_base = bande_haute->expressions[i]->bg_color;
+    bande_haute->expressions[i]->button_visibilite.bt.color_base = bande_haute->expressions[i]->bg_color;
+    bande_haute->expressions[i]->button_visibilite.bt.color_hover = bande_haute->expressions[i]->bg_color_oppo;
+    bande_haute->expressions[i]->button_delete.bt.color_base = bande_haute->expressions[i]->bg_color;
+}
+
 void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
     free_bande_expression(bande_haute->expressions[num_expression]);
     for (int i = num_expression; i < bande_haute->nb_expressions - 1; i++) {
         bande_haute->expressions[i] = bande_haute->expressions[i+1];
-        bande_haute->expressions[i]->numero = i;
-        if (bande_haute->expressions[i]->numero % 2 == 0){
-            bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_1;
-            bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_2;
-        } else {
-            bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_2;
-            bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_1;
-        }
-        bande_haute->expressions[i]->rect_initial.y -= bande_haute->params.height_bande_expression;
-        for (int j = 0; j < 3; j++) {
-            bande_haute->expressions[i]->champs_entrees[j]->position_initiale.y -= bande_haute->params.height_bande_expression;
-            
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base = bande_haute->expressions[i]->bg_color_oppo;
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover = bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base;
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover.a = 150;
-        }
-        bande_haute->expressions[i]->color_picker->boutton_y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_deplacement.rect_base.y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_visibilite.rect_base.y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_delete.rect_base.y -= bande_haute->params.height_bande_expression;
-
-        bande_haute->expressions[i]->button_deplacement.bt.color_base = bande_haute->expressions[i]->bg_color;
-        bande_haute->expressions[i]->button_visibilite.bt.color_base = bande_haute->expressions[i]->bg_color;
-        bande_haute->expressions[i]->button_visibilite.bt.color_hover = bande_haute->expressions[i]->bg_color_oppo;
-        bande_haute->expressions[i]->button_delete.bt.color_base = bande_haute->expressions[i]->bg_color;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, -1);
     }
     bande_haute->nb_expressions--;
     action_apres_modif_offset(bande_haute);

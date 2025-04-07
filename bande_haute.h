@@ -19,8 +19,8 @@
 #define WIDTH_CHAMPS_BORNES 150
 #define WIDTH_CHAMP_EXPRESSION 300
 
-//extern Message message;
-
+extern Message message;
+extern Probleme probleme;
 
 typedef enum { // ! L'ordre est important pour l'initialisation des champs d'entrées. Il doit correspondre à celui de l'initialisation des champs d'entrées et la SELECTION_NULL doit être en dernier
     BORNE_INF,
@@ -28,13 +28,6 @@ typedef enum { // ! L'ordre est important pour l'initialisation des champs d'ent
     EXPRESSION,
     SELECTION_NULL
 } SelectionEntree;
-
-typedef struct {
-    Button button_base;
-    int temps_affichage; // en secondes
-    int is_visible;
-    time_t start_time;
-} Message;
 
 typedef struct {
     char text[MAX_LEN_STR + 1]; // +1 pour le /0 comme fin de chaine
@@ -83,6 +76,8 @@ typedef struct {
     Button_mvt button_delete;
     SDL_Texture* image_button_visible;
     SDL_Texture* image_button_invisible;
+    bool is_moving; // Pour savoir si la bande d'expression est en train d'être déplacée
+    int moving_offset; // Pour savoir de combien la bande d'expression a été déplacée
 } Expression_fonction;
 
 typedef struct {
@@ -126,6 +121,13 @@ typedef struct {
  * @param bande_haute La bande d'entrées à afficher
  */
 void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
+ * Affiche la bande d'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande à afficher
+ */
+void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression);
 
 /**
  * Initialise la bande d'entrées
@@ -254,13 +256,6 @@ void resize_bande_haut (Bande_haute* bande_haute);
 int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_element);
 
 /**
- * Redimmentionne la bande haute en fonction de la taille de la fenêtre et des autres éléments de la fenêtre à l'instant t
- * @param text_erreur message d'erreur affiché
- * @param endroit_erreur rectangle où l'erreur a été enregestré
- */
-void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
-
-/**
  * Permet de nettoyer la mémoire allouée pour une bande d'expression
  * @param expression La bande d'expression à nettoyer
  */
@@ -310,6 +305,22 @@ Exemples exemples_fonctions_2D ();
  * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
  */
 Exemples exemples_fonctions_3D ();
+
+/**
+ * Gère le mouvement de la bande d'expression
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param expression La bande de l'expression qui bouge
+ * @param motion La valeur du déplacement à effectuer.
+ */
+void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* expression, int motion);
+
+/**
+ * Permet de faire tous les changement néssecaires lorque l'ordre de position d'une bande d'expression est modifiée
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param i L'index de la nouvelle position de la bande d'expression à aclimater (elle doit déjà y avoir été déplacée)
+ * @param diection La direction du changement : 1 si l'index à augmenté, -1 si l'index à diminué. 
+ */
+void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction);
 
 
 #endif

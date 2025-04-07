@@ -1,0 +1,54 @@
+{
+    "Bande_haute":{
+        "borne_inf": {
+            "fr": "Borne inférieure",
+            "en": "Lower bound"
+        },
+        "borne_sup":{
+            "fr": "Borne supérieure",
+            "en": "Upper bound"
+        },
+        "expression": {
+            "fr": "Expression",
+            "en": "Expression"
+        }
+    },
+
+    "Bande_droite":{
+        "centrer":{
+            "fr": "Centrer",
+            "en": "Auto Scale"
+        }
+    },
+
+    "Acceuil":{
+        "titre":{
+            "fr": "Grapheur d'expressions fonctionnelles",
+            "en": "Graphing functional expressions"
+        },
+        "Mode_emploi":{
+            "fr": "Mode d'emploi",
+            "en": "User manual"
+        },
+        "Remerciements":{
+            "fr": "Remerciements",
+            "en": "Acknowledgements"
+        },
+        "Grapheur_2D":{
+            "fr": "Grapheur 2D",
+            "en": "2D Grapher"
+        },
+        "Grapheur_3D":{
+            "fr": "Grapheur 3D",
+            "en": "3D Grapher"
+        },
+        "Titre_page_remerciement":{
+            "fr": "Remerciements",
+            "en": "Acknowledgements"
+        },
+        "Titre_page_mode_emploi":{
+            "fr": "Mode d'emploi",
+            "en": "User manual"
+        }
+    }
+}

@@ -238,7 +238,7 @@ WrappedText text_wrapper (TTF_Font *font, const char *text, int x_max) {
     Ligne_texte* current_line = &wrapped_text.fist_ligne;
     Ligne_texte* last_line = NULL;
     int space_width, word_width, word_height;
-    TTF_SizeText(font, " ", &space_width, NULL);
+    TTF_SizeUTF8(font, " ", &space_width, NULL);
     char buffer[NB_MAX_CHAR_PAR_LIGNE] = "";
     const char *text_2 = strcpy(malloc(strlen(text)+1), text);
     char *text_copy = strdup(text_2);
@@ -264,7 +264,7 @@ WrappedText text_wrapper (TTF_Font *font, const char *text, int x_max) {
             }
             x = 0;
         } else {
-            TTF_SizeText(font, word, &word_width, &word_height);
+            TTF_SizeUTF8(font, word, &word_width, &word_height);
             if (x + word_width > x_max) {
                 if (buffer[0] == '\0'){
                     printf("Attention ! La longeur du rectangle dans lequel doit être affiché le texte est trop petite par rapport à la taille d'un (ou plusieurs) mot(s) du texte (faire attention à la taille de la font !)\nLe texte n'a donc pas été affiché !\n\n");

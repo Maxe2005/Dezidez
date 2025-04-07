@@ -21,13 +21,7 @@ void affiche_interface_graph_3D (SDL_Renderer* ren, Bande_haute* bande_haute, Ba
         affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
     }
 
-    if (message.is_visible){
-        if (time(NULL) - message.start_time > message.temps_affichage){
-            message.is_visible = 0;
-        } else {
-            renderButton(ren, &message.button_base);
-        }
-    }
+    affiche_avertissements(ren);
 }
 
 
@@ -35,18 +29,18 @@ void init_totale_interface_grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements 
     dimention = _3D;
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
+
+    gr_ele->graph_3D_1->rotation = (Quaternion){1, 0, 0, 0};
+    gr_ele->graph_3D_1->zoom = 0.7f * (FEN_X - TAILLE_BANDE_DROITE < FEN_Y - TAILLE_BANDE_HAUT ? FEN_X - TAILLE_BANDE_DROITE : FEN_Y - TAILLE_BANDE_HAUT) / 10.0f;
+    gr_ele->graph_3D_1->origine_y_apres_bande_haut = gr_ele->bande_haute->surface.y + gr_ele->bande_haute->surface.h;
 }
 
 int Grapheur_3D (SDL_Renderer* ren, Grapheur_3D_elements *gr_ele){
     dimention = _3D;
     Bande_haute* bande_haute = gr_ele->bande_haute;
     Bande_droite* bande_droite = gr_ele->bande_droite;
-
-    Graph_3D_1* graph_3D_1 = malloc(sizeof(Graph_3D_1));
-    graph_3D_1->rotation = (Quaternion){1, 0, 0, 0};
-    graph_3D_1->zoom = 0.7f * (FEN_X - TAILLE_BANDE_DROITE < FEN_Y - TAILLE_BANDE_HAUT ? FEN_X - TAILLE_BANDE_DROITE : FEN_Y - TAILLE_BANDE_HAUT) / 10.0f;
-    graph_3D_1->dragging = false;
-    graph_3D_1->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
+    Graph_3D_1* graph_3D_1 = gr_ele->graph_3D_1;
+    
 
     resize_fen_3D(bande_haute, bande_droite);
     SDL_StartTextInput();
