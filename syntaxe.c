@@ -11,9 +11,13 @@ Node* createEmptyNode() {
     return arbre;
 }
 
-Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur) {    
+Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur) {
+    // Affichage de débogage si activé
+    if (syntaxeVerbose >= 2) afficher_liste_jetons(tab, debut, fin);
+    
     // Trouve l'opérateur de plus faible priorité dans la plage donnée
     int indOpPrincipal = findLowestPriorityOperator(tab, debut, fin, erreur);
+    if (syntaxeVerbose >= 10) printf("indOpPrincipal=%d\n", indOpPrincipal);
     
     // Si une erreur est survenue lors de la recherche de l'opérateur
     if (*erreur != 0) {
@@ -47,10 +51,12 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
             case FONCTION:
                 // Vérification de la syntaxe pour les fonctions
                 if (tab[debut + 1].lexem != PAR_OUV) {
+                    if (syntaxeVerbose >= 10) printf("PROBLEME_PARENTHESES_FONCTIONS dans fonctions tab[debut + 1].lexem != PAR_OUV\n");
                     *erreur = PROBLEME_PARENTHESES_FONCTIONS;
                     return createEmptyNode();
                 }
                 if ((tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)) {
+                    if (syntaxeVerbose >= 10) printf("MEMBRE VIDE dans fonctions (tab[debut+2].lexem!=FONCTION) && (tab[debut+2].lexem!=REEL) && (tab[debut+2].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
                     return createEmptyNode();
                 }
@@ -69,10 +75,12 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
             case PAR_OUV:
                 // Vérification de la syntaxe pour les expressions entre parenthèses
                 if (tab[fin].lexem != PAR_FERM) {
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV tab[fin].lexem != PAR_FERM\n");
                     *erreur = MEMBRE_VIDE;
                     return createEmptyNode();
                 }
                 if ((tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)) {
+                    if (syntaxeVerbose >= 10) printf("MEMBRE_VIDE dans PAR_OUV (tab[debut+1].lexem!=FONCTION) && (tab[debut+1].lexem!=REEL) && (tab[debut+1].lexem !=VARIABLE)\n");
                     *erreur = MEMBRE_VIDE;
                     return createEmptyNode();
                 }
@@ -84,6 +92,7 @@ Node* buildExpressionTree(typejeton *tab, int debut, int fin, typeerreur *erreur
                 
             case PAR_FERM:
                 // Erreur: parenthèse fermante en premier jeton
+                if (syntaxeVerbose >= 10) printf("PARENTHESE_FERMEE_1_ER_JETON dans PAR_FERM\n");
                 *erreur = PARENTHESE_FERMEE_1_ER_JETON;
                 return createEmptyNode(); 
                 break;
@@ -183,6 +192,7 @@ bool checkParenthesesBalance(int debut, int fin, typejeton *tab) {
 Node* buildSyntaxTree(typejeton *tab, typeerreur *erreur) {
     // Détermination de la fin effective de l'expression
     int fin = findExpressionLength(tab);
+    if (syntaxeVerbose >= 10) printf("findExpressionLength fin=%d\n", fin);
     
     // Vérification de la présence du jeton FIN
     if (fin == -1) {

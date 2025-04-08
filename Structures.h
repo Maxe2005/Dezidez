@@ -13,7 +13,7 @@ typedef enum
 //énumération des diff types d'opérateurs existants
 typedef enum
 {
-    PLUS, MOINS, FOIS, DIV, PUIS
+    PLUS=0, MOINS, FOIS, DIV, PUIS
 } typeoperateur;
 
 //énumération des diff types de fonctions existantes
@@ -47,44 +47,21 @@ typedef struct Node
 } Node;
 
 typedef enum {
-//ERREUR ANALYSE LEXICAL
-FONCTION_INCONNUE = 101 ,
-NOMBRE_INVALIDE = 102,
-CARACTERE_INCONNUE = 103,
-VARIABLE_INCONNUE = 104,
-
-//ERREUR FONCTION 20X
-PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
+    //ERREUR FONCTION 20X
+    PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
     
-// ERREUR OPERATEUR 21X
-MEMBRE_VIDE = 211, // ++,**,/*
-//MANQUE_OPERATEUR = 212, // 3+
+    // ERREUR OPERATEUR 21X
+    MEMBRE_VIDE = 211, // ++,**,/*
 
-// ERREUR PARENTHESES 22X
-PARENTHESE_FERMEE_1_ER_JETON = 221 ,// ......
-PROBLEMES_NOMBRE_PARENTHESES = 223, // ((.....), ((()))))))))))
+    // ERREUR PARENTHESES 22X
+    PARENTHESE_FERMEE_1_ER_JETON = 221 ,// )......
+    PROBLEMES_NOMBRE_PARENTHESES = 223, // ((.....), ((()))))))))))
 
-// ERREUR REEL 23X
-PROBLEME_APRES_REEL = 231, // 2,3,4
     // ERREUR REEL / VARIABLE 23X
     PROBLEME_APRES_REEL_OU_VARIABLE = 231, // 2,3,4
 
-//ERREUR TAILLE 24X
-ABSENCE_FIN = 241, //debut>fin, absence token END
-
-
-//ERREUR FONCTION 30X
-RACINE_NEGATIVE=301, 
-LOG_NEGATIF=302,
-LOG_ZERO=303, 
-TAN_PI_SUR_2=304, 
-SINC_DIVISIION_PAR_ZERO=305, // SIN(0)/0 
-
-// ERREUR OPERATEUR 31X
-DIVISION_PAR_ZERO=311, // 0/0
-ERREUR_ZERO_PUIS_ZERO=312, // 0^0
-ERREUR_ZERRO_PUIS_NEGATIVE=313, //0^(-x) 
-
+    //ERREUR TAILLE 24X
+    ABSENCE_FIN = 241, //debut>fin, absence token END
 } typeerreur;
 
-#endif
+#endif 

@@ -7,6 +7,7 @@
 #include <string.h>
 #include <float.h>
 #include "Structures.h"
+#include "affiche_syntaxe.h"
 
 /**
  * Table de priorité des opérateurs
@@ -88,5 +89,6 @@ Node* buildSyntaxTree(typejeton *tab, typeerreur *erreur);
  * @param racine Pointeur vers la racine de l'arbre à libérer
  */
 void liberer_arbre(Node* racine);
+
 
 #endif
