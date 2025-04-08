@@ -110,7 +110,7 @@ void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph, Bande_haute* ban
 
         for (int i = 0; i < bande_haute->nb_expressions; i++) {
             Fonction f = bande_haute->expressions[i]->fonction;
-            if (f.visible){
+            if (f.visible && !bande_haute->expressions[i]->fonction.is_erreur){
                 // Dessiner la fonction
                 SDL_SetRenderDrawColor(renderer, f.color.r, f.color.g, f.color.b, f.color.a);
                 for (float x = f.borne_inf; x <= f.borne_sup; x += graph->zoom/470) {
@@ -118,9 +118,8 @@ void renderGraph3D_1(SDL_Renderer* renderer, Graph_3D_1* graph, Bande_haute* ban
                         int code_erreur = 0;
                         float z = evaluateur(f.fonction_arbre, x, y, &code_erreur);
                         if (code_erreur){
-                            ErrorInfo info_erreur = get_error_message(code_erreur);
-                            SDL_Rect rectangle = {3*FEN_X/8,3*FEN_Y/8,FEN_X/8,FEN_Y/16};
-                            set_message(info_erreur.message,rectangle);
+                            set_probleme(code_erreur);
+                            bande_haute->expressions[i]->fonction.is_erreur = true;
                             return;
                         }
                         Point3D p = {x, y, z};
