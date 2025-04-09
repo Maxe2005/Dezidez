@@ -30,8 +30,8 @@ void projectPoint(Point3D point, int* screenX, int* screenY) {
     
     // Perspective projection
     float scale = 200.0f / (point.z + 5.0f);
-    //*screenX = WIDTH / 2 + (int)(point.x * scale);
-    //*screenY = HEIGHT / 2 + (int)(point.y * scale);
+    *screenX = (FEN_X - TAILLE_BANDE_DROITE) / 2 + (int)(point.x * scale);
+    *screenY = (FEN_Y - TAILLE_BANDE_HAUT) / 2 + (int)(point.y * scale);
 }
 
 bool shouldRenderPoint(Point3D point) {

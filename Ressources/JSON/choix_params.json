@@ -1,0 +1,21 @@
+{
+    "defauld_language": [
+        {
+            "Nom": "Français",
+            "valeur": "fr"
+        },
+        {
+            "Nom": "English",
+            "valeur": "en"
+        },
+        {
+            "Nom": "Español",
+            "valeur": "es"
+        },
+        {
+            "Nom": "Deutsch",
+            "valeur": "al"
+        }
+    ]
+
+}

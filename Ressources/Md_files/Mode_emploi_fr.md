@@ -2,7 +2,7 @@
 
 - Les fonctions utilisables : sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier(),  
 - Pour les valeurs négatives toujours utiliser les parenthèses  ex : sin(-2) => sin((-2)) ou -4 => (-4)
-- Pour les puissances utiliser ** ex : x puissance y => x**y
+- Pour les puissances utiliser '**' ex : x puissance y => x**y
 - Pour les nombre decimaux utiliser des '.' et non des ','
 - toutes les lettres majuscules sont considérées comme des minuscules
 

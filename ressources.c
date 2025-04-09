@@ -226,7 +226,6 @@ ErrorInfo get_error_message(int code) {
 
     char code_str[10];
     sprintf(code_str, "%d", code);  // Convertit l'entier en chaîne
-    printf("%s",code_str);
     cJSON *lang_json = cJSON_GetObjectItem(tous_les_JSON.json_erreurs, get_lang_str());
     if (!lang_json) return error_info; // Langue non trouvée
 

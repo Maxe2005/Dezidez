@@ -44,12 +44,12 @@ Point2D project(Point3D p, Graph_3D_1* graph) {
     return projected;
 }
 
-int x_intersect_droite (int y, int x1, int y1, int x2, int y2){
-    if (y1 == y2) return -1; // Pas d'intersection
-    if (x1 == x2) return x1; // Ligne verticale
-    float m = (float)(y2 - y1) / (x2 - x1);
-    float p = y1 - m * x1;
-    return (int)(y - p) / m;
+float x_intersect_droite(float y_cut, float x1, float y1, float x2, float y2) {
+    if (y2 == y1) {
+        // La droite est horizontale => pas d'intersection unique
+        return x1; // ou (x1 + x2) / 2 par exemple
+    }
+    return x1 + (x2 - x1) * (y_cut - y1) / (y2 - y1);
 }
 
 // Dessiner un axe avec des graduations
@@ -57,12 +57,12 @@ void drawAxis(SDL_Renderer* renderer, Point3D start, Point3D end, int steps, Gra
     Point2D start2D = project(start, graph);
     Point2D end2D = project(end, graph);
     if (start2D.y < graph->origine_y_apres_bande_haut) {
-        start2D.y = graph->origine_y_apres_bande_haut;
         start2D.x = x_intersect_droite(graph->origine_y_apres_bande_haut, start2D.x, start2D.y, end2D.x, end2D.y);
+        start2D.y = graph->origine_y_apres_bande_haut;
     }
     if (end2D.y < graph->origine_y_apres_bande_haut) {
-        end2D.y = graph->origine_y_apres_bande_haut;
         end2D.x = x_intersect_droite(graph->origine_y_apres_bande_haut, start2D.x, start2D.y, end2D.x, end2D.y);
+        end2D.y = graph->origine_y_apres_bande_haut;
     }
     SDL_RenderDrawLine(renderer, start2D.x, start2D.y, end2D.x, end2D.y);
 

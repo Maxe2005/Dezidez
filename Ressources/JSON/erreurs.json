@@ -4,10 +4,10 @@
         "2": { "message": "BORNE INF SUPERIEUR A BORNE SUP", "severity": "low" },
         "3": { "message": "BORNE SUP INFERIEUR A BORNE INF", "severity": "low" },
         
-        "101": { "message": "Fonction inconnue", "severity": "high" },
-        "102": { "message": "Nombre invalide", "severity": "medium" },
-        "103": { "message": "Caractère inconnu", "severity": "medium" },
-        "104": { "message": "Variable inconnue", "severity": "medium" },
+        "101": { "message": "Fonction inconnue \n \n Les fonctions connues sont : \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
+        "102": { "message": "Nombre invalide \n \n Pour les valeurs négatives toujours utiliser les parenthèses : \n sin(-2) => sin((-2)) ou -4 => (-4)", "severity": "medium" },
+        "103": { "message": "Caractère inconnu \n \n Pour les nombre decimaux utiliser des '.' et non des ',' ", "severity": "medium" },
+        "104": { "message": "Variable inconnue \n \n La seule variable autorisée est x (et y en 3D)", "severity": "medium" },
 
         "201": { "message": "Parenthèse manquante pour la fonction", "severity": "medium" },
         "211": { "message": "Opération incomplète", "severity": "medium" },
@@ -29,6 +29,20 @@
         "1": { "message": "CONVERSION PROBLEM", "severity": "low" },
         "2": { "message": "LOWER BOUND GREATER THAN UPPER BOUND", "severity": "low" },
         "3": { "message": "UPPER BOUND LESS THAN LOWER BOUND", "severity": "low" },
+
+        "101": { "message": "Unknown function \n \n Known functions are: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
+        "102": { "message": "Invalid number \n \n For negative values always use parentheses: \n sin(-2) => sin((-2)) or -4 => (-4)", "severity": "medium" },
+        "103": { "message": "Unknown character \n \n For decimal numbers use '.' instead of ','", "severity": "medium" },
+        "104": { "message": "Unknown variable \n \n The only allowed variable is x (and y in 3D)", "severity": "medium" },
+
+
+        "201": { "message": "Missing parenthesis for function", "severity": "medium" },
+        "211": { "message": "Incomplete operation", "severity": "medium" },
+        "221": { "message": "Closing parenthesis before opening", "severity": "medium" },
+        "222": { "message": "Error in number of parentheses", "severity": "medium" },
+        "231": { "message": "Two adjacent real numbers", "severity": "medium" },
+        "241": { "message": "Missing end token", "severity": "medium" },
+
         "301": { "message": "Negative root", "severity": "medium" },
         "302": { "message": "Negative logarithm", "severity": "medium"},
         "303": { "message": "Zero logarithm", "severity": "medium"},
@@ -44,10 +58,10 @@
         "2": { "message": "LÍMITE INFERIOR SUPERIOR AL LÍMITE SUPERIOR", "severity": "low" },
         "3": { "message": "LÍMITE SUPERIOR INFERIOR AL LÍMITE INFERIOR", "severity": "low" },
         
-        "101": { "message": "Función desconocida", "severity": "high" },
-        "102": { "message": "Número no válido", "severity": "medium" },
-        "103": { "message": "Carácter desconocido", "severity": "medium" },
-        "104": { "message": "Variable desconocida", "severity": "medium" },
+        "101": { "message": "Función desconocida \n \n Las funciones conocidas son: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
+        "102": { "message": "Número inválido \n \n Para valores negativos siempre usar paréntesis: \n sin(-2) => sin((-2)) o -4 => (-4)", "severity": "medium" },
+        "103": { "message": "Carácter desconocido \n \n Para los números decimales usar '.' en lugar de ','", "severity": "medium" },
+        "104": { "message": "Variable desconocida \n \n La única variable permitida es x (y y en 3D)", "severity": "medium" },
 
         "201": { "message": "Paréntesis faltante para la función", "severity": "medium" },
         "211": { "message": "Operación incompleta", "severity": "medium" },
@@ -70,10 +84,10 @@
         "2": { "message": "UNTERE GRANZE ÜBER OBERE GRANZE", "severity": "low" },
         "3": { "message": "OBERE GRANZE UNTER UNTERER GRANZE", "severity": "low" },
         
-        "101": { "message": "Unbekannte Funktion", "severity": "high" },
-        "102": { "message": "Ungültige Zahl", "severity": "medium" },
-        "103": { "message": "Unbekanntes Zeichen", "severity": "medium" },
-        "104": { "message": "Unbekannte Variable", "severity": "medium" },
+        "101": { "message": "Unbekannte Funktion \n \n Bekannte Funktionen sind: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
+        "102": { "message": "Ungültige Zahl \n \n Für negative Werte immer Klammern verwenden: \n sin(-2) => sin((-2)) oder -4 => (-4)", "severity": "medium" },
+        "103": { "message": "Unbekanntes Zeichen \n \n Für Dezimalzahlen verwende '.' statt ','", "severity": "medium" },
+        "104": { "message": "Unbekannte Variable \n \n Die einzige erlaubte Variable ist x (und y in 3D)", "severity": "medium" },
 
         "201": { "message": "Fehlende Klammer für die Funktion", "severity": "medium" },
         "211": { "message": "Unvollständige Operation", "severity": "medium" },

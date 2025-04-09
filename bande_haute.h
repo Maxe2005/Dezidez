@@ -323,5 +323,15 @@ void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* exp
  */
 void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction);
 
+/**
+ * Récupère le texte autour du curseur pour l'afficher dans le champs d'entrée
+ * @param text Le texte d'origine
+ * @param cursor_index La position du curseur dans le texte d'origine
+ * @param font La police utilisée pour le texte
+ * @param output Le texte à afficher dans le champs d'entrée
+ * @param cursor_pos_in_output La position du curseur dans le texte à afficher
+ * @param MAX_DISPLAY_PIXELS La largeur maximum d'affichage
+ */
+void extract_text_around_cursor(const char *text, int cursor_index, TTF_Font *font, char *output, int *cursor_pos_in_output, int MAX_DISPLAY_PIXELS);
 
 #endif

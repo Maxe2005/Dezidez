@@ -337,13 +337,13 @@ void execute_expression (Expression_fonction* expression){
         else dim = 0;
         int erreur = 0;
         Analyse_Lexicale(TabToken, expression->expression->text, &erreur, dim);
+        expression->expression->position_cursor = strlen(expression->expression->text);
         if (erreur){
             set_probleme(erreur);
             expression->fonction.visible = 0;
             expression->button_visibilite.bt.image = expression->image_button_invisible;
             return;
         }
-        expression->expression->position_cursor = strlen(expression->expression->text);
         typeerreur erreur_2 = 0;
         Node* arbre = buildSyntaxTree(TabToken, &erreur_2);
         if (erreur_2){
@@ -399,6 +399,79 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
         expression->color_picker->show_picker = 0;
     }
 }
+void extract_text_around_cursor(const char *text, int cursor_index, TTF_Font *font, char *output, int *cursor_pos_in_output, int MAX_DISPLAY_PIXELS) {
+    int len = strlen(text);
+    int start = cursor_index, end = cursor_index;
+    int final_start = cursor_index, final_end = cursor_index;
+
+    char buffer[MAX_LEN_STR];
+    int best_width = 0;
+
+    const char *ellipsis = "...";
+    int ellipsis_width = 0, h = 0;
+    TTF_SizeUTF8(font, ellipsis, &ellipsis_width, &h);
+
+    int reserve_left = 0;
+    int reserve_right = 0;
+
+    // Essayer d'étendre autour du curseur tant que possible
+    while (start > 0 || end < len) {
+        int test_start = start > 0 ? start - 1 : start;
+        int test_end = end < len ? end + 1 : end;
+        int slice_len = test_end - test_start;
+
+        if (slice_len <= 0 || test_start < 0 || test_end > len) break;
+
+        strncpy(buffer, text + test_start, slice_len);
+        buffer[slice_len] = '\0';
+
+        int w = 0;
+        TTF_SizeUTF8(font, buffer, &w, &h);
+
+        int left_cut = test_start > 0;
+        int right_cut = test_end < len;
+
+        int total_reserved = (left_cut ? ellipsis_width : 0) + (right_cut ? ellipsis_width : 0);
+
+        if (w + total_reserved <= MAX_DISPLAY_PIXELS) {
+            final_start = test_start;
+            final_end = test_end;
+            best_width = w;
+
+            reserve_left = left_cut ? ellipsis_width : 0;
+            reserve_right = right_cut ? ellipsis_width : 0;
+
+            start = test_start;
+            end = test_end;
+        } else {
+            break;
+        }
+    }
+
+    // Créer la sous-chaîne visible avec les éventuels "..."
+    char visible[MAX_LEN_STR];
+    int visible_len = final_end - final_start;
+    strncpy(visible, text + final_start, visible_len);
+    visible[visible_len] = '\0';
+
+    int output_pos = 0;
+    output[0] = '\0';
+
+    if (final_start > 0) {
+        strcpy(output, ellipsis);
+        output_pos += strlen(ellipsis);
+    }
+
+    strncpy(output + output_pos, visible, visible_len);
+    output[output_pos + visible_len] = '\0';
+
+    if (final_end < len) {
+        strcat(output, ellipsis);
+    }
+
+    // Calculer la position relative du curseur dans output
+    *cursor_pos_in_output = (final_start > 0 ? strlen(ellipsis) : 0) + (cursor_index - final_start);
+}
 
 void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression){
     Entree_texte *target_champs = NULL;
@@ -413,11 +486,21 @@ void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expressio
         if (i != expression->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
             target_champs->champs_texte->label = texte_defaut[i];
         } else {
-            strcpy(target_champs->display, target_champs->text);
-            if (expression->entree_selectionnee == target_champs->type_entree){
-                if (target_champs->cursorVisible){
-                    insert_char(target_champs->display, target_champs->position_cursor, '|');
-                } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+            if (i == 2){
+                int relative_cursor_pos = 0;
+                extract_text_around_cursor(target_champs->text, target_champs->position_cursor, target_champs->champs_texte->font_text, target_champs->display, &relative_cursor_pos, target_champs->champs_texte->rect.w - 2 * target_champs->champs_texte->radius);
+                if (expression->entree_selectionnee == target_champs->type_entree){
+                    if (target_champs->cursorVisible){
+                        insert_char(target_champs->display, relative_cursor_pos, '|');
+                    } else insert_char(target_champs->display, relative_cursor_pos, ' ');
+                }
+            } else {
+                strcpy(target_champs->display, target_champs->text);
+                if (expression->entree_selectionnee == target_champs->type_entree){
+                    if (target_champs->cursorVisible){
+                        insert_char(target_champs->display, target_champs->position_cursor, '|');
+                    } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+                }
             }
             target_champs->champs_texte->label = target_champs->display;
         }
@@ -547,7 +630,7 @@ void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
 
 Exemples exemples_fonctions_2D (){
     Exemples ex;
-    ex.nb_exemples = 1;
+    ex.nb_exemples = 5;
     ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
     ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
     for (int i = 0; i < ex.nb_exemples; i++) {
@@ -556,6 +639,22 @@ Exemples exemples_fonctions_2D (){
 
     int i = -1;
     ex.nom_f[++i] = "x";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "sin(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "cos(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "exp(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "2-x";
     ex.interval[i][0] = "-5";
     ex.interval[i][1] = "5";
 
