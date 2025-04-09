@@ -1,76 +1,120 @@
 {
-    "Bande_haute":{
-        "borne_inf": {
-            "fr": "Borne inférieure",
-            "en": "Lower bound",
-            "al": "Untere Grenze",
-            "es": "Límite inferior"
-        },
-        "borne_sup":{
-            "fr": "Borne supérieure",
-            "en": "Upper bound",
-            "al": "Obere Grenze",
-            "es": "Límite superior"
-        },
-        "expression": {
-            "fr": "Expression",
-            "en": "Expression",
-            "al": "Ausdruck",
-            "es": "Expresión"
-        }
+  "Bande_haute": {
+    "borne_inf": {
+      "fr": "Borne inférieure",
+      "en": "Lower bound",
+      "al": "Untere Grenze",
+      "es": "Límite inferior",
+      "it": "Limite inferiore",
+      "pt": "Limite inferior",
+      "ru": "Нижняя граница",
+      "uk": "Нижня межа"
     },
-
-    "Bande_droite":{
-        "centrer":{
-            "fr": "Centrer",
-            "en": "Auto Scale",
-            "al": "Automatisch skalieren",
-            "es": "Escala automática"
-        }
+    "borne_sup": {
+      "fr": "Borne supérieure",
+      "en": "Upper bound",
+      "al": "Obere Grenze",
+      "es": "Límite superior",
+      "it": "Limite superiore",
+      "pt": "Limite superior",
+      "ru": "Верхняя граница",
+      "uk": "Верхня межа"
     },
-
-    "Acceuil":{
-        "titre":{
-            "fr": "Grapheur d'expressions fonctionnelles",
-            "en": "Graphing functional expressions",
-            "al": "Funktionale Ausdrücke grafisch darstellen",
-            "es": "Graficando expresiones funcionales"
-        },
-        "Mode_emploi":{
-            "fr": "Mode d'emploi",
-            "en": "User manual",
-            "al": "Benutzerhandbuch",
-            "es": "Manual de usuario"
-        },
-        "Remerciements":{
-            "fr": "Remerciements",
-            "en": "Acknowledgements",
-            "al": "Danksagung",
-            "es": "Agradecimientos"
-        },
-        "Grapheur_2D":{
-            "fr": "Grapheur 2D",
-            "en": "2D Grapher",
-            "al": "2D-Diagrammer",
-            "es": "Grapher 2D"
-        },
-        "Grapheur_3D":{
-            "fr": "Grapheur 3D",
-            "en": "3D Grapher",
-            "al": "3D-Diagrammer",
-            "es": "Grapher 3D"
-        },
-        "Titre_page_remerciement":{
-            "fr": "Remerciements",
-            "en": "Acknowledgements",
-            "al": "Danksagung",
-            "es": "Agradecimientos"
-        },
-        "Titre_page_mode_emploi":{
-            "fr": "Mode d'emploi",
-            "en": "User manual",
-            "al": "Benutzerhandbuch",
-            "es": "Manual de usuario"
-        }
+    "expression": {
+      "fr": "Expression",
+      "en": "Expression",
+      "al": "Ausdruck",
+      "es": "Expresión",
+      "it": "Espressione",
+      "pt": "Expressão",
+      "ru": "Выражение",
+      "uk": "Вираз"
     }
+  },
+
+  "Bande_droite": {
+    "centrer": {
+      "fr": "Centrer",
+      "en": "Auto Scale",
+      "al": "Automatisch skalieren",
+      "es": "Escala automática",
+      "it": "Scala automatica",
+      "pt": "Escala automática",
+      "ru": "Автомасштаб",
+      "uk": "Автомасштаб"
+    }
+  },
+
+  "Acceuil": {
+    "titre": {
+      "fr": "Grapheur d'expressions fonctionnelles",
+      "en": "Graphing functional expressions",
+      "al": "Funktionale Ausdrücke grafisch darstellen",
+      "es": "Graficando expresiones funcionales",
+      "it": "Grafico di espressioni funzionali",
+      "pt": "Gráfico de expressões funcionais",
+      "ru": "График функциональных выражений",
+      "uk": "Графік функціональних виразів"
+    },
+    "Mode_emploi": {
+      "fr": "Mode d'emploi",
+      "en": "User manual",
+      "al": "Benutzerhandbuch",
+      "es": "Manual de usuario",
+      "it": "Manuale utente",
+      "pt": "Manual do usuário",
+      "ru": "Руководство пользователя",
+      "uk": "Посібник користувача"
+    },
+    "Remerciements": {
+      "fr": "Remerciements",
+      "en": "Acknowledgements",
+      "al": "Danksagung",
+      "es": "Agradecimientos",
+      "it": "Ringraziamenti",
+      "pt": "Agradecimentos",
+      "ru": "Благодарности",
+      "uk": "Подяки"
+    },
+    "Grapheur_2D": {
+      "fr": "Grapheur 2D",
+      "en": "2D Grapher",
+      "al": "2D-Diagrammer",
+      "es": "Grapher 2D",
+      "it": "Grafico 2D",
+      "pt": "Gráfico 2D",
+      "ru": "2D график",
+      "uk": "2D графік"
+    },
+    "Grapheur_3D": {
+      "fr": "Grapheur 3D",
+      "en": "3D Grapher",
+      "al": "3D-Diagrammer",
+      "es": "Grapher 3D",
+      "it": "Grafico 3D",
+      "pt": "Gráfico 3D",
+      "ru": "3D график",
+      "uk": "3D графік"
+    },
+    "Titre_page_remerciement": {
+      "fr": "Remerciements",
+      "en": "Acknowledgements",
+      "al": "Danksagung",
+      "es": "Agradecimientos",
+      "it": "Ringraziamenti",
+      "pt": "Agradecimentos",
+      "ru": "Благодарности",
+      "uk": "Подяки"
+    },
+    "Titre_page_mode_emploi": {
+      "fr": "Mode d'emploi",
+      "en": "User manual",
+      "al": "Benutzerhandbuch",
+      "es": "Manual de usuario",
+      "it": "Manuale utente",
+      "pt": "Manual do usuário",
+      "ru": "Руководство пользователя",
+      "uk": "Посібник користувача"
+    }
+  }
 }

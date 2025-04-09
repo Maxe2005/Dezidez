@@ -52,7 +52,7 @@ typedef struct {
 } ErrorInfo;
 
 typedef enum {
-    FR, EN, ES, AL
+    FR, EN, ES, AL, IT, PT, RU, UK
 } Langue;
 extern Langue langue;
 

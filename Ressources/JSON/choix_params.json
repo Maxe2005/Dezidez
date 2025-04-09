@@ -1,21 +1,50 @@
 {
-    "defauld_language": [
-        {
-            "Nom": "Français",
-            "valeur": "fr"
-        },
-        {
-            "Nom": "English",
-            "valeur": "en"
-        },
-        {
-            "Nom": "Español",
-            "valeur": "es"
-        },
-        {
-            "Nom": "Deutsch",
-            "valeur": "al"
-        }
-    ]
-
+  "defauld_language": [
+    {
+      "Nom": "Français",
+      "valeur": "fr"
+    },
+    {
+      "Nom": "English",
+      "valeur": "en"
+    },
+    {
+      "Nom": "Español",
+      "valeur": "es"
+    },
+    {
+      "Nom": "Deutsch",
+      "valeur": "al"
+    },
+    {
+      "Nom": "Italiano",
+      "valeur": "it"
+    },
+    {
+      "Nom": "Português",
+      "valeur": "pt"
+    },
+    {
+      "Nom": "Русский",
+      "valeur": "ru"
+    },
+    {
+      "Nom": "Українська",
+      "valeur": "uk"
+    }
+  ],
+  "defauld_font": [
+    {
+      "Nom": "DejaVuSans-Bold",
+      "valeur": "DejaVuSans-Bold.ttf"
+    },
+    {
+      "Nom": "Chewy-Regular",
+      "valeur": "Chewy-Regular.ttf"
+    },
+    {
+      "Nom": "ImperialScript-Regular",
+      "valeur": "ImperialScript-Regular.ttf"
+    }
+  ]
 }

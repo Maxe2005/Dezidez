@@ -175,6 +175,10 @@ char* get_lang_str(){
     if (langue == EN) return "en";
     if (langue == ES) return "es";
     if (langue == AL) return "al";
+    if (langue == IT) return "it";
+    if (langue == PT) return "pt";
+    if (langue == RU) return "ru";
+    if (langue == UK) return "uk";
     return "Problème de langue";
 }
 

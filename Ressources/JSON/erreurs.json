@@ -1,109 +1,404 @@
 {
-    "fr": {
-        "1": { "message": "PROBLEME DE CONVERSION", "severity": "low" },
-        "2": { "message": "BORNE INF SUPERIEUR A BORNE SUP", "severity": "low" },
-        "3": { "message": "BORNE SUP INFERIEUR A BORNE INF", "severity": "low" },
-        
-        "101": { "message": "Fonction inconnue \n \n Les fonctions connues sont : \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
-        "102": { "message": "Nombre invalide \n \n Pour les valeurs négatives toujours utiliser les parenthèses : \n sin(-2) => sin((-2)) ou -4 => (-4)", "severity": "medium" },
-        "103": { "message": "Caractère inconnu \n \n Pour les nombre decimaux utiliser des '.' et non des ',' ", "severity": "medium" },
-        "104": { "message": "Variable inconnue \n \n La seule variable autorisée est x (et y en 3D)", "severity": "medium" },
+  "fr": {
+    "1": { "message": "PROBLEME DE CONVERSION", "severity": "low" },
+    "2": { "message": "BORNE INF SUPERIEUR A BORNE SUP", "severity": "low" },
+    "3": { "message": "BORNE SUP INFERIEUR A BORNE INF", "severity": "low" },
 
-        "201": { "message": "Parenthèse manquante pour la fonction", "severity": "medium" },
-        "211": { "message": "Opération incomplète", "severity": "medium" },
-        "221": { "message": "Parenthèse fermée avant d'être ouverte", "severity": "medium" },
-        "222": { "message": "Erreur dans le nombre de parenthèses", "severity": "medium" },
-        "231": { "message": "Deux réels adjacents", "severity": "medium" },
-        "241": { "message": "Jeton de fin manquant", "severity": "medium" },
-
-        "301": { "message": "Racine négative", "severity": "medium" },
-        "302": { "message": "Logarithme négatif", "severity": "medium"},
-        "303": { "message": "Logarithme nul", "severity": "medium"},
-        "304": { "message": "Tangente nulle", "severity": "medium"},
-        "305": { "message": "Sinus Cardinal nul", "severity": "medium"},
-        "311": { "message": "Division par Zéro", "severity": "medium"},
-        "312": { "message": "Zéro puissance Zéro", "severity": "medium"},
-        "313": { "message": "Zéro puissance négative", "severity": "medium"}
+    "101": {
+      "message": "Fonction inconnue \n \n Les fonctions connues sont : \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
     },
-    "en": {
-        "1": { "message": "CONVERSION PROBLEM", "severity": "low" },
-        "2": { "message": "LOWER BOUND GREATER THAN UPPER BOUND", "severity": "low" },
-        "3": { "message": "UPPER BOUND LESS THAN LOWER BOUND", "severity": "low" },
-
-        "101": { "message": "Unknown function \n \n Known functions are: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
-        "102": { "message": "Invalid number \n \n For negative values always use parentheses: \n sin(-2) => sin((-2)) or -4 => (-4)", "severity": "medium" },
-        "103": { "message": "Unknown character \n \n For decimal numbers use '.' instead of ','", "severity": "medium" },
-        "104": { "message": "Unknown variable \n \n The only allowed variable is x (and y in 3D)", "severity": "medium" },
-
-
-        "201": { "message": "Missing parenthesis for function", "severity": "medium" },
-        "211": { "message": "Incomplete operation", "severity": "medium" },
-        "221": { "message": "Closing parenthesis before opening", "severity": "medium" },
-        "222": { "message": "Error in number of parentheses", "severity": "medium" },
-        "231": { "message": "Two adjacent real numbers", "severity": "medium" },
-        "241": { "message": "Missing end token", "severity": "medium" },
-
-        "301": { "message": "Negative root", "severity": "medium" },
-        "302": { "message": "Negative logarithm", "severity": "medium"},
-        "303": { "message": "Zero logarithm", "severity": "medium"},
-        "304": { "message": "Zero tangent", "severity": "medium"},
-        "305": { "message": "Cardinal sine zero", "severity": "medium"},
-        "311": { "message": "Division by Zero", "severity": "medium"},
-        "312": { "message": "Zero to the power of Zero", "severity": "medium"},
-        "313": { "message": "Zero to the power of negative number", "severity": "medium"}
+    "102": {
+      "message": "Nombre invalide \n \n Pour les valeurs négatives toujours utiliser les parenthèses : \n sin(-2) => sin((-2)) ou -4 => (-4)",
+      "severity": "medium"
     },
-    
-    "es": {
-        "1": { "message": "PROBLEMA DE CONVERSIÓN", "severity": "low" },
-        "2": { "message": "LÍMITE INFERIOR SUPERIOR AL LÍMITE SUPERIOR", "severity": "low" },
-        "3": { "message": "LÍMITE SUPERIOR INFERIOR AL LÍMITE INFERIOR", "severity": "low" },
-        
-        "101": { "message": "Función desconocida \n \n Las funciones conocidas son: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
-        "102": { "message": "Número inválido \n \n Para valores negativos siempre usar paréntesis: \n sin(-2) => sin((-2)) o -4 => (-4)", "severity": "medium" },
-        "103": { "message": "Carácter desconocido \n \n Para los números decimales usar '.' en lugar de ','", "severity": "medium" },
-        "104": { "message": "Variable desconocida \n \n La única variable permitida es x (y y en 3D)", "severity": "medium" },
-
-        "201": { "message": "Paréntesis faltante para la función", "severity": "medium" },
-        "211": { "message": "Operación incompleta", "severity": "medium" },
-        "221": { "message": "Paréntesis cerrado antes de ser abierto", "severity": "medium" },
-        "223": { "message": "Error en el número de paréntesis", "severity": "medium" },
-        "231": { "message": "Dos números reales adyacentes", "severity": "medium" },
-        "241": { "message": "Falta el token de fin", "severity": "medium" },
-
-        "301": { "message": "Raíz negativa", "severity": "medium" },
-        "302": { "message": "Logaritmo negativo", "severity": "medium" },
-        "303": { "message": "Logaritmo nulo", "severity": "medium" },
-        "304": { "message": "Tangente nula", "severity": "medium" },
-        "305": { "message": "Seno cardinal nulo", "severity": "medium" },
-        "311": { "message": "División por cero", "severity": "medium" },
-        "312": { "message": "Cero elevado a cero", "severity": "medium" },
-        "313": { "message": "Cero elevado a un exponente negativo", "severity": "medium" }
+    "103": {
+      "message": "Caractère inconnu \n \n Pour les nombre decimaux utiliser des '.' et non des ',' ",
+      "severity": "medium"
     },
-    "al": {
-        "1": { "message": "KONVERTIERUNGSPROBLEM", "severity": "low" },
-        "2": { "message": "UNTERE GRANZE ÜBER OBERE GRANZE", "severity": "low" },
-        "3": { "message": "OBERE GRANZE UNTER UNTERER GRANZE", "severity": "low" },
-        
-        "101": { "message": "Unbekannte Funktion \n \n Bekannte Funktionen sind: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()", "severity": "high" },
-        "102": { "message": "Ungültige Zahl \n \n Für negative Werte immer Klammern verwenden: \n sin(-2) => sin((-2)) oder -4 => (-4)", "severity": "medium" },
-        "103": { "message": "Unbekanntes Zeichen \n \n Für Dezimalzahlen verwende '.' statt ','", "severity": "medium" },
-        "104": { "message": "Unbekannte Variable \n \n Die einzige erlaubte Variable ist x (und y in 3D)", "severity": "medium" },
+    "104": {
+      "message": "Variable inconnue \n \n La seule variable autorisée est x (et y en 3D)",
+      "severity": "medium"
+    },
 
-        "201": { "message": "Fehlende Klammer für die Funktion", "severity": "medium" },
-        "211": { "message": "Unvollständige Operation", "severity": "medium" },
-        "221": { "message": "Klammer wurde geschlossen, bevor sie geöffnet wurde", "severity": "medium" },
-        "223": { "message": "Fehler bei der Anzahl der Klammern", "severity": "medium" },
-        "231": { "message": "Zwei benachbarte reale Zahlen", "severity": "medium" },
-        "241": { "message": "Fehlendes Endzeichen", "severity": "medium" },
+    "201": {
+      "message": "Parenthèse manquante pour la fonction",
+      "severity": "medium"
+    },
+    "211": { "message": "Opération incomplète", "severity": "medium" },
+    "221": {
+      "message": "Parenthèse fermée avant d'être ouverte",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Erreur dans le nombre de parenthèses",
+      "severity": "medium"
+    },
+    "231": { "message": "Deux réels adjacents", "severity": "medium" },
+    "241": { "message": "Jeton de fin manquant", "severity": "medium" },
 
-        "301": { "message": "Negative Wurzel", "severity": "medium" },
-        "302": { "message": "Negativer Logarithmus", "severity": "medium" },
-        "303": { "message": "Null Logarithmus", "severity": "medium" },
-        "304": { "message": "Null Tangens", "severity": "medium" },
-        "305": { "message": "Null Kardinal Sinus", "severity": "medium" },
-        "311": { "message": "Division durch Null", "severity": "medium" },
-        "312": { "message": "Null hoch Null", "severity": "medium" },
-        "313": { "message": "Null hoch negative Zahl", "severity": "medium" }
+    "301": { "message": "Racine négative", "severity": "medium" },
+    "302": { "message": "Logarithme négatif", "severity": "medium" },
+    "303": { "message": "Logarithme nul", "severity": "medium" },
+    "304": { "message": "Tangente nulle", "severity": "medium" },
+    "305": { "message": "Sinus Cardinal nul", "severity": "medium" },
+    "311": { "message": "Division par Zéro", "severity": "medium" },
+    "312": { "message": "Zéro puissance Zéro", "severity": "medium" },
+    "313": { "message": "Zéro puissance négative", "severity": "medium" }
+  },
+  "en": {
+    "1": { "message": "CONVERSION PROBLEM", "severity": "low" },
+    "2": {
+      "message": "LOWER BOUND GREATER THAN UPPER BOUND",
+      "severity": "low"
+    },
+    "3": { "message": "UPPER BOUND LESS THAN LOWER BOUND", "severity": "low" },
+
+    "101": {
+      "message": "Unknown function \n \n Known functions are: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Invalid number \n \n For negative values always use parentheses: \n sin(-2) => sin((-2)) or -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Unknown character \n \n For decimal numbers use '.' instead of ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Unknown variable \n \n The only allowed variable is x (and y in 3D)",
+      "severity": "medium"
+    },
+
+    "201": {
+      "message": "Missing parenthesis for function",
+      "severity": "medium"
+    },
+    "211": { "message": "Incomplete operation", "severity": "medium" },
+    "221": {
+      "message": "Closing parenthesis before opening",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Error in number of parentheses",
+      "severity": "medium"
+    },
+    "231": { "message": "Two adjacent real numbers", "severity": "medium" },
+    "241": { "message": "Missing end token", "severity": "medium" },
+
+    "301": { "message": "Negative root", "severity": "medium" },
+    "302": { "message": "Negative logarithm", "severity": "medium" },
+    "303": { "message": "Zero logarithm", "severity": "medium" },
+    "304": { "message": "Zero tangent", "severity": "medium" },
+    "305": { "message": "Cardinal sine zero", "severity": "medium" },
+    "311": { "message": "Division by Zero", "severity": "medium" },
+    "312": { "message": "Zero to the power of Zero", "severity": "medium" },
+    "313": {
+      "message": "Zero to the power of negative number",
+      "severity": "medium"
     }
+  },
 
+  "es": {
+    "1": { "message": "PROBLEMA DE CONVERSIÓN", "severity": "low" },
+    "2": {
+      "message": "LÍMITE INFERIOR SUPERIOR AL LÍMITE SUPERIOR",
+      "severity": "low"
+    },
+    "3": {
+      "message": "LÍMITE SUPERIOR INFERIOR AL LÍMITE INFERIOR",
+      "severity": "low"
+    },
+
+    "101": {
+      "message": "Función desconocida \n \n Las funciones conocidas son: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Número inválido \n \n Para valores negativos siempre usar paréntesis: \n sin(-2) => sin((-2)) o -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Carácter desconocido \n \n Para los números decimales usar '.' en lugar de ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Variable desconocida \n \n La única variable permitida es x (y y en 3D)",
+      "severity": "medium"
+    },
+
+    "201": {
+      "message": "Paréntesis faltante para la función",
+      "severity": "medium"
+    },
+    "211": { "message": "Operación incompleta", "severity": "medium" },
+    "221": {
+      "message": "Paréntesis cerrado antes de ser abierto",
+      "severity": "medium"
+    },
+    "223": {
+      "message": "Error en el número de paréntesis",
+      "severity": "medium"
+    },
+    "231": { "message": "Dos números reales adyacentes", "severity": "medium" },
+    "241": { "message": "Falta el token de fin", "severity": "medium" },
+
+    "301": { "message": "Raíz negativa", "severity": "medium" },
+    "302": { "message": "Logaritmo negativo", "severity": "medium" },
+    "303": { "message": "Logaritmo nulo", "severity": "medium" },
+    "304": { "message": "Tangente nula", "severity": "medium" },
+    "305": { "message": "Seno cardinal nulo", "severity": "medium" },
+    "311": { "message": "División por cero", "severity": "medium" },
+    "312": { "message": "Cero elevado a cero", "severity": "medium" },
+    "313": {
+      "message": "Cero elevado a un exponente negativo",
+      "severity": "medium"
+    }
+  },
+  "al": {
+    "1": { "message": "KONVERTIERUNGSPROBLEM", "severity": "low" },
+    "2": { "message": "UNTERE GRANZE ÜBER OBERE GRANZE", "severity": "low" },
+    "3": { "message": "OBERE GRANZE UNTER UNTERER GRANZE", "severity": "low" },
+
+    "101": {
+      "message": "Unbekannte Funktion \n \n Bekannte Funktionen sind: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Ungültige Zahl \n \n Für negative Werte immer Klammern verwenden: \n sin(-2) => sin((-2)) oder -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Unbekanntes Zeichen \n \n Für Dezimalzahlen verwende '.' statt ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Unbekannte Variable \n \n Die einzige erlaubte Variable ist x (und y in 3D)",
+      "severity": "medium"
+    },
+
+    "201": {
+      "message": "Fehlende Klammer für die Funktion",
+      "severity": "medium"
+    },
+    "211": { "message": "Unvollständige Operation", "severity": "medium" },
+    "221": {
+      "message": "Klammer wurde geschlossen, bevor sie geöffnet wurde",
+      "severity": "medium"
+    },
+    "223": {
+      "message": "Fehler bei der Anzahl der Klammern",
+      "severity": "medium"
+    },
+    "231": { "message": "Zwei benachbarte reale Zahlen", "severity": "medium" },
+    "241": { "message": "Fehlendes Endzeichen", "severity": "medium" },
+
+    "301": { "message": "Negative Wurzel", "severity": "medium" },
+    "302": { "message": "Negativer Logarithmus", "severity": "medium" },
+    "303": { "message": "Null Logarithmus", "severity": "medium" },
+    "304": { "message": "Null Tangens", "severity": "medium" },
+    "305": { "message": "Null Kardinal Sinus", "severity": "medium" },
+    "311": { "message": "Division durch Null", "severity": "medium" },
+    "312": { "message": "Null hoch Null", "severity": "medium" },
+    "313": { "message": "Null hoch negative Zahl", "severity": "medium" }
+  },
+  "it": {
+    "1": { "message": "PROBLEMA DI CONVERSIONE", "severity": "low" },
+    "2": {
+      "message": "LIMITE INFERIORE MAGGIORE DEL LIMITE SUPERIORE",
+      "severity": "low"
+    },
+    "3": {
+      "message": "LIMITE SUPERIORE MINORE DEL LIMITE INFERIORE",
+      "severity": "low"
+    },
+    "101": {
+      "message": "Funzione sconosciuta \n \n Le funzioni conosciute sono: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Numero non valido \n \n Per i valori negativi utilizzare sempre le parentesi: \n sin(-2) => sin((-2)) o -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Carattere sconosciuto \n \n Per i numeri decimali utilizzare '.' invece di ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Variabile sconosciuta \n \n L'unica variabile consentita è x (e y in 3D)",
+      "severity": "medium"
+    },
+    "201": {
+      "message": "Parentesi mancante per la funzione",
+      "severity": "medium"
+    },
+    "211": { "message": "Operazione incompleta", "severity": "medium" },
+    "221": {
+      "message": "Parentesi chiusa prima di essere aperta",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Errore nel numero di parentesi",
+      "severity": "medium"
+    },
+    "231": { "message": "Due numeri reali adiacenti", "severity": "medium" },
+    "241": { "message": "Token di fine mancante", "severity": "medium" },
+
+    "301": { "message": "Radice negativa", "severity": "medium" },
+    "302": { "message": "Logaritmo negativo", "severity": "medium" },
+    "303": { "message": "Logaritmo nullo", "severity": "medium" },
+    "304": { "message": "Tangente nulla", "severity": "medium" },
+    "305": { "message": "Seno cardinale nullo", "severity": "medium" },
+    "311": { "message": "Divisione per zero", "severity": "medium" },
+    "312": { "message": "Zero elevato a zero", "severity": "medium" },
+    "313": {
+      "message": "Zero elevato a un numero negativo",
+      "severity": "medium"
+    }
+  },
+  "pt": {
+    "1": { "message": "PROBLEMA DE CONVERSÃO", "severity": "low" },
+    "2": {
+      "message": "LIMITE INFERIOR MAIOR QUE O LIMITE SUPERIOR",
+      "severity": "low"
+    },
+    "3": {
+      "message": "LIMITE SUPERIOR MENOR QUE O LIMITE INFERIOR",
+      "severity": "low"
+    },
+    "101": {
+      "message": "Função desconhecida \n \n As funções conhecidas são: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Número inválido \n \n Para valores negativos, use sempre parênteses: \n sin(-2) => sin((-2)) ou -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Caractere desconhecido \n \n Para números decimais, use '.' em vez de ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Variável desconhecida \n \n A única variável permitida é x (e y em 3D)",
+      "severity": "medium"
+    },
+    "201": {
+      "message": "Parêntese ausente para a função",
+      "severity": "medium"
+    },
+    "211": { "message": "Operação incompleta", "severity": "medium" },
+    "221": {
+      "message": "Parêntese fechado antes de ser aberto",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Erro no número de parênteses",
+      "severity": "medium"
+    },
+    "231": { "message": "Dois números reais adjacentes", "severity": "medium" },
+    "241": { "message": "Token de fim ausente", "severity": "medium" },
+
+    "301": { "message": "Raiz negativa", "severity": "medium" },
+    "302": { "message": "Logaritmo negativo", "severity": "medium" },
+    "303": { "message": "Logaritmo zero", "severity": "medium" },
+    "304": { "message": "Tangente zero", "severity": "medium" },
+    "305": { "message": "Seno cardinal zero", "severity": "medium" },
+    "311": { "message": "Divisão por zero", "severity": "medium" },
+    "312": { "message": "Zero elevado a zero", "severity": "medium" },
+    "313": {
+      "message": "Zero elevado a um número negativo",
+      "severity": "medium"
+    }
+  },
+  "ru": {
+    "1": { "message": "ПРОБЛЕМА КОНВЕРТАЦИИ", "severity": "low" },
+    "2": { "message": "НИЖНЯЯ ГРАНИЦА БОЛЬШЕ ВЕРХНЕЙ", "severity": "low" },
+    "3": { "message": "ВЕРХНЯЯ ГРАНИЦА МЕНЬШЕ НИЖНЕЙ", "severity": "low" },
+    "101": {
+      "message": "Неизвестная функция \n \n Известные функции: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Неверное число \n \n Для отрицательных значений всегда используйте скобки: \n sin(-2) => sin((-2)) или -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Неизвестный символ \n \n Для десятичных чисел используйте '.' вместо ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Неизвестная переменная \n \n Единственная разрешенная переменная - x (и y в 3D)",
+      "severity": "medium"
+    },
+    "201": {
+      "message": "Отсутствует скобка для функции",
+      "severity": "medium"
+    },
+    "211": { "message": "Неполная операция", "severity": "medium" },
+    "221": {
+      "message": "Закрывающая скобка перед открывающей",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Ошибка в количестве скобок",
+      "severity": "medium"
+    },
+    "231": { "message": "Два соседних числа", "severity": "medium" },
+    "241": { "message": "Отсутствует конечный токен", "severity": "medium" },
+
+    "301": { "message": "Отрицательный корень", "severity": "medium" },
+    "302": { "message": "Отрицательный логарифм", "severity": "medium" },
+    "303": { "message": "Нулевой логарифм", "severity": "medium" },
+    "304": { "message": "Нулевой тангенс", "severity": "medium" },
+    "305": { "message": "Нулевой синус", "severity": "medium" },
+    "311": { "message": "Деление на ноль", "severity": "medium" },
+    "312": { "message": "Ноль в степени ноль", "severity": "medium" },
+    "313": { "message": "Ноль в отрицательной степени", "severity": "medium" }
+  },
+  "uk": {
+    "1": { "message": "ПРОБЛЕМА КОНВЕРТАЦІЇ", "severity": "low" },
+    "2": { "message": "НИЖНЯ МЕЖА БІЛЬША ЗА ВЕРХНЮ", "severity": "low" },
+    "3": { "message": "ВЕРХНЯ МЕЖА МЕНША ЗА НИЖНЮ", "severity": "low" },
+    "101": {
+      "message": "Невідома функція \n \n Відомі функції: \n sin(), cos(), tan(), sqrt(), exp(), log(), abs(), sinc(), entier()",
+      "severity": "high"
+    },
+    "102": {
+      "message": "Невірне число \n \n Для від'ємних значень завжди використовуйте дужки: \n sin(-2) => sin((-2)) або -4 => (-4)",
+      "severity": "medium"
+    },
+    "103": {
+      "message": "Невідомий символ \n \n Для десяткових чисел використовуйте '.' замість ','",
+      "severity": "medium"
+    },
+    "104": {
+      "message": "Невідома змінна \n \n Єдина дозволена змінна - x (та y у 3D)",
+      "severity": "medium"
+    },
+    "201": {
+      "message": "Відсутня дужка для функції",
+      "severity": "medium"
+    },
+    "211": { "message": "Неповна операція", "severity": "medium" },
+    "221": {
+      "message": "Закриваюча дужка перед відкриваючою",
+      "severity": "medium"
+    },
+    "222": {
+      "message": "Помилка у кількості дужок",
+      "severity": "medium"
+    },
+    "231": { "message": "Два сусідніх числа", "severity": "medium" },
+    "241": { "message": "Відсутній кінцевий токен", "severity": "medium" },
+
+    "301": { "message": "Від'ємний корінь", "severity": "medium" },
+    "302": { "message": "Від'ємний логарифм", "severity": "medium" },
+    "303": { "message": "Нульовий логарифм", "severity": "medium" },
+    "304": { "message": "Нульовий тангенс", "severity": "medium" },
+    "305": { "message": "Нульовий синус", "severity": "medium" },
+    "311": { "message": "Ділення на нуль", "severity": "medium" },
+    "312": { "message": "Нуль у степені нуль", "severity": "medium" },
+    "313": { "message": "Нуль у від'ємній степені", "severity": "medium" }
+  }
 }
