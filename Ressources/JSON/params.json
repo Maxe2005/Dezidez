@@ -1,17 +1,4 @@
 {
-    "theme": {
-        "background_color": { "r": 30, "g": 30, "b": 30, "a": 255 }
-    },
-    "buttons": [
-        {
-            "id": "play",
-            "text": "Jouer",
-            "color": { "r": 255, "g": 0, "b": 0, "a": 255 }
-        },
-        {
-            "id": "settings",
-            "text": "Options",
-            "color": { "r": 0, "g": 255, "b": 0, "a": 255 }
-        }
-    ]
+    "defauld_language": "fr"
+    
 }

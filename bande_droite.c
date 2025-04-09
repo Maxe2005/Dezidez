@@ -2,7 +2,9 @@
 
 void init_bande_droite (SDL_Renderer* ren, Bande_droite* bande_droite){
     init_boutton_home(ren, bande_droite);
-    init_boutton_centrer(ren ,bande_droite);
+    if (dimention == _2D){
+        init_boutton_centrer(ren ,bande_droite);
+    }
 }
 
 void init_boutton_home (SDL_Renderer* ren, Bande_droite* bande_droite){
@@ -22,7 +24,7 @@ void init_boutton_home (SDL_Renderer* ren, Bande_droite* bande_droite){
 }
 
 void init_boutton_centrer (SDL_Renderer* ren, Bande_droite* bande_droite){
-    bande_droite->bouton_centrer.label = "Centrer";
+    bande_droite->bouton_centrer.label = get_texte("Bande_droite", "centrer");
     bande_droite->bouton_centrer.is_survolable = 1;
     bande_droite->bouton_centrer.color_text = (SDL_Color){255, 255, 255, 255};
     bande_droite->bouton_centrer.color_base = (SDL_Color){150, 150, 150, 255};
@@ -31,7 +33,7 @@ void init_boutton_centrer (SDL_Renderer* ren, Bande_droite* bande_droite){
     bande_droite->bouton_centrer.font_text = fonts[6];
     bande_droite->bouton_centrer.font_text_hover = fonts[7];
     int width, height;
-    TTF_SizeText(bande_droite->bouton_centrer.font_text, bande_droite->bouton_centrer.label, &width, &height);
+    TTF_SizeUTF8(bande_droite->bouton_centrer.font_text, bande_droite->bouton_centrer.label, &width, &height);
     bande_droite->bouton_centrer.rect.w = width + 30;
     bande_droite->bouton_centrer.rect.h = height + 20;
     bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
@@ -43,12 +45,16 @@ void init_boutton_centrer (SDL_Renderer* ren, Bande_droite* bande_droite){
 
 void resize_bande_droite (Bande_droite* bande_droite){
     bande_droite->bouton_retour.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_retour.rect.w)/2 ;
-    bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
+    if (dimention == _2D){
+        bande_droite->bouton_centrer.rect.x = FEN_X - TAILLE_BANDE_DROITE + (TAILLE_BANDE_DROITE - bande_droite->bouton_centrer.rect.w) / 2;
+    }
 }
 
 void affiche_bande_droite (SDL_Renderer* ren, Bande_droite* bande_droite){
     boxRGBA(ren, FEN_X - TAILLE_BANDE_DROITE, 0, FEN_X, FEN_Y, colors->bande_droite.r, colors->bande_droite.g, colors->bande_droite.b, colors->bande_droite.a);
     renderImageButton(ren, &bande_droite->bouton_retour);
-    renderButton(ren, &bande_droite->bouton_centrer);
+    if (dimention == _2D){
+        renderButton(ren, &bande_droite->bouton_centrer);
+    }
 }
 

@@ -64,7 +64,7 @@
       "name": "Debug Windows",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/test",
+      "program": "${workspaceFolder}/main",
       "args": [],
       "stopAtEntry": false,
       "cwd": "${workspaceFolder}",
@@ -72,7 +72,7 @@
       "externalConsole": false,
       "MIMode": "gdb",
       "miDebuggerPath": "C:/mingw/bin/gdb.exe",
-      "preLaunchTask": "build_windows",
+      //"preLaunchTask": "build_windows",
       "setupCommands": [
         {
           "description": "Enable pretty-printing for gdb",

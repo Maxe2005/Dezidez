@@ -1,10 +1,13 @@
 #ifndef STRUCTURES_H
 #define STRUCTURES_H
 
+#define TAILLE_MAX 100
+#define MAX_DEPTH TAILLE_MAX
+
 //énumération des différents types de lexems existants
 typedef enum
 {
-    REEL, OPERATEUR, FONCTION, ERREUR, FIN, PAR_OUV, PAR_FERM, VARIABLE, BAR_OUV, BAR_FERM, ABSOLU
+    REEL=0, OPERATEUR, FONCTION, ERREUR, FIN, PAR_OUV, PAR_FERM, VARIABLE, BAR_OUV, BAR_FERM, ABSOLU
 } typelexem;
 
 //énumération des diff types d'opérateurs existants
@@ -16,7 +19,7 @@ typedef enum
 //énumération des diff types de fonctions existantes
 typedef enum
 {
-    ABS, SIN, SQRT, LOG, COS, TAN, EXP, ENTIER, VAL_NEG, SINC
+    ABS=0, SIN, SQRT, LOG, COS, TAN, EXP, ENTIER, VAL_NEG, SINC
 } typefonction;
 
 //énumération des diff types de valeurs existantes
@@ -26,7 +29,6 @@ typedef union
     typefonction fonction;
     typeoperateur operateur;
     char variable;
-    //typeerreur erreur;
 } typevaleur;
 
 //énumération des diff types de jetons existants
@@ -44,14 +46,30 @@ typedef struct Node
     struct Node *pjeton_suiv;
 } Node;
 
-typedef Node *Arbre;
-
 typedef enum {
 //ERREUR ANALYSE LEXICAL
 FONCTION_INCONNUE = 101 ,
 NOMBRE_INVALIDE = 102,
 CARACTERE_INCONNUE = 103,
 VARIABLE_INCONNUE = 104,
+
+//ERREUR FONCTION 20X
+PROBLEME_PARENTHESES_FONCTIONS = 201, // cos(.... , cos....., cos.....)
+    
+// ERREUR OPERATEUR 21X
+MEMBRE_VIDE = 211, // ++,**,/*
+//MANQUE_OPERATEUR = 212, // 3+
+
+// ERREUR PARENTHESES 22X
+PARENTHESE_FERMEE_1_ER_JETON = 221 ,// ......
+PROBLEMES_NOMBRE_PARENTHESES = 222, // ((.....), ((()))))))))))
+
+// ERREUR REEL / VARIABLE 23X
+PROBLEME_APRES_REEL_OU_VARIABLE = 231, // 2,3,4
+
+//ERREUR TAILLE 24X
+ABSENCE_FIN = 241, //debut>fin, absence token END
+
 
 //ERREUR FONCTION 30X
 RACINE_NEGATIVE=301, 

@@ -8,12 +8,11 @@
 #define NB_GRAD_MIN 5
 #define NB_GRAD_MAX 20
 #define ZOOM_SPEED 5
-#define TAILLE_GRADUATION_MIN 50
-#define TAILLE_GRADUATION_MAX 100
+#define TAILLE_GRADUATION_MIN 80
+#define TAILLE_GRADUATION_MAX 130
 #define MARGE_EXT_GRAPH 5 // Marge autorisé en dehors du cadre du graph pour avoir des frontières fluides 
 #define NB_EVALUATEUR_MAX 100
-
-extern Message message;
+#define TAILLE_MAX_TEXT_GRAD_X (int)(TAILLE_GRADUATION_MIN / 2)
 
 typedef struct {
     int precision; // Précision des graduations (nombre de chiffres après la virgule)
@@ -114,12 +113,6 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes);
 void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haute, Bande_droite* bande_droite);
 
 /**
- * Change le mode de couleur
- * @param color_mode Le mode de couleur à appliquer
- */
-void change_color_mode (int color_mode);
-
-/**
  * @param renderer Un pointeur sur une structure contenant l'état du rendu
  * @param x La position en x du point
  * @param y La position en y du point
@@ -133,7 +126,7 @@ void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size);
  * @param graph Le graphique à afficher
  * @param fonction La fonction à afficher
  */
-void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction);
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction* fonction);
 
 /**
  * Cherche et trouve le maximum et le minimum de la fonction. Et affecte les valeurs trouvés aux paramètres de la fonction
@@ -186,18 +179,6 @@ void resize_precision_grad (Graph* graph);
  * @param y_souris_px La position en pixel de la souris
  */
 void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px);
-
-/**
- * Actions à effectuer après avoir chager la taille de la bande des entrées
- * @param graph Le graphique à afficher
- * @param bande_haute La bande d'entrées à afficher
- */
-void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute);
-
-/**
- * Initialisation des constantes pour la structure message
- */
-void init_const_message();
 
 /**
  * Gère l'évènement MOUSEBUTTONUP_LEFT quand le graphique est en mode évaluateur

@@ -27,6 +27,12 @@ void ExpressionSansLesEspaces (char *Expression,int SizeExpression,char *buffer)
     memset(buffer, '\0', sizeof(buffer));
 }
 
+void MajtoMin(char *str) {
+    while (*str) {
+        *str = tolower(*str);
+        str++;
+    }
+}
 
 // Fonction qui vérifie si un caractère est dans un tableau de chaînes
 int IsInTab(char *tab, int size, char element) {
@@ -78,6 +84,10 @@ int IsInTab3(char *tab[], int size, char *element) {
 int PlusieursVirgules (char * nombre){
     int compteur = 0;
     int res = 0;
+    if (nombre[0]=='.'){ //cas des nombre ".2591" ou "."
+        res = 1;
+    }
+    
     for (int i = 0; i < strlen(nombre); i++){
         if (nombre[i]== '.'){
             compteur++;
@@ -188,27 +198,38 @@ typejeton TokenOperateur (char *Element){
 }
 
 
-typejeton TokenVariable (char *Element, int *erreur){
-    char *var[] = {"x","y"};
+typejeton TokenVariable (char *Element, int *erreur, int dimension){
+    char *var2[] = {"x","y"};
+    char *var1[] = {"x"};
     typejeton fonct;
-    if (IsInTab2(var,2,Element)){
-        fonct.lexem = VARIABLE;
-        if (ComparaisonString(Element,"y")){
-            fonct.valeur.variable = 'y';
+    if (dimension){
+        if (IsInTab2(var2,2,Element)){
+            fonct.lexem = VARIABLE;
+            if (ComparaisonString(Element,"y")){
+                fonct.valeur.variable = 'y';
+            }
+            else if (ComparaisonString(Element,"x")){
+                fonct.valeur.variable = 'x';
+            }
+        }  
+        else{
+            *erreur = VARIABLE_INCONNUE; 
         }
-        else if (ComparaisonString(Element,"x")){
+    }else {
+        if (IsInTab2(var1,2,Element)){
+            fonct.lexem = VARIABLE;
             fonct.valeur.variable = 'x';
+        } 
+        else{
+            *erreur = VARIABLE_INCONNUE; 
         }
-        
-    }  
-    else{
-        *erreur = VARIABLE_INCONNUE; 
     }
+    
     return fonct;     
 }
 
 
-typejeton TokenReelPositif (char *Element, int* erreur){
+typejeton TokenReel (char *Element, int* erreur){
     typejeton fonct;
     if (PlusieursVirgules(Element)){
         *erreur = NOMBRE_INVALIDE;
@@ -219,32 +240,9 @@ typejeton TokenReelPositif (char *Element, int* erreur){
     return fonct;
 }  
 
-typejeton TokenReelNegatif (char *Element){
-    typejeton fonct;
-    int tailleElement = strlen(Element);
-    char buffer[100];
-    char debug;
-    int i;
-    int j=0;
-    memset(buffer, '\0', sizeof(buffer));
-    
-    //on parcour l'Element pour garder que le nombre
-    for ( i = 0; i < tailleElement; i++){
-        if (Element[i] != '(' && Element[i] != ')' ){
-            buffer[j++]=Element[i];
-            //memset(buffer, '\0', sizeof(buffer));
-        }
-    }
-    fonct.lexem = REEL;
-    fonct.valeur.reel = atof(buffer);
-    return fonct;
-}  
 
-
-
-void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* erreur) {
-    char buffer[TailleMax];
-    char bufferneg[TailleMax];
+void DecompositionToken(char *str, int SizeExpression, typejeton TabToken[TAILLE_MAX],int* erreur,int dimension) {
+    char buffer[TAILLE_MAX];
     char *chiffre[] = {"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "."};
     int lenchiffre = 11;
     char *op[] = {"+","-","*","/","**"};
@@ -272,7 +270,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
         // Traitement des nombres
         if (IsInTab3(chiffre, lenchiffre, buffer) == 1) {
             int longueurdunombre = 0;
-            char reschiffre[TailleMax] = "";
+            char reschiffre[TAILLE_MAX] = "";
 
             // Continue tant que tu trouves des chiffres
             while (i + longueurdunombre < SizeExpression && str[i + longueurdunombre] != '\0') {
@@ -287,11 +285,11 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
                     break;
                 }
             }
-            TabToken[indiceinjection]=TokenReelPositif(reschiffre,erreur);
+            TabToken[indiceinjection]=TokenReel(reschiffre,erreur);
             indiceinjection++;
             i = i + longueurdunombre - 1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit
         }
-        // Traitement des nombres negatifs
+        // Traitement des élément négatif (-x...) 
         else if (str[i]== '(' && str[i+1]=='-' ) { // si on a (- on commence la recher jusqu'a la dernière parenthèse
             int longueurdunombre = 2;
             TabToken[indiceinjection].lexem = FONCTION;
@@ -301,11 +299,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
             indiceinjection++;
             i = i + longueurdunombre -1;  // Ajuste l'index 'i' pour reprendre l'analyse au bon endroit (on fait +1 pour skip la dernière parenthèse déjà traité)
         }
-
-
-
-
-        // Gestion des opérateurs
+        // Gestion des opérateur
 
         else if (IsInTab3(op, lenop, buffer) == 1) {
             if (str[i]=='*' && str[i+1]=='*'){ //cas de la puissance
@@ -330,7 +324,7 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
         //gestion des fonction et variable apparement
         else if (IsInTab3(alphabet, lenalphabet, buffer) == 1) {
             int longueurident = 0;
-            char residentificateur[TailleMax] = "";
+            char residentificateur[TAILLE_MAX] = "";
 
             while (i + longueurident < SizeExpression && str[i + longueurident] != '\0') {
                 strenchainedecarac[0] = str[i + longueurident];
@@ -349,14 +343,14 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
                 indiceinjection++;
                 i = i + longueurident -1 ; 
             } else { //cas d'une variable
-                TabToken[indiceinjection]=TokenVariable(residentificateur, erreur);
+                TabToken[indiceinjection]=TokenVariable(residentificateur, erreur,dimension);
                 indiceinjection++;
                 i = i + longueurident -1; 
             }
             
             
         }
-        else{
+        else{ //cas où notre élément ne correspond à aucune des condition au dessue ==> erreur on ne connais pas ce caractère
             *erreur = CARACTERE_INCONNUE;         
 
         }
@@ -364,12 +358,86 @@ void CutStr(char *str, int SizeExpression, typejeton TabToken[TailleMax],int* er
     TabToken[indiceinjection].lexem = FIN;
 }
 
-void Analyse_Lexicale (typejeton TabToken[TailleMax],char Expression[TailleMax],int* erreur){
+void Analyse_Lexicale (typejeton TabToken[TAILLE_MAX],char Expression[TAILLE_MAX],int* erreur,int  Dimension){
     int tailleExpression = strlen(Expression);
-    char buffert[TailleMax];
+    char buffert[TAILLE_MAX];
     ExpressionSansLesEspaces(Expression,tailleExpression,buffert);//on retire les potentiel espace 
     MultiplicationImplicite(Expression,tailleExpression,buffert);//on rajoute les multiplications dans les cas 2x --> 2*x
     tailleExpression = strlen(Expression);
-    CutStr(Expression,tailleExpression,TabToken,erreur);//transforme l'expression en un tableau de Token 
+    DecompositionToken(Expression,tailleExpression,TabToken,erreur,Dimension);//transforme l'expression en un tableau de Token 
+}
+
+// Fonction pour afficher un jeton unique
+void afficher_jeton(typejeton jeton) {
+    printf("Lexem: ");
+    switch (jeton.lexem) {
+        case REEL:
+            printf("REEL, Valeur: %.2f\n", jeton.valeur.reel);
+            break;
+        case OPERATEUR:
+            printf("OPERATEUR, Type: ");
+            switch (jeton.valeur.operateur) {
+                case PLUS: printf("+\n"); break;
+                case MOINS: printf("-\n"); break;
+                case FOIS: printf("*\n"); break;
+                case DIV: printf("/\n"); break;
+                case PUIS: printf("^\n"); break;
+                default: printf("Inconnu\n"); break;
+            }
+            break;
+        case FONCTION:
+            printf("FONCTION, Type: ");
+            switch (jeton.valeur.fonction) {
+                case ABS: printf("ABS\n"); break;
+                case SIN: printf("SIN\n"); break;
+                case SQRT: printf("SQRT\n"); break;
+                case LOG: printf("LOG\n"); break;
+                case COS: printf("COS\n"); break;
+                case TAN: printf("TAN\n"); break;
+                case EXP: printf("EXP\n"); break;
+                case ENTIER: printf("ENTIER\n"); break;
+                case VAL_NEG: printf("VAL_NEG\n"); break;
+                case SINC: printf("SINC\n"); break;
+                default: printf("Inconnu\n"); break;
+            }
+            break;
+        case VARIABLE:
+            printf("VARIABLE, Nom: %c\n", jeton.valeur.variable);
+            break;
+        case ERREUR:
+            printf("ERREUR rencontrée\n");
+            break;
+        case FIN:
+            printf("FIN de l'analyse\n");
+            break;
+        case PAR_OUV:
+            printf("Parenthese Ouvrante: (\n");
+            break;
+        case PAR_FERM:
+            printf("Parenthese Fermante: )\n");
+            break;
+        case BAR_OUV:
+            printf("Barre Ouvrante: |\n");
+            break;
+        case BAR_FERM:
+            printf("Barre Fermante: |\n");
+            break;
+        case ABSOLU:
+            printf("ABSOLU\n");
+            break;
+        default:
+            printf("Type inconnu\n");
+            break;
+    }
+}
+
+// Fonction pour afficher un tableau de jetons
+void afficher_tableau_jetons(typejeton tableau[], int taille) {
+    printf("=== Affichage du tableau de jetons ===\n");
+    for (int i = 0; i < taille; i++) {
+        printf("Jeton %d: ", i + 1);
+        afficher_jeton(tableau[i]);
+    }
+    printf("======================================\n");
 }
 

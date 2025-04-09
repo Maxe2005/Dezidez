@@ -12,20 +12,17 @@
 #include "cJSON/cJSON.h"
 #include "evaluateur.h"
 #include "Analyse_lexicale.h"
+#include "syntaxe.h"
 
-#define HEADER_HEIGHT 100
-#define BUTTON_WIDTH 200
-#define BUTTON_HEIGHT 50
-#define BUTTON_MARGIN 30
-#define SCROLL_SPEED 30  // Vitesse du scroll
-#define SCROLL_OFFSET_MIN -100
+#define TAILLE_BANDE_DESCRIPTIONS 40 
+#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
+#define TAILLE_BANDE_DROITE 150
 
 #define NB_FONTS 8
 extern TTF_Font* fonts[NB_FONTS];
 
 extern int FEN_X;
 extern int FEN_Y;
-
 
 typedef struct {
     SDL_Color bg;
@@ -44,26 +41,90 @@ typedef struct {
 } Colors;
 extern Colors* colors;
 
+typedef enum {
+    _2D, _3D
+} Dimention;
+extern Dimention dimention;
+
 typedef struct {
     char *message;
     char *severity;
 } ErrorInfo;
 
 typedef enum {
-    FR, EN
+    FR, EN, ES, AL
 } Langue;
 extern Langue langue;
 
 typedef struct {
     cJSON *json_erreurs;
+    cJSON *json_textes;
 } Tous_les_JSON;
 extern Tous_les_JSON tous_les_JSON;
+
+typedef struct {
+    Button button_base;
+    ImageButton boutton_quitter;
+    int temps_affichage; // en secondes
+    bool is_visible;
+    time_t start_time;
+} Message;
+
+typedef enum {
+    LOW, MEDIUM, HIGH, CRITICAL
+} Severity;
+
+typedef struct {
+    WrappedText text;
+    bool is_visible;
+    Severity severity;
+} Probleme;
 
 /**
  * Initialise les différentes polices de caractère avec les tailles correspondantes
  * @param font Le tableau de police vide à remplire
  */
 void init_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Libère la mémoire allouée pour les polices de caractère
+ * @param font Le tableau de police à libérer
+ * @note Il est important de libérer la mémoire allouée pour les polices de caractère
+ *       pour éviter les fuites de mémoire. Cette fonction doit être appelée
+ *       lorsque les polices ne sont plus nécessaires.
+ */
+void free_font (TTF_Font* font[NB_FONTS]);
+
+/**
+ * Initialisation des constantes pour la structure message
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ */
+void init_const_message(SDL_Renderer* ren);
+
+/**
+ * Prépare le message d'erreur à afficher
+ * @param text_erreur message d'erreur affiché
+ * @param endroit_erreur rectangle où l'erreur a été enregestré
+ */
+void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
+
+/**
+ * Prépare le problème à afficher
+ * @param code_erreur Le code d'erreur correspondant au problème à afficher
+ */
+void set_probleme (int code_erreur);
+
+/**
+ * Affiche le message d'erreur des champs des bornes d'entrées s'il y en a un et le message problème s'il y en a un
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ */
+void affiche_avertissements (SDL_Renderer* ren);
+
+/**
+ * Change le mode de couleur
+ * @param color_mode Le mode de couleur à appliquer
+ */
+void change_color_mode (int color_mode);
 
 /**
  * Génère un nombre aléatoire compris entre les valeurs min et max (incluses).
@@ -97,6 +158,19 @@ ErrorInfo get_error_message(int code);
  * Initialise tous les fichiers JSON
  */
 void init_tous_les_json ();
+
+/**
+ * Renvoie le texte correspondant à une entité et un identifiant donnés dans le fichier JSON "textes.json"
+ * @param entitee_name Le nom de l'entité
+ * @param id L'identifiant de l'entité
+ * @return Le texte correspondant à l'entité et l'identifiant donnés
+ */
+char* get_texte (const char* entitee_name, const char* id);
+
+/**
+ * Libère la mémoire allouée pour tous les fichiers JSON
+ */
+void free_tous_les_json ();
 
 #include "color_picker.h"
 

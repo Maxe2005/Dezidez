@@ -5,8 +5,8 @@
 #include "bande_haute.h"
 #include "bande_droite.h"
 #include "grapheur.h"
-
-
+#include "Gestion_3D/gestion_3D_1.h"
+#include "Gestion_3D/gestion_3D_2.h"
 
 /**
  * Gère l'évènement MOUSEWHEEL relatif au graphique
@@ -208,6 +208,13 @@ int handle_event_bande_droite_MOUSEBUTTONUP (SDL_Renderer* ren, SDL_Event event,
 void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph);
 
 /**
+ * Redimentionne tous les éléments de la fenêtre
+ * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
+ */
+void resize_fen_3D (Bande_haute* bande_haute, Bande_droite* bande_droite);
+
+/**
  * Gère tous les évènement par type
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_haute La bande d'entrées affiché
@@ -218,5 +225,16 @@ void resize_fen_2D (Bande_haute* bande_haute, Bande_droite* bande_droite, Graph*
  * @param is_event_backspace_used Permet de séparer (ou hiérarchiser) l'utilisation de la touche backspace pour plusieurs utilisation
  */
 int handle_all_events (SDL_Renderer* ren, Bande_haute* bande_haute, Bande_droite* bande_droite, Graph* graph, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
+
+/**
+ * Gère tous les évènement par type
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param bande_haute La bande d'entrées affiché
+ * @param bande_droite La bande droite affichée
+ * @param x_souris_px La position en abssices actuelle de la souris 
+ * @param y_souris_px La position en ordonnées actuelle de la souris 
+ * @param is_event_backspace_used Permet de séparer (ou hiérarchiser) l'utilisation de la touche backspace pour plusieurs utilisation
+ */
+int handle_all_events_3D (SDL_Renderer* ren, Graph_3D_1* graph_3D_1, Bande_haute* bande_haute, Bande_droite* bande_droite, int* x_souris_px, int* y_souris_px, bool* is_event_backspace_used);
 
 #endif

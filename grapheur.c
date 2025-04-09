@@ -102,9 +102,19 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
         if (abs(x_axis_pos - x) > 3 && x > graph->origine_x && x < graph->origine_x + graph->x) {
             SDL_RenderDrawLine(ren, x, y_axis_pos - 5, x, y_axis_pos + 5);
             // Afficher les valeurs des graduations en x
-            char label[10];
-            snprintf(label, 10, "%.*f", graph->axe_x->precision, graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
-            renderText(ren, (const char*)label, x, y_axis_pos + 2*graph->axe_x->grad_text_size, color_axes, graph->axe_x->font_texte_grad);
+            char label[15];
+            snprintf(label, 15, "%.*f", graph->axe_x->precision, graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
+            int w, h;
+            TTF_SizeUTF8(graph->axe_x->font_texte_grad, label, &w, &h);
+            if (w > TAILLE_MAX_TEXT_GRAD_X){
+                snprintf(label, 15, "%.2g", graph->axe_x->min + fmodf(0-graph->axe_x->min, graph->axe_x->echelle_grad) + i * graph->axe_x->echelle_grad);
+                TTF_SizeUTF8(graph->axe_x->font_texte_grad, label, &w, &h);
+            }
+            if (FEN_Y - y_axis_pos < 4*h){
+                renderText(ren, (const char*)label, x, y_axis_pos - 2*h, color_axes, graph->axe_x->font_texte_grad);
+            } else {
+                renderText(ren, (const char*)label, x, y_axis_pos + 2*h, color_axes, graph->axe_x->font_texte_grad);
+            }
         }
     }
 
@@ -113,26 +123,41 @@ void affiche_axes_graph (SDL_Renderer* ren, Graph* graph, SDL_Color color_axes){
         if (abs(y_axis_pos - y) > 3 && y > graph->origine_y_apres_bande_haut && y < graph->origine_y + graph->y) {
             SDL_RenderDrawLine(ren, x_axis_pos - 5, y, x_axis_pos + 5, y);
             // Afficher les valeurs des graduations en y
-            char label[10];
-            snprintf(label, 10, "%.*f", graph->axe_y->precision, graph->axe_y->max - fmodf(graph->axe_y->max, graph->axe_y->echelle_grad) - i * graph->axe_y->echelle_grad);
-            renderText(ren, (const char*)label, x_axis_pos - (graph->axe_y->precision + 1)*2*graph->axe_x->grad_text_size, y, color_axes, graph->axe_y->font_texte_grad);
+            char label[15];
+            snprintf(label, 15, "%.*f", graph->axe_y->precision, graph->axe_y->max - fmodf(graph->axe_y->max, graph->axe_y->echelle_grad) - i * graph->axe_y->echelle_grad);
+            int w, h;
+            TTF_SizeUTF8(graph->axe_y->font_texte_grad, label, &w, &h);
+            if (w > TAILLE_MAX_TEXT_GRAD_X){
+                snprintf(label, 15, "%.2g", graph->axe_y->max - fmodf(0-graph->axe_y->max, graph->axe_y->echelle_grad) + i * graph->axe_y->echelle_grad);
+                TTF_SizeUTF8(graph->axe_y->font_texte_grad, label, &w, &h);
+            }
+            if (x_axis_pos < w + 4*h){
+                renderText(ren, (const char*)label, x_axis_pos + w/2 + 2*h, y, color_axes, graph->axe_y->font_texte_grad);
+            } else {
+                renderText(ren, (const char*)label, x_axis_pos - w/2 - 2*h, y, color_axes, graph->axe_y->font_texte_grad);
+            }
         }
     }
 }
 
-void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction fonction){
-    if (fonction.borne_sup > graph->axe_x->min && fonction.borne_inf < graph->axe_x->max){
-        SDL_SetRenderDrawColor(ren, fonction.color.r, fonction.color.g, fonction.color.b, fonction.color.a);
+void tracer_fonction (SDL_Renderer* ren, Graph* graph, Fonction* fonction){
+    if (fonction->borne_sup > graph->axe_x->min && fonction->borne_inf < graph->axe_x->max){
+        SDL_SetRenderDrawColor(ren, fonction->color.r, fonction->color.g, fonction->color.b, fonction->color.a);
         int nb_pts = graph->x;
-        float borne_sup = (fonction.borne_sup > graph->axe_x->max) ? graph->axe_x->max : fonction.borne_sup;
-        float borne_inf = (fonction.borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction.borne_inf;;
+        float borne_sup = (fonction->borne_sup > graph->axe_x->max) ? graph->axe_x->max : fonction->borne_sup;
+        float borne_inf = (fonction->borne_inf < graph->axe_x->min) ? graph->axe_x->min : fonction->borne_inf;;
         float step_size = (borne_sup - borne_inf) / nb_pts;
         float x, y_sur_graph, x_sur_graph;
         float fx;
         int code_erreur = 0;
         for (int i = 0; i < nb_pts; i++) {
             x = borne_inf + i * step_size;
-            fx = evaluateur(fonction.fonction_arbre, x, 0, &code_erreur);
+            fx = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
+            if (code_erreur){
+                set_probleme(code_erreur);
+                fonction->is_erreur = true;
+                return;
+            }
             if (fx >= graph->axe_y->min && fx <= graph->axe_y->max){
                 y_sur_graph = graph->origine_y + (graph->axe_y->max - fx) / graph->axe_y->echelle_grad * graph->axe_y->taille_grad;
                 if (y_sur_graph > graph->origine_y_apres_bande_haut){
@@ -171,28 +196,6 @@ Graph init_graph (Fonction* fonction_defaut){
     }
     graph.nombre_evaluateur = 0;
     return graph;
-}
-
-void change_color_mode (int color_mode){
-    if (color_mode == 0){
-        colors->bg = (SDL_Color){255, 255, 255, 255};
-        colors->axes = (SDL_Color){0, 0, 0, 255};
-        colors->texte_axes = (SDL_Color){0, 0, 0, 255};
-    } else {
-        colors->bg = (SDL_Color){0, 0, 0, 255};
-        colors->axes = (SDL_Color){255, 255, 255, 255};
-        colors->texte_axes = (SDL_Color){255, 255, 255, 255};
-    }
-    colors->bande_droite = (SDL_Color){100, 100, 100, 255};
-    colors->bande_haute_expressions = (SDL_Color){200, 200, 200, 255};
-    colors->bande_haute_description = (SDL_Color){150, 150, 150, 255};
-    colors->texte_champ_entree = (SDL_Color){0, 0, 0, 255};
-    colors->texte_descriptifs_bande_haut = (SDL_Color){255, 255, 255, 255};
-    colors->bg_bandes_expression_1 = colors->bande_haute_expressions;
-    colors->bg_bandes_expression_2 = (SDL_Color){150, 150, 150, 255};
-    colors->bande_bas_de_bande_haut = (SDL_Color){200, 200, 200, 255};
-    colors->button_new_expression = (SDL_Color){125, 125, 125, 255};
-    colors->button_new_expression_hover = (SDL_Color){150, 150, 150, 255};
 }
 
 float arrondir_ordre_grandeur(float x) {
@@ -235,7 +238,7 @@ float recherche_meilleur_echelle_grad (float max, float min){
             nb_grad = fabsf(max - min) / echelle_grad_arrondi;
             if (nb_grad >= nb_grad_min && nb_grad <= nb_grad_max) return echelle_grad_arrondi;
             else {
-                printf("nb graduations : %d\n", nb_grad);
+                //printf("nb graduations : %d\n", nb_grad);
                 return echelle_grad;
             }
         } else {
@@ -296,28 +299,22 @@ void affiche_interface (SDL_Renderer* ren, Graph* graph, Bande_haute* bande_haut
     affiche_axes_graph(ren, graph, colors->axes);
 
     for (int i = 0; i < bande_haute->nb_expressions; i++) {
-        if (bande_haute->expressions[i]->fonction.visible && bande_haute->expressions[i]->expression->text[0] != '\0') {
-            tracer_fonction(ren, graph, bande_haute->expressions[i]->fonction);
+        if (bande_haute->expressions[i]->fonction.visible && !bande_haute->expressions[i]->fonction.is_erreur && bande_haute->expressions[i]->expression->text[0] != '\0') {
+            tracer_fonction(ren, graph, &bande_haute->expressions[i]->fonction);
         }
     }
-    affichage_graph_evaluateur(ren,graph);
+    if (bande_haute->expressions[0]->fonction.visible) affichage_graph_evaluateur(ren,graph);
     // Dessiner le bas arrondi de la bande haute
     affiche_bande_arrondis_en_bas(ren, bande_haute->surface.x, bande_haute->surface.y + bande_haute->surface.h - TAILLE_BARRE_BASSE_DE_BANDE_HAUT, bande_haute->surface.x + bande_haute->surface.w, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_bas_de_bande_haut);
     renderImageButton(ren, &bande_haute->button_new_expression.bt);
     // Affichage de la bande droite
     affiche_bande_droite(ren, bande_droite);
-    
-    if (message.is_visible){
-        if (time(NULL) - message.start_time > message.temps_affichage){
-            message.is_visible = 0;
-        } else {
-            renderButton(ren, &message.button_base);
-        }
-    }
 
     for (int j = 0; j < bande_haute->nb_expressions; j++) {
         affiche_interface_color_picker(ren, bande_haute->expressions[j]->color_picker);
     }
+
+    affiche_avertissements(ren);
 }
 
 void draw_thick_point(SDL_Renderer *renderer, int x, int y, int size) {
@@ -334,12 +331,13 @@ void find_min_max(Fonction* fonction, int steps) {
     }
 
     float step_size = (fonction->borne_sup - fonction->borne_inf) / steps;
-    int code_erreur;
+    int code_erreur = 0;
     fonction->fx_min = fonction->fx_max = evaluateur(fonction->fonction_arbre, fonction->borne_inf, 0, &code_erreur); // Initialisation
 
+    float x,y;
     for (int i = 1; i <= steps; i++) {
-        float x = fonction->borne_inf + i * step_size;
-        float y = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
+        x = fonction->borne_inf + i * step_size;
+        y = evaluateur(fonction->fonction_arbre, x, 0, &code_erreur);
 
         if (y < fonction->fx_min) fonction->fx_min = y;
         if (y > fonction->fx_max) fonction->fx_max = y;
@@ -389,25 +387,8 @@ void zoomer (SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px){
     }
 }
 
-void actions_apres_resize_bande_haute (Graph* graph, Bande_haute* bande_haute){
-    graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
-    for (int i = 0; i < bande_haute->nb_expressions; i++) {
-        cacher_expression_si_nessessaire(bande_haute, bande_haute->expressions[i]);
-    }
-    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.15*bande_haute->button_new_expression.bt.rect.h;
-}
-
-void init_const_message(){
-    message.temps_affichage = 5;
-    message.button_base.is_survolable = 0;
-    message.button_base.color_base = (SDL_Color) {255,0,0,255};
-    message.button_base.radius = 15;
-    message.button_base.font_text = fonts[5];
-    message.button_base.color_text = (SDL_Color) {255,255,255,255};
-
-}
-
 void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x_souris_px, int y_souris_px, Bande_haute* bande_haute) {
+    if (!bande_haute->expressions[0]->fonction.visible) return;
     Evaluateur affichage_evaluateur;
     int valeur_pixel_x = x_souris_px;
     float valeur_en_x = ((valeur_pixel_x - graph->centre_x) * graph->axe_x->echelle_grad / graph->axe_x->taille_grad);//+ graph->axe_x->min;
@@ -423,7 +404,7 @@ void ajout_evaluateur_x (SDL_Renderer* ren, SDL_Event event, Graph* graph, int x
         affichage_evaluateur.bouton_evaluateur.label = formatted_string;
         affichage_evaluateur.bouton_evaluateur.font_text = fonts[4];
         int width, height;
-        TTF_SizeText(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
+        TTF_SizeUTF8(affichage_evaluateur.bouton_evaluateur.font_text, affichage_evaluateur.bouton_evaluateur.label, &width, &height);
         affichage_evaluateur.bouton_evaluateur.rect = (SDL_Rect){valeur_pixel_x, valeur_pixel_y, width + 20, height + 15};
         affichage_evaluateur.bouton_evaluateur.color_text = (SDL_Color){255, 255, 255, 255};
         affichage_evaluateur.bouton_evaluateur.color_base = (SDL_Color){150, 150, 150, 255};
@@ -463,21 +444,18 @@ void suppr_evaluateur_x (Graph* graph, int index){
 }
 
 void init_totale_interface_grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
-    colors = malloc(sizeof(Colors));
-    change_color_mode(1);
-
+    dimention = _2D;
     init_bande_droite(ren, gr_ele->bande_droite);
     init_bande_haute(ren, gr_ele->bande_haute);
 
     *gr_ele->graph = init_graph(&gr_ele->bande_haute->expressions[0]->fonction);
     gr_ele->graph->souris_pressee = false;
-    actions_apres_resize_bande_haute(gr_ele->graph, gr_ele->bande_haute);
-
-    init_const_message();
-    message.is_visible = 0;
+    gr_ele->graph->origine_y_apres_bande_haut = gr_ele->bande_haute->surface.y + gr_ele->bande_haute->surface.h;
+    actions_apres_resize_bande_haute(gr_ele->bande_haute);
 }
 
 int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
+    dimention = _2D;
     Graph* graph = gr_ele->graph;
     Bande_haute* bande_haute = gr_ele->bande_haute;
     Bande_droite* bande_droite = gr_ele->bande_droite;
@@ -498,10 +476,12 @@ int Grapheur (SDL_Renderer* ren, Grapheur_elements *gr_ele){
         // Animation de l'agrandissement
         if (bande_haute->expanding && bande_haute->surface.h < TAILLE_BANDE_EXPRESSIONS_MAX) {
             bande_haute->surface.h += (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
-            actions_apres_resize_bande_haute(graph, bande_haute);
+            graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
+            actions_apres_resize_bande_haute(bande_haute);
         } else if (!bande_haute->expanding && bande_haute->surface.h > TAILLE_BANDE_EXPRESSIONS_MIN) {
             bande_haute->surface.h -= (TAILLE_BANDE_EXPRESSIONS_MAX - TAILLE_BANDE_EXPRESSIONS_MIN) / 3;
-            actions_apres_resize_bande_haute(graph, bande_haute);
+            graph->origine_y_apres_bande_haut = bande_haute->surface.y + bande_haute->surface.h;
+            actions_apres_resize_bande_haute(bande_haute);
         }
 
         updateDisplay(ren);

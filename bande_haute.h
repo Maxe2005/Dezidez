@@ -4,13 +4,11 @@
 #include "ressources.h"
 #include "bande_droite.h"
 
-#define TAILLE_BANDE_DESCRIPTIONS 40 
-#define TAILLE_BANDE_HAUT (TAILLE_BANDE_DESCRIPTIONS + 90)
 #define TAILLE_BANDE_EXPRESSIONS_MIN (TAILLE_BANDE_HAUT - TAILLE_BANDE_DESCRIPTIONS)
 #define TAILLE_BANDE_EXPRESSIONS_MAX (TAILLE_BANDE_EXPRESSIONS_MIN + 200)
 #define BANDE_EXPRESSIONS_ON_SCROLL_STEP 20
 #define BANDE_EXPRESSIONS_OFF_SCROLL_STEP 10
-#define MAX_LEN_STR 20
+#define MAX_LEN_STR TAILLE_MAX
 #define MAX_LEN_ENTREES_BORNES 8
 #define NB_ENTREES 3
 #define NB_ELEMENTS_PAR_EXPRESSION 7
@@ -21,8 +19,8 @@
 #define WIDTH_CHAMPS_BORNES 150
 #define WIDTH_CHAMP_EXPRESSION 300
 
-//extern Message message;
-
+extern Message message;
+extern Probleme probleme;
 
 typedef enum { // ! L'ordre est important pour l'initialisation des champs d'entrées. Il doit correspondre à celui de l'initialisation des champs d'entrées et la SELECTION_NULL doit être en dernier
     BORNE_INF,
@@ -32,14 +30,8 @@ typedef enum { // ! L'ordre est important pour l'initialisation des champs d'ent
 } SelectionEntree;
 
 typedef struct {
-    Button button_base;
-    int temps_affichage; // en secondes
-    int is_visible;
-    time_t start_time;
-} Message;
-
-typedef struct {
     char text[MAX_LEN_STR + 1]; // +1 pour le /0 comme fin de chaine
+    char text_backup[MAX_LEN_STR + 1]; // La dernière chaine exécutée fonctionnelle
     char display[MAX_LEN_STR + 2]; // +2 pour le /0 et le curseur
     Button* champs_texte;
     SDL_Rect position_initiale; // Position de l'entrée sans offset. L'offset est appliqué directement dans le bouton <champs_texte>
@@ -50,7 +42,6 @@ typedef struct {
 } Entree_texte;
 
 typedef struct {
-    char fonction_str [MAX_LEN_STR]; // L'expression en chaine de caractère de la fonction
     Node * fonction_arbre; // L'arbre de la fonction
     float borne_inf; // Le minimum de l'intervale de définition choisi
     float borne_sup; // Le maximum de l'intervale de définition choisi
@@ -58,6 +49,7 @@ typedef struct {
     float fx_min; // Le minimum de la fonction sur l'interval choisi
     bool visible; // Pour savoir si la courbe est affichée ou non sur le graph
     SDL_Color color;
+    bool is_erreur;
 } Fonction;
 
 // Un bouton en mouvement
@@ -85,6 +77,8 @@ typedef struct {
     Button_mvt button_delete;
     SDL_Texture* image_button_visible;
     SDL_Texture* image_button_invisible;
+    bool is_moving; // Pour savoir si la bande d'expression est en train d'être déplacée
+    int moving_offset; // Pour savoir de combien la bande d'expression a été déplacée
 } Expression_fonction;
 
 typedef struct {
@@ -114,12 +108,27 @@ typedef struct {
 } Bande_haute;
 
 
+typedef struct {
+    const char* **interval;
+    Node* *arbres;
+    const char* *nom_f;
+    int nb_exemples;
+} Exemples;
+
+
 /**
  * Affiche la bande haute de l'interface
  * @param ren Un pointeur sur une structure contenant l'état du rendu
  * @param bande_haute La bande d'entrées à afficher
  */
 void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
+ * Affiche la bande d'expression
+ * @param ren Un pointeur sur une structure contenant l'état du rendu
+ * @param expression La bande à afficher
+ */
+void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression);
 
 /**
  * Initialise la bande d'entrées
@@ -248,13 +257,6 @@ void resize_bande_haut (Bande_haute* bande_haute);
 int calcul_pos (int tab[NB_ELEMENTS_PAR_EXPRESSION + 1], int espaces, int num_element);
 
 /**
- * Redimmentionne la bande haute en fonction de la taille de la fenêtre et des autres éléments de la fenêtre à l'instant t
- * @param text_erreur message d'erreur affiché
- * @param endroit_erreur rectangle où l'erreur a été enregestré
- */
-void set_message (const char* text_erreur, SDL_Rect endroit_erreur);
-
-/**
  * Permet de nettoyer la mémoire allouée pour une bande d'expression
  * @param expression La bande d'expression à nettoyer
  */
@@ -286,5 +288,50 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
  * @param bande_haute La bande d'entrées dans laquelle ce trouve la bande d'expression
  */
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute);
+
+/**
+ * Actions à effectuer après avoir changé la taille de la bande des entrées
+ * @param bande_haute La bande d'entrées à afficher
+ */
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute);
+
+/**
+ * Génère des exemples de fonctions 2D pour l'utilisateur
+ * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
+ */
+Exemples exemples_fonctions_2D ();
+
+/**
+ * Génère des exemples de fonctions 3D pour l'utilisateur
+ * @return Une structure <Exemples> contenant les intervals, nom et définition des fonctions exemples
+ */
+Exemples exemples_fonctions_3D ();
+
+/**
+ * Gère le mouvement de la bande d'expression
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param expression La bande de l'expression qui bouge
+ * @param motion La valeur du déplacement à effectuer.
+ */
+void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* expression, int motion);
+
+/**
+ * Permet de faire tous les changement néssecaires lorque l'ordre de position d'une bande d'expression est modifiée
+ * @param bande_haute La bande haute qui contient la bande d'expression
+ * @param i L'index de la nouvelle position de la bande d'expression à aclimater (elle doit déjà y avoir été déplacée)
+ * @param diection La direction du changement : 1 si l'index à augmenté, -1 si l'index à diminué. 
+ */
+void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction);
+
+/**
+ * Récupère le texte autour du curseur pour l'afficher dans le champs d'entrée
+ * @param text Le texte d'origine
+ * @param cursor_index La position du curseur dans le texte d'origine
+ * @param font La police utilisée pour le texte
+ * @param output Le texte à afficher dans le champs d'entrée
+ * @param cursor_pos_in_output La position du curseur dans le texte à afficher
+ * @param MAX_DISPLAY_PIXELS La largeur maximum d'affichage
+ */
+void extract_text_around_cursor(const char *text, int cursor_index, TTF_Font *font, char *output, int *cursor_pos_in_output, int MAX_DISPLAY_PIXELS);
 
 #endif

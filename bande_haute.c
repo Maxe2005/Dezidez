@@ -1,7 +1,5 @@
 #include "bande_haute.h"
 
-Message message;
-
 void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_bandes_entrees params){
     // Bande descriptive : bornes inférieure, supérieure et expression
     int num_element_du_premier_champs = 3;
@@ -9,7 +7,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
     bande_haute->texte_descriptif_borne_sup = malloc(sizeof(Button));
     bande_haute->texte_descriptif_expression = malloc(sizeof(Button));
     Button* but[] = {bande_haute->texte_descriptif_borne_inf, bande_haute->texte_descriptif_borne_sup, bande_haute->texte_descriptif_expression};
-    char* noms[] = {"Borne inférieure", "Borne supérieure", "Expression"};
+    char* id[] = {"Borne_inf", "Borne_sup", "expression"};
     int x = calcul_pos(params.width_elements, params.espace_entre_elements, num_element_du_premier_champs);
     for (int j = 0; j < 3; j++){
         but[j]->rect.w = params.width_elements[j+num_element_du_premier_champs];
@@ -18,7 +16,7 @@ void init_placement_bande_descriptive (Bande_haute* bande_haute, Parametres_band
         x += params.width_elements[j+num_element_du_premier_champs] + params.espace_entre_elements;
         but[j]->rect.y = (TAILLE_BANDE_DESCRIPTIONS - but[j]->rect.h)/2 ;
         but[j]->is_survolable = 0;
-        but[j]->label = noms[j];
+        but[j]->label = get_texte("Bande_haute", id[j]);
         but[j]->color_text = colors->texte_descriptifs_bande_haut;
         but[j]->color_base = colors->bande_haute_description;
         but[j]->font_text = fonts[4];
@@ -116,12 +114,13 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
         but[j]->champs_texte->color_hover = but[j]->champs_texte->color_base;
         but[j]->champs_texte->color_hover.a = 150;
         but[j]->champs_texte->font_text = fonts[1];
-        but[j]->champs_texte->font_text_hover = fonts[2];
+        but[j]->champs_texte->font_text_hover = fonts[1];
         but[j]->champs_texte->taille_bonus_hover_x = 0;
         but[j]->champs_texte->taille_bonus_hover_y = 0;
         but[j]->champs_texte->radius = but[j]->position_initiale.h / 3;
         but[j]->cursorVisible = 0;
         strcpy(but[j]->text, "");
+        strcpy(but[j]->text_backup, "");
         but[j]->position_cursor = 0;//strlen(but[j]->text);
         but[j]->lastCursorToggle = SDL_GetTicks();
         expression->champs_entrees[j] = but[j];
@@ -130,6 +129,8 @@ void init_champs_entrees (SDL_Renderer* ren, Expression_fonction* expression, Pa
 
 void init_placement_entrees (SDL_Renderer* ren, Expression_fonction* expression, Parametres_bandes_entrees params, SDL_Rect surface_bande_haut){
     expression->entree_selectionnee = SELECTION_NULL;
+    expression->is_moving = false;
+    expression->moving_offset = 0;
     expression->rect_initial.x = surface_bande_haut.x;
     expression->rect_initial.h = params.height_bande_expression;
     expression->rect_initial.y = surface_bande_haut.y + expression->numero * (expression->rect_initial.h); // pour centrer : (TAILLE_BANDE_HAUT + TAILLE_BANDE_DESCRIPTIONS - but[j]->champs_texte->rect.h)/2 ;
@@ -287,13 +288,17 @@ void charge_valeur_borne_inf (Expression_fonction* expression){
         char *end;
         float test = strtof(expression->borne_inf->text, &end);
         if (*end != '\0') {
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_inf->champs_texte->rect);
+            strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         
         } else if(test > expression->fonction.borne_sup){
-            set_message("BORNE INF SUPERIEUR A BORNE SUP", expression->borne_inf->champs_texte->rect);
+            strcpy(expression->borne_inf->text, expression->borne_inf->text_backup);
+            ErrorInfo error = get_error_message(2);
+            set_message(error.message, expression->borne_inf->champs_texte->rect);
         }
         else {
+            strcpy(expression->borne_inf->text_backup, expression->borne_inf->text);
             expression->fonction.borne_inf = test;
         }
         expression->borne_inf->position_cursor = strlen(expression->borne_inf->text);
@@ -305,13 +310,17 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
         char *end;
         float test = strtof(expression->borne_sup->text, &end);
         if (*end != '\0') {
-            printf("Conversion incomplète, problème à : %s, nb gardé : %f\n", end, test); //TODO : ajouter les messages d'erreur
-            set_message("PROBLEME DE CONVERSION", expression->borne_sup->champs_texte->rect);
-        } 
+            strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
+            ErrorInfo error = get_error_message(1);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
+        }
         else if(expression->fonction.borne_inf > test){
-            set_message("BORNE SUP INFERIEUR A BORNE INF", expression->borne_sup->champs_texte->rect);
+            strcpy(expression->borne_sup->text, expression->borne_sup->text_backup);
+            ErrorInfo error = get_error_message(3);
+            set_message(error.message, expression->borne_sup->champs_texte->rect);
         }
         else {
+            strcpy(expression->borne_sup->text_backup, expression->borne_sup->text);
             expression->fonction.borne_sup = test;
         }
         expression->borne_sup->position_cursor = strlen(expression->borne_sup->text);
@@ -321,10 +330,35 @@ void charge_valeur_borne_sup (Expression_fonction* expression){
 void execute_expression (Expression_fonction* expression){
     if (expression->expression->text[0] != '\0'){
         // TODO : A connecter avec les autres modules
-        typejeton TabToken[TailleMax] = {};
+        typejeton TabToken[TAILLE_MAX+1] = {};
+        int dim;
+        if (dimention == _2D) dim = 0;
+        if (dimention == _3D) dim = 1;
+        else dim = 0;
         int erreur = 0;
-        Analyse_Lexicale(TabToken, expression->expression->text, &erreur);
+        Analyse_Lexicale(TabToken, expression->expression->text, &erreur, dim);
         expression->expression->position_cursor = strlen(expression->expression->text);
+        if (erreur){
+            set_probleme(erreur);
+            expression->fonction.visible = 0;
+            expression->button_visibilite.bt.image = expression->image_button_invisible;
+            return;
+        }
+        typeerreur erreur_2 = 0;
+        Node* arbre = buildSyntaxTree(TabToken, &erreur_2);
+        if (erreur_2){
+            set_probleme((int)erreur_2);
+            expression->fonction.visible = 0;
+            expression->button_visibilite.bt.image = expression->image_button_invisible;
+            return;
+        }
+        if (expression->fonction.fonction_arbre != NULL) {
+            liberer_arbre(expression->fonction.fonction_arbre);
+        }
+        expression->fonction.is_erreur = false;
+        expression->fonction.fonction_arbre = arbre;
+        expression->fonction.visible = 1;
+        expression->button_visibilite.bt.image = expression->image_button_visible;
     }
 }
 
@@ -333,17 +367,6 @@ void execute_champs_select_and_change_focus (Expression_fonction* expression, Se
     if (expression->entree_selectionnee == BORNE_SUP) charge_valeur_borne_sup(expression);
     if (expression->entree_selectionnee == EXPRESSION) execute_expression(expression);
     expression->entree_selectionnee = nouvelle_entree;
-}
-
-void set_message (const char* text_erreur, SDL_Rect endroit_erreur){
-    message.start_time = time(NULL);
-    message.button_base.label = text_erreur;
-    message.is_visible = 1;
-    message.button_base.rect.x = endroit_erreur.x;
-    message.button_base.rect.y = endroit_erreur.y + FEN_Y/16;
-    message.button_base.rect.w = FEN_X/4;
-    message.button_base.rect.h = FEN_Y/16;
-
 }
 
 void placement_pour_affichage_avec_offset (Expression_fonction* expression, int offset){
@@ -376,41 +399,171 @@ void cacher_expression_si_nessessaire (Bande_haute* bande_haute, Expression_fonc
         expression->color_picker->show_picker = 0;
     }
 }
+void extract_text_around_cursor(const char *text, int cursor_index, TTF_Font *font, char *output, int *cursor_pos_in_output, int MAX_DISPLAY_PIXELS) {
+    int len = strlen(text);
+    int start = cursor_index, end = cursor_index;
+    int final_start = cursor_index, final_end = cursor_index;
+
+    char buffer[MAX_LEN_STR];
+    int best_width = 0;
+
+    const char *ellipsis = "...";
+    int ellipsis_width = 0, h = 0;
+    TTF_SizeUTF8(font, ellipsis, &ellipsis_width, &h);
+
+    int reserve_left = 0;
+    int reserve_right = 0;
+
+    // Essayer d'étendre autour du curseur tant que possible
+    while (start > 0 || end < len) {
+        int test_start = start > 0 ? start - 1 : start;
+        int test_end = end < len ? end + 1 : end;
+        int slice_len = test_end - test_start;
+
+        if (slice_len <= 0 || test_start < 0 || test_end > len) break;
+
+        strncpy(buffer, text + test_start, slice_len);
+        buffer[slice_len] = '\0';
+
+        int w = 0;
+        TTF_SizeUTF8(font, buffer, &w, &h);
+
+        int left_cut = test_start > 0;
+        int right_cut = test_end < len;
+
+        int total_reserved = (left_cut ? ellipsis_width : 0) + (right_cut ? ellipsis_width : 0);
+
+        if (w + total_reserved <= MAX_DISPLAY_PIXELS) {
+            final_start = test_start;
+            final_end = test_end;
+            best_width = w;
+
+            reserve_left = left_cut ? ellipsis_width : 0;
+            reserve_right = right_cut ? ellipsis_width : 0;
+
+            start = test_start;
+            end = test_end;
+        } else {
+            break;
+        }
+    }
+
+    // Créer la sous-chaîne visible avec les éventuels "..."
+    char visible[MAX_LEN_STR];
+    int visible_len = final_end - final_start;
+    strncpy(visible, text + final_start, visible_len);
+    visible[visible_len] = '\0';
+
+    int output_pos = 0;
+    output[0] = '\0';
+
+    if (final_start > 0) {
+        strcpy(output, ellipsis);
+        output_pos += strlen(ellipsis);
+    }
+
+    strncpy(output + output_pos, visible, visible_len);
+    output[output_pos + visible_len] = '\0';
+
+    if (final_end < len) {
+        strcat(output, ellipsis);
+    }
+
+    // Calculer la position relative du curseur dans output
+    *cursor_pos_in_output = (final_start > 0 ? strlen(ellipsis) : 0) + (cursor_index - final_start);
+}
+
+void affiche_bande_expression (SDL_Renderer* ren, Expression_fonction* expression){
+    Entree_texte *target_champs = NULL;
+    const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
+    boxRGBA(ren, expression->rect_affiche.x, expression->rect_affiche.y, expression->rect_affiche.x + expression->rect_affiche.w, expression->rect_affiche.y + expression->rect_affiche.h, expression->bg_color.r, expression->bg_color.g, expression->bg_color.b, expression->bg_color.a);
+    for (int i = 0; i < NB_ENTREES; i++) {
+        target_champs = expression->champs_entrees[i];
+        if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
+            target_champs->cursorVisible = !target_champs->cursorVisible;
+            target_champs->lastCursorToggle = SDL_GetTicks();
+        }
+        if (i != expression->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
+            target_champs->champs_texte->label = texte_defaut[i];
+        } else {
+            if (i == 2){
+                int relative_cursor_pos = 0;
+                extract_text_around_cursor(target_champs->text, target_champs->position_cursor, target_champs->champs_texte->font_text, target_champs->display, &relative_cursor_pos, target_champs->champs_texte->rect.w - 2 * target_champs->champs_texte->radius);
+                if (expression->entree_selectionnee == target_champs->type_entree){
+                    if (target_champs->cursorVisible){
+                        insert_char(target_champs->display, relative_cursor_pos, '|');
+                    } else insert_char(target_champs->display, relative_cursor_pos, ' ');
+                }
+            } else {
+                strcpy(target_champs->display, target_champs->text);
+                if (expression->entree_selectionnee == target_champs->type_entree){
+                    if (target_champs->cursorVisible){
+                        insert_char(target_champs->display, target_champs->position_cursor, '|');
+                    } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
+                }
+            }
+            target_champs->champs_texte->label = target_champs->display;
+        }
+        renderButton(ren, target_champs->champs_texte);
+    }
+    affiche_boutton_color_picker(ren, expression->color_picker);
+    renderImageButton(ren, &expression->button_deplacement.bt);
+    renderImageButton(ren, &expression->button_visibilite.bt);
+    renderImageButton(ren, &expression->button_delete.bt);
+}
+
+void moving_bande_expression (Bande_haute* bande_haute, Expression_fonction* expression, int motion){
+    expression->moving_offset += motion;
+    bool is_on = true;
+    if (expression->rect_initial.y - bande_haute->scroll_offset + expression->moving_offset < bande_haute->surface.y){
+        expression->moving_offset = bande_haute->surface.y - expression->rect_initial.y + bande_haute->scroll_offset;
+        is_on = false;
+    }
+    if (expression->rect_initial.y + expression->rect_initial.h - bande_haute->scroll_offset + expression->moving_offset > bande_haute->surface.y + bande_haute->surface.h){
+        expression->moving_offset = bande_haute->surface.y + bande_haute->surface.h - expression->rect_initial.y + bande_haute->scroll_offset - expression->rect_initial.h;
+        is_on = false;
+    }
+    if (expression->numero < bande_haute->nb_expressions-1 && expression->moving_offset > bande_haute->params.height_bande_expression / 2){
+        expression->moving_offset = expression->moving_offset - bande_haute->params.height_bande_expression;
+        int i = expression->numero;
+        bande_haute->expressions[i] = bande_haute->expressions[i+1];
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, -1);
+        placement_pour_affichage_avec_offset(bande_haute->expressions[i], bande_haute->scroll_offset);
+        bande_haute->expressions[i+1] = expression;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i+1, 1);
+    } else if (expression->numero > 0 && 0-expression->moving_offset > bande_haute->params.height_bande_expression / 2){
+        expression->moving_offset = bande_haute->params.height_bande_expression + expression->moving_offset;
+        int i = expression->numero;
+        bande_haute->expressions[i] = bande_haute->expressions[i-1];
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, 1);
+        placement_pour_affichage_avec_offset(bande_haute->expressions[i], bande_haute->scroll_offset);
+        bande_haute->expressions[i-1] = expression;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i-1, -1);
+    }
+    if (!is_on) {
+        //expression->is_moving = false;
+        //placement_pour_affichage_avec_offset(expression, bande_haute->scroll_offset);
+    }
+}
 
 void affiche_bande_haut (SDL_Renderer* ren, Bande_haute* bande_haute){
     // Fond de la bande haute des champs
     affiche_bande_arrondis_en_bas(ren, 0, TAILLE_BANDE_DESCRIPTIONS, FEN_X - TAILLE_BANDE_DROITE, bande_haute->surface.y + bande_haute->surface.h, RAYON_BAS_BANDE_HAUT, colors->bande_haute_expressions);
 
     // Texte affiché (ajoute un curseur clignotant)
-    const char* texte_defaut[] = {"ex: -5", "ex: 5", "ex: sin(x)"};
-    Entree_texte *target_champs = NULL;
+    int num_bande_moving = -1;
     for (int j = 0; j < bande_haute->nb_expressions; j++) {
-        if (bande_haute->expressions[j]->visible) {
-            boxRGBA(ren, bande_haute->expressions[j]->rect_affiche.x, bande_haute->expressions[j]->rect_affiche.y, bande_haute->expressions[j]->rect_affiche.x + bande_haute->expressions[j]->rect_affiche.w, bande_haute->expressions[j]->rect_affiche.y + bande_haute->expressions[j]->rect_affiche.h, bande_haute->expressions[j]->bg_color.r, bande_haute->expressions[j]->bg_color.g, bande_haute->expressions[j]->bg_color.b, bande_haute->expressions[j]->bg_color.a);
-            for (int i = 0; i < NB_ENTREES; i++) {
-                target_champs = bande_haute->expressions[j]->champs_entrees[i];
-                if (SDL_GetTicks() - target_champs->lastCursorToggle >= CURSOR_BLINK_TIME) {
-                    target_champs->cursorVisible = !target_champs->cursorVisible;
-                    target_champs->lastCursorToggle = SDL_GetTicks();
-                }
-                if (i != bande_haute->expressions[j]->entree_selectionnee && strcmp(target_champs->text, "") == 0) {
-                    target_champs->champs_texte->label = texte_defaut[i];
-                } else {
-                    strcpy(target_champs->display, target_champs->text);
-                    if (bande_haute->expressions[j]->entree_selectionnee == target_champs->type_entree){
-                        if (target_champs->cursorVisible){
-                            insert_char(target_champs->display, target_champs->position_cursor, '|');
-                        } else insert_char(target_champs->display, target_champs->position_cursor, ' ');
-                    }
-                    target_champs->champs_texte->label = target_champs->display;
-                }
-                renderButton(ren, target_champs->champs_texte);
-            }
-            affiche_boutton_color_picker(ren, bande_haute->expressions[j]->color_picker);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_deplacement.bt);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_visibilite.bt);
-            renderImageButton(ren, &bande_haute->expressions[j]->button_delete.bt);
+        if (bande_haute->expressions[j]->is_moving){
+            num_bande_moving = j;
+            boxRGBA(ren, bande_haute->expressions[j]->rect_initial.x, bande_haute->expressions[j]->rect_initial.y - bande_haute->scroll_offset, bande_haute->expressions[j]->rect_initial.x + bande_haute->expressions[j]->rect_initial.w, bande_haute->expressions[j]->rect_initial.y - bande_haute->scroll_offset + bande_haute->expressions[j]->rect_initial.h, 
+                        170, 85, 85, 150);
+        } else if (bande_haute->expressions[j]->visible) {
+            affiche_bande_expression(ren, bande_haute->expressions[j]);
         }
+    }
+    if (num_bande_moving > -1){
+        placement_pour_affichage_avec_offset(bande_haute->expressions[num_bande_moving], bande_haute->scroll_offset - bande_haute->expressions[num_bande_moving]->moving_offset);
+        affiche_bande_expression(ren, bande_haute->expressions[num_bande_moving]);
     }
 
     // Fond de la bande haute des descriptions
@@ -437,39 +590,97 @@ void free_bande_expression (Expression_fonction* expression){
     free(expression);
 }
 
+void aclimater_une_bande_expression_a_sa_nouvelle_position (Bande_haute* bande_haute, int i, int direction){
+    bande_haute->expressions[i]->numero = i;
+    if (bande_haute->expressions[i]->numero % 2 == 0){
+        bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_1;
+        bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_2;
+    } else {
+        bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_2;
+        bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_1;
+    }
+    bande_haute->expressions[i]->rect_initial.y += direction * bande_haute->params.height_bande_expression;
+    for (int j = 0; j < 3; j++) {
+        bande_haute->expressions[i]->champs_entrees[j]->position_initiale.y += direction * bande_haute->params.height_bande_expression;
+        
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base = bande_haute->expressions[i]->bg_color_oppo;
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover = bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base;
+        bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover.a = 150;
+    }
+    bande_haute->expressions[i]->color_picker->boutton_y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_deplacement.rect_base.y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_visibilite.rect_base.y += direction * bande_haute->params.height_bande_expression;
+    bande_haute->expressions[i]->button_delete.rect_base.y += direction * bande_haute->params.height_bande_expression;
+
+    bande_haute->expressions[i]->button_deplacement.bt.color_base = bande_haute->expressions[i]->bg_color;
+    bande_haute->expressions[i]->button_visibilite.bt.color_base = bande_haute->expressions[i]->bg_color;
+    bande_haute->expressions[i]->button_visibilite.bt.color_hover = bande_haute->expressions[i]->bg_color_oppo;
+    bande_haute->expressions[i]->button_delete.bt.color_base = bande_haute->expressions[i]->bg_color;
+}
+
 void suppr_bande_expression (Bande_haute* bande_haute, int num_expression){
     free_bande_expression(bande_haute->expressions[num_expression]);
     for (int i = num_expression; i < bande_haute->nb_expressions - 1; i++) {
         bande_haute->expressions[i] = bande_haute->expressions[i+1];
-        bande_haute->expressions[i]->numero = i;
-        if (bande_haute->expressions[i]->numero % 2 == 0){
-            bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_1;
-            bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_2;
-        } else {
-            bande_haute->expressions[i]->bg_color = colors->bg_bandes_expression_2;
-            bande_haute->expressions[i]->bg_color_oppo = colors->bg_bandes_expression_1;
-        }
-        bande_haute->expressions[i]->rect_initial.y -= bande_haute->params.height_bande_expression;
-        for (int j = 0; j < 3; j++) {
-            bande_haute->expressions[i]->champs_entrees[j]->position_initiale.y -= bande_haute->params.height_bande_expression;
-            
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base = bande_haute->expressions[i]->bg_color_oppo;
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover = bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_base;
-            bande_haute->expressions[i]->champs_entrees[j]->champs_texte->color_hover.a = 150;
-        }
-        bande_haute->expressions[i]->color_picker->boutton_y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_deplacement.rect_base.y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_visibilite.rect_base.y -= bande_haute->params.height_bande_expression;
-        bande_haute->expressions[i]->button_delete.rect_base.y -= bande_haute->params.height_bande_expression;
-
-        bande_haute->expressions[i]->button_deplacement.bt.color_base = bande_haute->expressions[i]->bg_color;
-        bande_haute->expressions[i]->button_visibilite.bt.color_base = bande_haute->expressions[i]->bg_color;
-        bande_haute->expressions[i]->button_visibilite.bt.color_hover = bande_haute->expressions[i]->bg_color_oppo;
-        bande_haute->expressions[i]->button_delete.bt.color_base = bande_haute->expressions[i]->bg_color;
+        aclimater_une_bande_expression_a_sa_nouvelle_position(bande_haute, i, -1);
     }
     bande_haute->nb_expressions--;
     action_apres_modif_offset(bande_haute);
 }
+
+Exemples exemples_fonctions_2D (){
+    Exemples ex;
+    ex.nb_exemples = 5;
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+
+    int i = -1;
+    ex.nom_f[++i] = "x";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "sin(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "cos(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "exp(x)";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "2-x";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    return ex;
+}
+
+Exemples exemples_fonctions_3D (){
+    Exemples ex;
+    ex.nb_exemples = 2;
+    ex.nom_f = malloc(sizeof(const char*) * ex.nb_exemples);
+    ex.interval = malloc(sizeof(const char**) * ex.nb_exemples);
+    for (int i = 0; i < ex.nb_exemples; i++) {
+        ex.interval[i] = malloc(sizeof(const char*) * 2);
+    }
+    
+    int i = -1;
+    ex.nom_f[++i] = "sin(sqrt(x*x + y*y))";
+    ex.interval[i][0] = "-5";
+    ex.interval[i][1] = "5";
+
+    ex.nom_f[++i] = "x*x + y*y";
+    ex.interval[i][0] = "-2";
+    ex.interval[i][1] = "2";
+
+    return ex;
+}  
 
 void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     if (bande_haute->nb_expressions >= NB_EXPRESSIONS_MAX) return; // TODO : message d'erreur
@@ -478,52 +689,28 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.visible = true;
     init_placement_entrees(ren, bande_haute->expressions[bande_haute->nb_expressions], bande_haute->params, bande_haute->surface);
     
-    const char* nom_f[] = {"sin(x)", "cos(x)", "exp(x)", "x", "2-x"};
-    typejeton x;
-    x.lexem=VARIABLE;
-    x.valeur.variable='x';
-    //Soustraction
-    typejeton Soustraction;
-    Soustraction.lexem=OPERATEUR;
-    Soustraction.valeur.operateur=MOINS;
-    // Sinus
-    typejeton Sinus;
-    Sinus.lexem=FONCTION;
-    Sinus.valeur.fonction=SIN;
-    // Cosinus
-    typejeton Cosinus;
-    Cosinus.lexem=FONCTION;
-    Cosinus.valeur.fonction=COS;
-    // Exp
-    typejeton Exp;
-    Exp.lexem=FONCTION;
-    Exp.valeur.fonction=EXP;
-    //Deux
-    typejeton Deux;
-    Deux.lexem=REEL;
-    Deux.valeur.reel=2;
-    Node* DEUX_ARBRE = malloc(sizeof(Node));
-    *DEUX_ARBRE = creation_arbre(Deux,NULL,NULL);
-    Node* X_ARBRE = malloc(sizeof(Node));
-    *X_ARBRE = creation_arbre(x,NULL,NULL);
-    Node* COSINUS_ARBRE = malloc(sizeof(Node));
-    *COSINUS_ARBRE = creation_arbre(Cosinus,X_ARBRE,NULL);
-    Node* SOMME_ARBRE = malloc(sizeof(Node));
-    *SOMME_ARBRE = creation_arbre(Soustraction,DEUX_ARBRE,X_ARBRE);
-    Node* EXP_ARBRE = malloc(sizeof(Node));
-    *EXP_ARBRE = creation_arbre(Exp,X_ARBRE,NULL);
-    Node* SIN_ARBRE = malloc(sizeof(Node));
-    *SIN_ARBRE = creation_arbre(Sinus,X_ARBRE,NULL);
-    Node* arbres[] = {SIN_ARBRE, COSINUS_ARBRE, EXP_ARBRE, X_ARBRE, SOMME_ARBRE};
-    const char* interval[][2] = {{"-4", "4"}, {"5", "10"}, {"-7", "-3"}, {"0.2", "3.5"}, {"-1e1", "2e-1"}};
+    Exemples exemples;
+    if (dimention == _2D){
+        exemples = exemples_fonctions_2D();
+    } else if (dimention == _3D){
+        exemples = exemples_fonctions_3D();
+    }
+
+
     bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = malloc(sizeof(Node));
-    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = arbres[bande_haute->nb_expressions % 5];
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % 5]);
-    int a = nb_alea(0,4);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, interval[a][0]);
-    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, interval[a][1]);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = NULL;
+    //bande_haute->expressions[bande_haute->nb_expressions]->fonction.fonction_arbre = exemples.arbres[bande_haute->nb_expressions % exemples.nb_exemples];
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->expression->text, exemples.nom_f[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][0]);
+    strcpy(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, exemples.interval[bande_haute->expressions[bande_haute->nb_expressions]->numero % exemples.nb_exemples][1]);
+    char *end;
+    float test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text, &end);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_inf = test - 2;
+    test = strtof(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text, &end);
+    bande_haute->expressions[bande_haute->nb_expressions]->fonction.borne_sup = test + 2;
     charge_valeur_borne_inf(bande_haute->expressions[bande_haute->nb_expressions]);
     charge_valeur_borne_sup(bande_haute->expressions[bande_haute->nb_expressions]);
+    execute_expression(bande_haute->expressions[bande_haute->nb_expressions]);
     bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->borne_inf->text);
     bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->borne_sup->text);
     bande_haute->expressions[bande_haute->nb_expressions]->expression->position_cursor = strlen(bande_haute->expressions[bande_haute->nb_expressions]->expression->text);
@@ -532,4 +719,9 @@ void ajout_bande_expression (SDL_Renderer* ren, Bande_haute* bande_haute){
     action_apres_modif_offset(bande_haute);
 }
 
-
+void actions_apres_resize_bande_haute (Bande_haute* bande_haute){
+    for (int i = 0; i < bande_haute->nb_expressions; i++) {
+        cacher_expression_si_nessessaire(bande_haute, bande_haute->expressions[i]);
+    }
+    bande_haute->button_new_expression.bt.rect.y = bande_haute->surface.y + bande_haute->surface.h - 1.15*bande_haute->button_new_expression.bt.rect.h;
+}

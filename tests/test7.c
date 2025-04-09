@@ -18,7 +18,7 @@ typedef struct {
 } Camera;
 
 Camera camera = {
-    .position = {0, 0, -5},
+    .position = {0, 0, 10},
     .rotation = {0, 0, 0},
     .renderCenter = {0, 0, 0}
 };
@@ -187,7 +187,7 @@ void render(SDL_Renderer* renderer) {
     
     for (int i = 0; i < 4; i++) {
         SDL_RenderDrawLine(renderer, screenX[i], screenY[i],
-                          screenX[(i+1)%4], screenY[(i+1)%4]);
+                            screenX[(i+1)%4], screenY[(i+1)%4]);
     }
     
     SDL_RenderPresent(renderer);
