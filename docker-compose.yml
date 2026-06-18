@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  dezidez:
+    build: .
+    container_name: dezidez_app
+    network_mode: host # Permet une communication directe (souvent nécessaire pour X11)
+    environment:
+      - DISPLAY=${DISPLAY} # Transmet ton écran actuel au conteneur
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:ro # Partage le socket X11 pour l'affichage graphique
+      - /dev/dri:/dev/dri:ro             # Accélération matérielle (optionnel mais recommandé pour la 3D/SDL2)
+    ipc: host # Permet le partage de mémoire pour de meilleures performances graphiques
